@@ -10,7 +10,7 @@ export function interactionShakeFrames(rest=0){
 }
 
 // One shared clock prevents independent objects from starting together.
-export function createInteractionCascade({items,onStart=()=>{},onEnd=()=>{},eligible=()=>true,interval=3}={}){
+export function createInteractionCascade({items,onStart=()=>{},onEnd=()=>{},eligible=()=>true,interval=5}={}){
  let current=null,index=0,nextAt=interval,lastTime=0;
  function stop(){if(current)onEnd(current.item);current=null;}
  function interrupt(time=lastTime){stop();nextAt=time+interval;}

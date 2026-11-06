@@ -159,9 +159,7 @@ export function createNewRoom(T){
   const surfaces=[];
   object.traverse(mesh=>{if(!mesh.isMesh)return;action(mesh,id,label);const clone=mat=>{const copy=mat.clone();rememberPropAppearance(copy);resources.push(copy);surfaces.push(copy);return copy;};mesh.material=Array.isArray(mesh.material)?mesh.material.map(clone):clone(mesh.material);});
   object.updateWorldMatrix(true,true);
-  const bounds=new T.Box3().setFromObject(object),cue=box('Interaction cue · '+id,(bounds.min.x+bounds.max.x)/2,bounds.max.y+.026,(bounds.min.z+bounds.max.z)/2,.009,.009,.009,material('#ffb547'),interactive);
-  cue.rotation.z=Math.PI/4;cue.userData.interactionCue=true;action(cue,id,label);
-  discoveries.set(id,{object,surfaces,restY:object.position.y,restZ:object.rotation.z,lift,cue,cueScale:cue.scale.clone()});
+  discoveries.set(id,{object,surfaces,restY:object.position.y,restZ:object.rotation.z,lift});
  }
  discovery('bible',bibleObject,'Bíblia · examinar em 3D · NTLH');
  discovery('pokedex',pokedex,'Pokédex · segurar e girar');
@@ -180,12 +178,11 @@ export function createNewRoom(T){
   }
  }
  function updateInteractionCues(time,reduced=false){
-  lastCueTime=time;let index=0;
+  lastCueTime=time;
   for(const [key,item]of discoveries){
-   const manual=key===highlighted,active=manual||key===automatic,pulse=reduced?1:1+Math.sin(time*2.6+index++)*.12,shake=active?interactionShake(time-(manual?focusStarted:automaticStarted),reduced):0;
-   item.cue.scale.copy(item.cueScale).multiplyScalar((active?1.65:1)*pulse);item.cue.rotation.z=Math.PI/4+shake;
-   item.cue.visible=!['notebook','discman'].includes(key)||!item.object.userData.drawerOpen;
-   if(item.lift>0||key.startsWith('poster-')){const rotation=item.restZ+shake;if(item.object.rotation.z!==rotation){item.object.rotation.z=rotation;T.invalidateShadows?.();}}
+   const manual=key===highlighted,active=manual||key===automatic,shake=active?interactionShake(time-(manual?focusStarted:automaticStarted),reduced):0;
+   const strength=item.lift>0||key.startsWith('poster-')?1:item.object.userData.drawerOpen?0:.25;
+   const rotation=item.restZ+shake*strength;if(item.object.rotation.z!==rotation){item.object.rotation.z=rotation;T.invalidateShadows?.();}
   }
  }
  for(let i=0;i<3;i++){
@@ -345,6 +342,7 @@ export function createNewRoom(T){
  }
  let drawerSequence=0;
  function setDrawerOpen(open,reduced=false,callbacks={}){
+  drawer.userData.drawerOpen=open;
   const sequence=++drawerSequence,current=()=>sequence===drawerSequence;
   if(!T.animate||reduced){drawer.position.z=open?-.51:-.743;drawerNotebook.position.set(0,open?.115:0,open?.065:0);if(open){callbacks.opened?.();callbacks.ready?.();}return;}
   if(open){
@@ -358,6 +356,7 @@ export function createNewRoom(T){
  }
  let musicSequence=0;
  function setDiscmanOpen(open,reduced=false,callbacks={}){
+  musicDrawer.userData.drawerOpen=open;
   const seq=++musicSequence;
   const ready=()=>{if(seq!==musicSequence)return;callbacks.opened?.();if(T.animate&&!reduced)T.animate(discman.root.position,{y:.1,duration:.38,overwrite:true,onComplete:()=>{if(seq===musicSequence)callbacks.ready?.();}});else{discman.root.position.y=.1;callbacks.ready?.();}};
   if(T.animate&&!reduced)T.animate(musicDrawer.position,{z:open?-.51:-.743,duration:.7,ease:'power3.inOut',overwrite:true,onComplete:open?ready:undefined});else{musicDrawer.position.z=open?-.51:-.743;if(open)ready();}

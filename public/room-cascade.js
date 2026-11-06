@@ -13,6 +13,7 @@ export function createRoomCascade(T,{doc=document}={}){
  };
  const cascade=createInteractionCascade({items,
   eligible(item){
+   if(item.root.userData.drawerOpen)return false;
    if(item.cart&&(carts.busy||item.cart===carts.inserted))return false;
    if(item.key===room?.focused||item.key===equipment.focused)return false;
    item.root.updateWorldMatrix(true,true);
