@@ -1,4 +1,5 @@
 import {createDiscman} from "./discman.js?v=cs-mode-3";
+import {interactionShake} from './interaction-motion.js?v=cs-mode-3';
 import {createFamilyFrame} from "./family-frame.js?v=cs-mode-3";
 import {createImportedProp,rememberPropAppearance,restorePropAppearance} from "./imported-props.js?v=cs-mode-3";
 // Novo Quarto 3D — original geometry and textures inspired by André's room reference.
@@ -140,7 +141,7 @@ export function createNewRoom(T){
  box('Family frame foot',0,-.13,-.06,.075,.02,.08,endWood,frame);
  }
  // Pick the visible geometry itself, as with the game cartridges.
- const discoveries=new Map(),posterModels=new Map();let highlighted=null;
+ const discoveries=new Map(),posterModels=new Map();let highlighted=null,focusStarted=0,lastCueTime=0;
  function poster(id,name,image,x,y,z,width,rotation=[0,0,0]){
   if(!image)return;
   const map=new CanvasTexture(image);map.colorSpace=SRGB;map.anisotropy=Math.max(1,Math.min(16,T.maxAnisotropy??8));map.generateMipmaps=true;resources.push(map);
@@ -168,12 +169,10 @@ export function createNewRoom(T){
  discovery('notebook',drawer,'Abrir gaveta: caderno de jogos',0);
  discovery('discman',musicDrawer,'Abrir segunda gaveta: Discman',0);
  function highlight(id,reduced=false){
-  if(id===highlighted)return;highlighted=id;
+  if(id===highlighted)return;highlighted=id;focusStarted=lastCueTime;
   for(const [key,item] of discoveries){
    const active=key===id,y=item.restY+(active?item.lift:0);
    if(T.animate&&!reduced)T.animate(item.object.position,{y,duration:.2,ease:'power2.out',overwrite:'auto'});else item.object.position.y=y;
-   if(T.animate&&!reduced&&active&&item.lift)T.animate(item.object.rotation,{keyframes:[{z:item.restZ+.035,duration:.08},{z:item.restZ-.025,duration:.1},{z:item.restZ+.012,duration:.1},{z:item.restZ,duration:.1}],overwrite:'auto'});
-   else if(T.animate&&!reduced)T.animate(item.object.rotation,{z:item.restZ,duration:.12,overwrite:'auto'});else item.object.rotation.z=item.restZ;
    for(const mat of item.surfaces){
     if(!mat.emissive)continue;if(active){mat.emissive.set('#ffb547');mat.emissiveIntensity=0;}else restorePropAppearance(mat);const intensity=active?.16:(mat.userData.roomAppearance?.intensity??0);
     if(T.animate&&!reduced)T.animate(mat,{emissiveIntensity:intensity,duration:.2,overwrite:'auto'});else mat.emissiveIntensity=intensity;
@@ -181,7 +180,13 @@ export function createNewRoom(T){
   }
  }
  function updateInteractionCues(time,reduced=false){
-  let index=0;for(const [key,item]of discoveries){const active=key===highlighted,pulse=reduced?1:1+Math.sin(time*2.6+index++)*.12;item.cue.scale.copy(item.cueScale).multiplyScalar((active?1.65:1)*pulse);item.cue.visible=!['notebook','discman'].includes(key)||!item.object.userData.drawerOpen;}
+  lastCueTime=time;let index=0;
+  for(const [key,item]of discoveries){
+   const active=key===highlighted,pulse=reduced?1:1+Math.sin(time*2.6+index++)*.12,shake=active?interactionShake(time-focusStarted,reduced):0;
+   item.cue.scale.copy(item.cueScale).multiplyScalar((active?1.65:1)*pulse);item.cue.rotation.z=Math.PI/4+shake;
+   item.cue.visible=!['notebook','discman'].includes(key)||!item.object.userData.drawerOpen;
+   if(item.lift>0||key.startsWith('poster-')){const rotation=item.restZ+shake;if(item.object.rotation.z!==rotation){item.object.rotation.z=rotation;T.invalidateShadows?.();}}
+  }
  }
  for(let i=0;i<3;i++){
   box('Wardrobe center drawer',wx,.24+i*.155,-.736,.33,.142,.028,oak);

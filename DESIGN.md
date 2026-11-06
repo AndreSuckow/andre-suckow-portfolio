@@ -14,6 +14,8 @@ O portfólio atual de André Luis Suckow apresenta Customer Success, onboarding,
 
 ## Conteúdo e interação
 
+Os objetos clicáveis compartilham a chacoalhada das empresas do mapa: seno amortecido de 420 ms e amplitude máxima de 0,035 rad, definido em `public/interaction-motion.js`. Bíblia, Pokédex, porta-retrato, tabuleiro, pôsteres e fitas usam essa base ao receber destaque; TV e console usam amplitudes menores, sem deslocamento. Gavetas mantêm sua rotação e destacam o marcador. A animação ocorre uma vez por mudança de foco, volta à rotação original, preserva escalas e desaparece com movimento reduzido. A inserção de cartuchos continua podendo cancelar a animação da fita.
+
 Na Dama, as pedras usam a geometria original de “Pedra (Jogo de Damas)”, de Guilherme Tognetti. Um material independente em branco cria a segunda equipe; o material preto e o arquivo original permanecem preservados. Um único canvas transparente, com renderização sob demanda e o Three.js compartilhado do quarto, acompanha as casas HTML acessíveis. Promoção empilha duas pedras e mantém a indicação D. Falha de WebGL ou do asset conserva as peças HTML e as regras existentes. O modelo é carregado somente ao escolher Dama; não há loop de animação contínua.
 
 Os quatro pôsteres 3D preservam as imagens na resolução original e usam anisotropia até 16, limitada pela GPU, com mipmaps. A impressão fica 1 mm à frente do suporte e usa deslocamento de profundidade para evitar a disputa de superfícies durante a rolagem. O material da arte é opaco, escreve/testa profundidade e preserva as cores sem sombras projetadas sobre a impressão; paredes e objetos continuam ocluindo os pôsteres. O verso de papel e a inspeção 3D são preservados.

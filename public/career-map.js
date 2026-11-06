@@ -1,3 +1,4 @@
+import {interactionShake} from './interaction-motion.js?v=cs-mode-3';
 // Movement uses the game's clock, so pause freezes the two-second journey.
 export function createCareerJourney(stations,{duration=2,roadX=-1.02}={}){
  let current=0,trip=null,position=[...stations[0]],heading=0;
@@ -130,7 +131,7 @@ export function createCareerMap(T,companies,assets){
  return {
   get current(){return journey.current;},get moving(){return journey.moving;},walkTo(index,time){return journey.walkTo(index,time);},update(time){return journey.update(time);},
   draw(ctx,rect,focused,time,reduced){
-   syncArt();focused=Math.max(0,Math.min(companies.length-1,focused));if(focused!==previousFocused){previousFocused=focused;focusStarted=time;}buildings.forEach((building,index)=>{const active=index===focused,elapsed=time-focusStarted;building.position.y=.065+(active?.035:0);building.rotation.z=active&&!reduced&&elapsed<.42?Math.sin(elapsed*42)*.035*(1-elapsed/.42):0;});
+   syncArt();focused=Math.max(0,Math.min(companies.length-1,focused));if(focused!==previousFocused){previousFocused=focused;focusStarted=time;}buildings.forEach((building,index)=>{const active=index===focused,elapsed=time-focusStarted;building.position.y=.065+(active?.035:0);building.rotation.z=active?interactionShake(elapsed,reduced):0;});
    const [x,z]=journey.position,walking=journey.moving,step=walking&&!reduced?Math.sin(time*15)*.55:0;
    avatar.position.set(x,walking&&!reduced?Math.abs(Math.sin(time*15))*.018:0,z);avatar.rotation.y=walking?journey.heading:Math.atan2(1.4,12);
    leftLeg.rotation.x=step;rightLeg.rotation.x=-step;leftArm.rotation.x=-step*.7;rightArm.rotation.x=step*.7;
