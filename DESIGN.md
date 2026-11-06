@@ -1,5 +1,9 @@
 # Direção visual do portfólio
 
+## Mobile 2D
+
+O retrato e a certificação de Sobre formam um bloco centralizado, com largura máxima de 280 px e imagem quadrada. A navegação mostra os seis destinos sem rolagem horizontal: três colunas na vertical e seis na horizontal ampla. As habilidades usam uma coluna, nomes em Inter e alvos de pelo menos 48 px. Ações iniciais e de apresentação ficam empilhadas; cartões e campos preservam a largura disponível. Espaçamentos menores liberam área de leitura e cabeçalhos dos modais permanecem acessíveis durante a rolagem. As regras em `public/custom.css` são restritas ao modo 2D e ao breakpoint mobile compartilhado com o CRT; desktop e cena 3D preservam suas regras.
+
 O portfólio atual de André Luis Suckow apresenta Customer Success, onboarding, implantação, adoção e retenção. A assinatura é o quarto 3D com TV de tubo; a versão 2D mantém o mesmo conteúdo e os mesmos contatos.
 
 ## Fontes e tokens
