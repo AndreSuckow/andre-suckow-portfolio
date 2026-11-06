@@ -240,6 +240,7 @@ export function createNewRoom(T){
  bed('Window bed',.99,.54,false);
  // A physical four-game board rests on the floor and leans beside the bed.
  const board=new Group();board.name='Four-game wooden board';interactive.add(board);board.position.set(-.29,.21,1.86);board.rotation.set(-.38,-.28,.025);
+ let importedBoard=null;
  box('Board wooden back',0,0,0,.42,.42,.026,material('#785231'),board);
  const boardMap=texture((c,w,h)=>{
   c.fillStyle='#b58b51';c.fillRect(0,0,w,h);const cell=w*.76/8,start=w*.12;
@@ -250,6 +251,11 @@ export function createNewRoom(T){
  plane('Four game board surface',0,0,.014,.404,.404,material('#ffffff',boardMap),[0,0,0],board);
  for(const x of [-.205,.205])box('Board side rim',x,0,.02,.014,.42,.016,material('#9b6c3f'),board);
  for(const y of [-.205,.205])box('Board top bottom rim',0,y,.02,.42,.014,.016,material('#9b6c3f'),board);
+ if(T.boardScene){
+  const removed=[];T.boardScene.traverse(mesh=>{if(!mesh.isMesh)return;let belongs=false;for(let node=mesh;node;node=node.parent)if(/^Board[ _]Baked$/.test(node.name))belongs=true;if(!belongs)removed.push(mesh);});for(const mesh of removed)mesh.removeFromParent();
+  importedBoard=createImportedProp(T,T.boardScene,{id:'board',name:'Supplied Ludo wooden board · Ahmad Taj',span:.42,rotation:[Math.PI/2,0,0]});
+  [...board.children].forEach(child=>child.removeFromParent());board.add(importedBoard.root);
+ }
  board.updateWorldMatrix(true,true);board.position.y-=new T.Box3().setFromObject(board).min.y;
  discovery('board',board,'Tabuleiro · clique para escolher um jogo',.022);
  box('Bedside bench',.19,.24,1.65,.58,.065,.25,darkOak);
@@ -348,5 +354,5 @@ export function createNewRoom(T){
   if(T.animate&&!reduced)T.animate(musicDrawer.position,{z:open?-.51:-.743,duration:.7,ease:'power3.inOut',overwrite:true,onComplete:open?ready:undefined});else{musicDrawer.position.z=open?-.51:-.743;if(open)ready();}
   if(!open){if(T.animate&&!reduced)T.animate(discman.root.position,{y:discmanRestY,duration:.2,overwrite:true});else discman.root.position.y=discmanRestY;}
  }
- return {root,targets:[...new Set(targets)],highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
+ return {root,targets:[...new Set(targets)],highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedBoard?.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
 }

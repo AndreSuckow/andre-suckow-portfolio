@@ -97,7 +97,7 @@ test('model loading installs the decoder and falls back independently without hi
  const models=await loadRoomModels({Loader,decoder,baseURL:'https://example.com/portfolio/model-loader.js',warn:(...args)=>warnings.push(args)});
  assert.equal(models.bibleScene.userData.assetVariant,'original');assert(models.bibleScene.url.includes('/portfolio/models/holy_bible/scene.gltf?v='));
  for(const key of ['familyFrameScene','pokedexScene','discmanScene'])assert.equal(models[key].userData.assetVariant,'optimized');
- assert.equal(requests.length,5);assert.equal(warnings.length,1);assert.equal(roomModels.length,4);
+ assert.equal(requests.length,6);assert.equal(warnings.length,1);assert.equal(roomModels.length,5);
 });
 
 test('procedural room avoids downloading the inactive classic assets',()=>{
