@@ -395,3 +395,6 @@ html[data-mode="2d"] .game-nav{display:none}
 
 /* Mobile always uses a clear TV image, including landscape phones. */
 @media (max-width:767px), (pointer:coarse) and (max-height:600px){[data-toggle="crt"]{display:none!important}}
+
+/* Faded opening links must never intercept the 3D scene. */
+html[data-mode="3d"] .hero[inert] .interactive,html[data-mode="3d"] .hero[inert] .interactive *{pointer-events:none!important}

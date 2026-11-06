@@ -101,3 +101,5 @@ Foto aprovada para o site: `public/img/teste-retrato.png`, foto fornecida por An
 No celular, o efeito CRT fica desativado e seu botão não aparece, tanto na vertical quanto na horizontal. O motor e o CSS compartilham o critério de largura até 767 px ou toque com altura até 600 px. Mudanças de orientação/tamanho atualizam o estado; a preferência do desktop é preservada e restaurada ao sair dessa condição.
 
 A curvatura CRT mantém as bordas da imagem dentro dos limites do vidro, evitando recortes e cunhas escuras nos cantos. O shader e a transformação de coordenadas do ponteiro usam a mesma deformação com bordas fixas; a curvatura suave do interior, scanlines e demais efeitos permanecem disponíveis no desktop.
+
+Na abertura 3D, o início do fade torna a seção `.hero` inerte: os links deixam de receber cliques, toque e foco, sem interromper a animação visual. A interação volta ao retornar ao início ou escolher o modo 2D. Se o foco estava na abertura ao desaparecer, ele retorna ao canvas da cena.
