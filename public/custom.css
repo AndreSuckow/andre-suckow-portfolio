@@ -402,3 +402,6 @@ html[data-mode="3d"] .hero[inert] .interactive,html[data-mode="3d"] .hero[inert]
 .room-interaction-hint{display:none;position:fixed;right:20px;bottom:18px;z-index:25;margin:0;padding:8px 12px;border:1px solid #ffb54760;background:#10172ad9;color:#ffcd7b;font:12px/1.5 Inter,sans-serif;pointer-events:none}
 html[data-mode="3d"]:not([data-tv-menu="visible"]) .room-interaction-hint,html[data-mode="3d"][data-chapter="projetos"] .room-interaction-hint{display:block}
 @media(max-width:800px){.room-interaction-hint{right:10px;bottom:8px;max-width:180px;font-size:10px}}
+
+/* Game entry points are omitted from the mobile 2D portfolio. */
+@media (max-width:767px), (pointer:coarse) and (max-height:600px){html[data-mode="2d"] .poster-gallery{display:none!important}}

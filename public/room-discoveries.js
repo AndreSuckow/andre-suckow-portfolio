@@ -1,3 +1,4 @@
+import "./game-access.js?v=cs-mode-3";
 import "./discman-player.js?v=cs-mode-3";
 const dialog=document.getElementById('games-notebook');
 const posterGames=JSON.parse(document.getElementById('poster-games')?.textContent||'[]');
