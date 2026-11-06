@@ -143,10 +143,14 @@ export function createNewRoom(T){
  const discoveries=new Map(),posterModels=new Map();let highlighted=null;
  function poster(id,name,image,x,y,z,width,rotation=[0,0,0]){
   if(!image)return;
-  const map=new CanvasTexture(image);map.colorSpace=SRGB;map.anisotropy=4;resources.push(map);
+  const map=new CanvasTexture(image);map.colorSpace=SRGB;map.anisotropy=Math.max(1,Math.min(16,T.maxAnisotropy??8));map.generateMipmaps=true;resources.push(map);
   const height=width*image.height/image.width,group=new Group();group.name=name;
   box(name+' paper',0,0,0,width,height,.003,material('#ede3cd'),group);
-  plane(name+' artwork',0,0,.0016,width,height,material('#ffffff',map),[0,0,0],group);
+  // Keep the printed face clear of the backing's .0015m front plane.
+  // The old .0001m gap lost depth precision while the camera moved.
+  const ink=new T.BasicMaterial({color:'#ffffff',map,transparent:false,opacity:1,depthTest:true,depthWrite:true,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});resources.push(ink);
+  const artwork=plane(name+' artwork',0,0,.0025,width,height,ink,[0,0,0],group);
+  artwork.receiveShadow=false;artwork.castShadow=false;artwork.userData.posterArtwork=true;
   group.position.set(x,y,z);group.rotation.set(...rotation);interactive.add(group);
   discovery(id,group,name+' · examinar em 3D',0);posterModels.set(id,group);
  }

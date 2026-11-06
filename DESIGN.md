@@ -14,6 +14,8 @@ O portfólio atual de André Luis Suckow apresenta Customer Success, onboarding,
 
 ## Conteúdo e interação
 
+Os quatro pôsteres 3D preservam as imagens na resolução original e usam anisotropia até 16, limitada pela GPU, com mipmaps. A impressão fica 1 mm à frente do suporte e usa deslocamento de profundidade para evitar a disputa de superfícies durante a rolagem. O material da arte é opaco, escreve/testa profundidade e preserva as cores sem sombras projetadas sobre a impressão; paredes e objetos continuam ocluindo os pôsteres. O verso de papel e a inspeção 3D são preservados.
+
 O pôster de Mega Man X usa a imagem fornecida em `public/img/megamanx.webp` no lugar do Twisted Metal, na parede lateral em x=1.589, y=1.47, z=.62. Mantém largura de .32 e altura derivada da proporção original, sem recorte.
 
 A certificação “SEBRAE – Customer Success: Como conquistar e manter clientes” aparece como uma conquista especial em Skills. No 2D, um cartão âmbar com medalha original em pixel art abre a apresentação do curso. Na TV, a conquista Sebrae recebe contorno âmbar e a ação “Abrir conquista”, acessível também pelo controle. Ambos usam o mesmo diálogo das habilidades, com foco, Escape e suspensão da navegação compartilhados. O curso e o nome vêm do currículo; a apresentação é uma recompensa visual do portfólio, sem imitar um certificado oficial nem acrescentar datas, carga horária ou código de validação.
