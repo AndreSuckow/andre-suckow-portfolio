@@ -141,7 +141,7 @@ export function createNewRoom(T){
  box('Family frame foot',0,-.13,-.06,.075,.02,.08,endWood,frame);
  }
  // Pick the visible geometry itself, as with the game cartridges.
- const discoveries=new Map(),posterModels=new Map();let highlighted=null,focusStarted=0,lastCueTime=0;
+ const discoveries=new Map(),posterModels=new Map();let highlighted=null,focusStarted=0,lastCueTime=0,automatic=null,automaticStarted=0;
  function poster(id,name,image,x,y,z,width,rotation=[0,0,0]){
   if(!image)return;
   const map=new CanvasTexture(image);map.colorSpace=SRGB;map.anisotropy=Math.max(1,Math.min(16,T.maxAnisotropy??8));map.generateMipmaps=true;resources.push(map);
@@ -182,7 +182,7 @@ export function createNewRoom(T){
  function updateInteractionCues(time,reduced=false){
   lastCueTime=time;let index=0;
   for(const [key,item]of discoveries){
-   const active=key===highlighted,pulse=reduced?1:1+Math.sin(time*2.6+index++)*.12,shake=active?interactionShake(time-focusStarted,reduced):0;
+   const manual=key===highlighted,active=manual||key===automatic,pulse=reduced?1:1+Math.sin(time*2.6+index++)*.12,shake=active?interactionShake(time-(manual?focusStarted:automaticStarted),reduced):0;
    item.cue.scale.copy(item.cueScale).multiplyScalar((active?1.65:1)*pulse);item.cue.rotation.z=Math.PI/4+shake;
    item.cue.visible=!['notebook','discman'].includes(key)||!item.object.userData.drawerOpen;
    if(item.lift>0||key.startsWith('poster-')){const rotation=item.restZ+shake;if(item.object.rotation.z!==rotation){item.object.rotation.z=rotation;T.invalidateShadows?.();}}
@@ -363,5 +363,5 @@ export function createNewRoom(T){
   if(T.animate&&!reduced)T.animate(musicDrawer.position,{z:open?-.51:-.743,duration:.7,ease:'power3.inOut',overwrite:true,onComplete:open?ready:undefined});else{musicDrawer.position.z=open?-.51:-.743;if(open)ready();}
   if(!open){if(T.animate&&!reduced)T.animate(discman.root.position,{y:discmanRestY,duration:.2,overwrite:true});else discman.root.position.y=discmanRestY;}
  }
- return {root,targets:[...new Set(targets)],highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedBoard?.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
+ return {root,targets:[...new Set(targets)],get focused(){return highlighted;},interactionObjects(){return [...discoveries].map(([key,item])=>({key,root:item.object}));},automaticHighlight(id,time=lastCueTime){automatic=id;automaticStarted=time;},highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedBoard?.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
 }
