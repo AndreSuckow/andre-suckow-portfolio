@@ -2,6 +2,8 @@
 
 ## Mobile 2D
 
+Movimento: `public/mobile-motion.js` oferece fades de entrada/saída nos blocos ao rolar, com duração de 460/220 ms; o fundo do quarto se desloca mais lentamente na abertura. Os efeitos só atuam no 2D mobile, usam transform/opacity e são removidos com movimento reduzido ou troca de modo. Elementos focados ficam imediatamente visíveis. As fitas dos estudos de caso giram por arraste horizontal, botão Girar fita e setas do teclado; o gesto vertical continua rolando a página e arrastar não abre a ficha. Restaurar retorna à frente; rotação manual continua disponível sem transição com movimento reduzido. Nenhum modelo extra é carregado.
+
 O retrato e a certificação de Sobre formam um bloco centralizado, com largura máxima de 280 px e imagem quadrada. A navegação mostra os seis destinos sem rolagem horizontal: três colunas na vertical e seis na horizontal ampla. As habilidades usam uma coluna, nomes em Inter e alvos de pelo menos 48 px. Ações iniciais e de apresentação ficam empilhadas; cartões e campos preservam a largura disponível. Espaçamentos menores liberam área de leitura e cabeçalhos dos modais permanecem acessíveis durante a rolagem. As regras em `public/custom.css` são restritas ao modo 2D e ao breakpoint mobile compartilhado com o CRT; desktop e cena 3D preservam suas regras.
 
 O portfólio atual de André Luis Suckow apresenta Customer Success, onboarding, implantação, adoção e retenção. A assinatura é o quarto 3D com TV de tubo; a versão 2D mantém o mesmo conteúdo e os mesmos contatos.
