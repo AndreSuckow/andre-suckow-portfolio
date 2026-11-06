@@ -247,8 +247,8 @@ export function createNewRoom(T){
  }
  bed('Front plaid bed',-.91,1.05,true);
  bed('Window bed',.99,.54,false);
- // A physical four-game board rests on the floor and leans beside the bed.
- const board=new Group();board.name='Four-game wooden board';interactive.add(board);board.position.set(-.29,.21,1.86);board.rotation.set(-.38,-.28,.025);
+ // Lay the board face up on the clear middle of the green plaid bed.
+ const board=new Group();board.name='Four-game wooden board';interactive.add(board);board.position.set(-.91,0,1.25);board.rotation.set(-Math.PI/2,0,-.08);
  let importedBoard=null;
  box('Board wooden back',0,0,0,.42,.42,.026,material('#785231'),board);
  const boardMap=texture((c,w,h)=>{
@@ -265,7 +265,7 @@ export function createNewRoom(T){
   importedBoard=createImportedProp(T,T.boardScene,{id:'board',name:'Supplied Ludo wooden board · Ahmad Taj',span:.42,rotation:[Math.PI/2,0,0]});
   [...board.children].forEach(child=>child.removeFromParent());board.add(importedBoard.root);
  }
- board.updateWorldMatrix(true,true);board.position.y-=new T.Box3().setFromObject(board).min.y;
+ board.updateWorldMatrix(true,true);board.position.y+=.49-new T.Box3().setFromObject(board).min.y;
  discovery('board',board,'Tabuleiro · clique para escolher um jogo',.022);
  box('Bedside bench',.19,.24,1.65,.58,.065,.25,darkOak);
  for(const x of [-.02,.4])for(const z of [1.57,1.73])box('Bench leg',x,.12,z,.035,.24,.035,oak);
