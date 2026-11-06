@@ -112,7 +112,7 @@ function render(){
   const choices=dialog.querySelector('[data-ludo-moves]');choices.replaceChildren();
   for(const action of actions){const button=document.createElement('button');button.type='button';button.className='btn';button.dataset.ludoPawn=action.pawn;button.textContent=`Mover peça ${action.pawn+1}`;choices.append(button);}
  }
- const history=dialog.querySelector('[data-board-history]');history.replaceChildren();for(const move of state.history){const li=document.createElement('li');li.textContent=move;history.append(li);}
+ const history=dialog.querySelector('[data-board-history]');history.closest('details').hidden=kind!=='xadrez';history.replaceChildren();for(const move of state.history){const li=document.createElement('li');li.textContent=move;history.append(li);}
  const routes=dialog.querySelector('[data-route-choices]');routes.replaceChildren();routeChoices.forEach((move,i)=>{const button=document.createElement('button');button.type='button';button.className='btn';button.dataset.route=i;button.textContent=[move.from,...move.path].map(square).join(' → ');routes.append(button);});
  scheduleComputer();
 }

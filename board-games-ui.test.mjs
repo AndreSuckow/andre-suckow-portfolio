@@ -15,11 +15,14 @@ test('board modal selects all four games, validates interactions, preserves sess
   click('[data-board-game="trilha"]');assert.equal(dialog.querySelectorAll('.morris-board .board-cell').length,24);click('[data-cell="0"]');assert.match(dialog.querySelector('[data-board-turn]').textContent,/Pretas/);
   click('[data-board-action="menu"]');click('[data-board-game="damas"]');assert.equal(dialog.querySelectorAll('.board-disc').length,24);click('[data-cell="40"]');assert(dialog.querySelector('[data-cell="33"]').classList.contains('legal'));click('[data-cell="33"]');assert.equal(dialog.querySelectorAll('[data-board-history] li').length,1);
   const checkerCanvas=dialog.querySelector('.checker-model-canvas');assert(checkerCanvas);assert.equal(checkerCanvas.getAttribute('aria-hidden'),'true');assert(checkerRequests.length>=3);assert(checkerRequests.every(request=>request.canvas===checkerCanvas&&request.board.length===64));assert.equal(checkerRequests.at(-1).board[33],1);assert(!dialog.querySelector('[data-checker-credit]').hidden);
+  assert.equal(dialog.querySelector('[data-board-history]').closest('details').hidden,true,'Dama does not show move history');
   click('[data-board-action="restart"]');assert(!dialog.querySelector('[data-reset-confirm]').hidden);click('[data-board-action="cancel-reset"]');assert.equal(dialog.querySelectorAll('[data-board-history] li').length,1);
   click('[data-board-action="restart"]');click('[data-board-action="confirm-reset"]');assert.equal(dialog.querySelectorAll('[data-board-history] li').length,0);
   click('[data-board-action="menu"]');click('[data-board-game="xadrez"]');assert.equal(dialog.querySelectorAll('.chess-piece').length,32);click('[data-cell="52"]');click('[data-cell="36"]');assert.equal(dialog.querySelector('[data-board-history] li').textContent,'e4');assert(!dialog.querySelector('[data-promotion-label]').hidden);
-  click('[data-board-action="menu"]');click('[data-board-game="ludo"]');assert.equal(dialog.querySelectorAll('.ludo-pawn').length,16);click('[data-board-action="roll"]');assert(dialog.querySelector('[data-board-history] li'));
+  assert.equal(dialog.querySelector('[data-board-history]').closest('details').hidden,false,'Xadrez preserves its visible move history');
+  click('[data-board-action="menu"]');click('[data-board-game="ludo"]');assert.equal(dialog.querySelectorAll('.ludo-pawn').length,16);click('[data-board-action="roll"]');assert(dialog.querySelector('[data-board-history] li'));assert.equal(dialog.querySelector('[data-board-history]').closest('details').hidden,true,'Ludo does not show move history');
   click('[data-board-action="menu"]');click('[data-board-game="trilha"]');assert.equal(dialog.querySelectorAll('[data-board-history] li').length,1,'Switching games keeps the existing session');
+  assert.equal(dialog.querySelector('[data-board-history]').closest('details').hidden,true,'Trilha does not show move history');
   click('[data-board-action="close"]');assert(!dialog.open);assert.equal(d.body.style.overflow,'clip');assert.equal(d.activeElement,trigger);
  }finally{globalThis.document=oldDocument;globalThis.CustomEvent=oldCustomEvent;dom.window.close();}
 });
