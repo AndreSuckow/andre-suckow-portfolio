@@ -392,3 +392,6 @@ html[data-mode="2d"] .game-nav{display:none}
 }
 @media(max-width:540px){.poster-actions .btn{width:100%}}
 @media(max-width:700px){.poster-game__toolbar{flex-wrap:wrap;gap:8px}.poster-game__toolbar strong{min-width:45%;font-size:13px}.poster-game__toolbar>div{width:100%}.poster-game__toolbar .btn{font-size:12px;padding:8px}.poster-actions{bottom:16px}.poster-actions p{font-size:12px}}
+
+/* Mobile always uses a clear TV image, including landscape phones. */
+@media (max-width:767px), (pointer:coarse) and (max-height:600px){[data-toggle="crt"]{display:none!important}}
