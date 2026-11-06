@@ -28,13 +28,16 @@ export function damaActions(board,turn){
   }
  });return moves;
 }
+export function damaBoardAfter(board,move){
+ const next=[...board];next[move.from]=0;for(const at of move.captures)next[at]=0;next[move.to]=move.piece;return next;
+}
 export function createDamas(){
  const state={kind:'damas',board:Array.from({length:64},(_,i)=>{const[x,y]=xy(i);return (x+y)%2===1?(y<3?-1:y>4?1:0):0;}),turn:1,winner:null,draw:null,history:[]},seen=new Map();
  const legalActions=()=>state.winner===null&&!state.draw?damaActions(state.board,state.turn):[];
  seen.set(JSON.stringify([state.board,state.turn]),1);
  return {state,legalActions,
   play(action){const move=legalActions().find(a=>a.from===action.from&&a.to===action.to&&JSON.stringify(a.path)===JSON.stringify(action.path));if(!move)return {ok:false,message:'Jogada inválida. A maior sequência de captura é obrigatória quando disponível.'};
-   state.board[move.from]=0;for(const at of move.captures)state.board[at]=0;state.board[move.to]=move.piece;
+   state.board=damaBoardAfter(state.board,move);
    const square=i=>String.fromCharCode(97+i%8)+(8-Math.floor(i/8));state.history.push(`${state.turn===1?'Brancas':'Pretas'}: ${[move.from,...move.path].map(square).join(' → ')}${move.captures.length?` · ${move.captures.length} captura(s)`:''}`);
    state.turn*=-1;if(!legalActions().length)state.winner=-state.turn;
    const key=JSON.stringify([state.board,state.turn]);seen.set(key,(seen.get(key)||0)+1);if(seen.get(key)>=3)state.draw='Repetição tripla da posição';return {ok:true};

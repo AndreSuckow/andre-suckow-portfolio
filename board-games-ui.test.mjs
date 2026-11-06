@@ -23,3 +23,24 @@ test('board modal selects all four games, validates interactions, preserves sess
   click('[data-board-action="close"]');assert(!dialog.open);assert.equal(d.body.style.overflow,'clip');assert.equal(d.activeElement,trigger);
  }finally{globalThis.document=oldDocument;globalThis.CustomEvent=oldCustomEvent;dom.window.close();}
 });
+
+test('Dama keeps human turns and computer replies safely cancel on menu or opponent changes',async()=>{
+ const dom=new JSDOM('<button id="trigger">Tabuleiro</button><canvas id="stage-canvas"></canvas>',{url:'http://localhost/',pretendToBeVisual:true}),w=dom.window,d=w.document,oldDocument=globalThis.document,oldEvent=globalThis.CustomEvent;
+ globalThis.document=d;globalThis.CustomEvent=w.CustomEvent;
+ w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','')};w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');this.dispatchEvent(new w.Event('close'))};
+ let dialog;
+ try{
+  const {openBoardGames}=await import('./public/board-games/ui.js?opponent-ui');openBoardGames();dialog=d.getElementById('board-games-dialog');
+  const click=selector=>dialog.querySelector(selector).click(),count=()=>dialog.querySelectorAll('[data-board-history] li').length;
+  const mode=value=>{const select=dialog.querySelector('[data-damas-mode]');select.value=value;select.dispatchEvent(new w.Event('change',{bubbles:true}))};
+  click('[data-board-game="damas"]');click('[data-cell="40"]');click('[data-cell="33"]');assert.equal(count(),1);
+  await new Promise(r=>setTimeout(r,450));assert.equal(count(),1,'human mode never moves automatically');
+  mode('computer');assert([...dialog.querySelectorAll('.board-cell')].every(b=>b.disabled));assert.match(dialog.querySelector('[data-board-status]').textContent,/pensando/);
+  for(let i=0;i<150&&count()<2;i++)await new Promise(r=>setTimeout(r,20));assert.equal(count(),2);assert.match(dialog.querySelector('[data-board-turn]').textContent,/Brancas/);
+  mode('human');assert.equal(count(),2,'changing opponent keeps the current position');
+  const {damaActions}=await import('./public/board-games/damas.js');const board=[...dialog.querySelectorAll('.board-cell')].map(cell=>{const p=cell.querySelector('.board-disc');return p?(p.classList.contains('disc-white')?1:-1)*(p.textContent==='D'?2:1):0}),move=damaActions(board,1)[0];
+  click(`[data-cell="${move.from}"]`);click(`[data-cell="${move.to}"]`);assert.equal(count(),3);
+  mode('computer');click('[data-board-action="menu"]');await new Promise(r=>setTimeout(r,500));assert.equal(count(),3,'leaving cancels the queued reply');
+  click('[data-board-game="damas"]');mode('human');await new Promise(r=>setTimeout(r,500));assert.equal(count(),3,'switching to human cancels the reply');assert.match(dialog.querySelector('[data-board-turn]').textContent,/Pretas/);
+ }finally{if(dialog?.open)dialog.close();globalThis.document=oldDocument;globalThis.CustomEvent=oldEvent;dom.window.close();}
+});

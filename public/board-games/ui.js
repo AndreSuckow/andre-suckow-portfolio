@@ -2,6 +2,8 @@ import {createTrilha,MORRIS_POINTS,MORRIS_EDGES} from './trilha.js?v=cs-mode-3';
 import {createDamas} from './damas.js?v=cs-mode-3';
 import {createLudo,LUDO_COLORS,LUDO_SAFE,LUDO_TRACK,LUDO_HOMES,ludoPoint} from './ludo.js?v=cs-mode-3';
 import {createXadrez} from './xadrez.js?v=cs-mode-3';
+import {createDamaOpponent} from './damas-opponent.js?v=cs-mode-3';
+import {snapshotTrilhaAction,animateTrilhaAction} from './trilha-motion.js?v=cs-mode-3';
 
 const names={trilha:'Trilha',damas:'Dama',ludo:'Ludo',xadrez:'Xadrez'};
 const descriptions={trilha:'Forme linhas de três e capture as peças adversárias.',damas:'Capture pelas diagonais e transforme suas peças em damas.',ludo:'Lance o dado e leve suas quatro peças até a chegada.',xadrez:'Proteja seu rei e encontre o xeque-mate.'};
@@ -11,23 +13,40 @@ const square=i=>String.fromCharCode(97+i%8)+(8-Math.floor(i/8));
 let dialog,game,kind,selected=null,routeChoices=[],previousFocus,previousOverflow='',ludoPlayers=4;
 const sessions=new Map();
 let checkerCanvas;
+const computer=createDamaOpponent();
+let damasMode='human',trilhaMotion=null,computerFocus=null;
+function computerTurn(){return kind==='damas'&&damasMode==='computer'&&game?.state.turn===-1&&game.state.winner===null&&!game.state.draw;}
+function cancelComputer(){computer.cancel();computerFocus=null;}
+function scheduleComputer(){
+ if(!computerTurn()||!dialog.open||document.hidden||!dialog.querySelector('[data-reset-confirm]').hidden||computer.pending)return;
+ const session=game,revision=game.state.history.length;
+ computer.request(game.state.board,-1,move=>{
+  if(!dialog.open||kind!=='damas'||game!==session||game.state.history.length!==revision||!computerTurn())return;
+  const restore=document.activeElement===dialog.querySelector('[data-board-status]'),focus=computerFocus;computerFocus=null;
+  if(move)play(move);else message('O computador não tem jogadas disponíveis.');
+  if(restore&&focus!==null)dialog.querySelector(`[data-cell="${focus}"]`)?.focus({preventScroll:true});
+ });
+}
 function makeGame(type){return ({trilha:createTrilha,damas:createDamas,xadrez:createXadrez,ludo:()=>createLudo({players:ludoPlayers})})[type]();}
 function turnName(state){return state.kind==='ludo'?LUDO_COLORS[state.turn]:state.turn===1?'Brancas':'Pretas';}
 function ensureDialog(){
  if(dialog)return;
  dialog=document.createElement('dialog');dialog.className='dialog board-game-dialog';dialog.id='board-games-dialog';dialog.setAttribute('aria-labelledby','board-games-title');dialog.setAttribute('data-lenis-prevent','');
- dialog.innerHTML=`<div class="board-game-shell"><header class="board-game-header"><div><p class="eyebrow">Ao lado da cama · Jogos de tabuleiro</p><h2 id="board-games-title">Escolha um jogo</h2></div><button type="button" class="btn" data-board-action="close" aria-label="Fechar jogos de tabuleiro">Fechar</button></header><section data-board-picker><p>Joguem neste aparelho, alternando os turnos. As partidas ficam guardadas enquanto esta página estiver aberta.</p><div class="board-game-picker">${Object.entries(names).map(([id,name])=>`<button type="button" data-board-game="${id}"><strong>${name}</strong><span>${descriptions[id]}</span></button>`).join('')}</div><label class="board-player-count">Jogadores no Ludo <select data-ludo-players><option value="2">2 jogadores</option><option value="3">3 jogadores</option><option value="4" selected>4 jogadores</option></select></label></section><section data-board-play hidden><div class="board-game-toolbar"><button type="button" class="btn" data-board-action="menu">Trocar jogo</button><button type="button" class="btn" data-board-action="restart">Reiniciar</button><label data-promotion-label hidden>Promover para <select data-promotion><option value="q">Dama</option><option value="r">Torre</option><option value="b">Bispo</option><option value="n">Cavalo</option></select></label></div><p class="board-game-turn" data-board-turn></p><p data-board-status role="status" aria-live="polite"></p><div class="board-reset-confirm" data-reset-confirm hidden><p>Reiniciar esta partida e apagar seu histórico?</p><button type="button" class="btn" data-board-action="confirm-reset">Reiniciar partida</button><button type="button" class="btn" data-board-action="cancel-reset">Continuar partida</button></div><div class="board-game-content"><div data-board-surface></div><aside class="board-game-sidebar"><p class="checker-credit" data-checker-credit hidden>Peças: <a href="https://sketchfab.com/3d-models/pedra-jogo-de-damas-b38d9483544741238067199fce8852ec" target="_blank" rel="noopener">Pedra (Jogo de Damas)</a>, de Guilherme Tognetti · CC BY 4.0. Versão branca adaptada.</p><div data-ludo-actions hidden><button type="button" class="btn btn--primary" data-board-action="roll">Lançar dado</button><p data-die-result></p><div data-ludo-moves></div></div><div data-route-choices></div><details open><summary>Histórico de jogadas</summary><ol data-board-history></ol></details><details><summary>Regras desta partida</summary><p data-board-rules></p></details></aside></div></section></div>`;
+ dialog.innerHTML=`<div class="board-game-shell"><header class="board-game-header"><div><p class="eyebrow">Ao lado da cama · Jogos de tabuleiro</p><h2 id="board-games-title">Escolha um jogo</h2></div><button type="button" class="btn" data-board-action="close" aria-label="Fechar jogos de tabuleiro">Fechar</button></header><section data-board-picker><p>Escolha um jogo. Na Dama, jogue contra outra pessoa ou contra o computador. As partidas ficam guardadas enquanto esta página estiver aberta.</p><div class="board-game-picker">${Object.entries(names).map(([id,name])=>`<button type="button" data-board-game="${id}"><strong>${name}</strong><span>${descriptions[id]}</span></button>`).join('')}</div><label class="board-player-count">Jogadores no Ludo <select data-ludo-players><option value="2">2 jogadores</option><option value="3">3 jogadores</option><option value="4" selected>4 jogadores</option></select></label></section><section data-board-play hidden><div class="board-game-toolbar"><button type="button" class="btn" data-board-action="menu">Trocar jogo</button><button type="button" class="btn" data-board-action="restart">Reiniciar</button><label data-damas-opponent hidden>Adversário <select data-damas-mode><option value="human">Humano (neste aparelho)</option><option value="computer">Computador</option></select></label><label data-promotion-label hidden>Promover para <select data-promotion><option value="q">Dama</option><option value="r">Torre</option><option value="b">Bispo</option><option value="n">Cavalo</option></select></label></div><p class="board-game-turn" data-board-turn></p><p data-board-status role="status" aria-live="polite" tabindex="-1"></p><p data-damas-help class="damas-opponent-help" hidden></p><div class="board-reset-confirm" data-reset-confirm hidden><p>Reiniciar esta partida e apagar seu histórico?</p><button type="button" class="btn" data-board-action="confirm-reset">Reiniciar partida</button><button type="button" class="btn" data-board-action="cancel-reset">Continuar partida</button></div><div class="board-game-content"><div data-board-surface></div><aside class="board-game-sidebar"><p class="checker-credit" data-checker-credit hidden>Peças: <a href="https://sketchfab.com/3d-models/pedra-jogo-de-damas-b38d9483544741238067199fce8852ec" target="_blank" rel="noopener">Pedra (Jogo de Damas)</a>, de Guilherme Tognetti · CC BY 4.0. Versão branca adaptada.</p><div data-ludo-actions hidden><button type="button" class="btn btn--primary" data-board-action="roll">Lançar dado</button><p data-die-result></p><div data-ludo-moves></div></div><div data-route-choices></div><details open><summary>Histórico de jogadas</summary><ol data-board-history></ol></details><details><summary>Regras desta partida</summary><p data-board-rules></p></details></aside></div></section></div>`;
  document.body.append(dialog);
+ dialog.querySelector('[data-damas-mode]').addEventListener('change',event=>{cancelComputer();damasMode=event.target.value;selected=null;routeChoices=[];if(kind==='damas')render();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelComputer();else if(dialog.open)scheduleComputer();});
  dialog.addEventListener('click',click);
- dialog.addEventListener('close',()=>{document.body.style.overflow=previousOverflow;if(!document.querySelector('dialog[open]'))document.dispatchEvent(new CustomEvent('resume:skill-close'));(previousFocus?.isConnected?previousFocus:document.getElementById('stage-canvas'))?.focus({preventScroll:true});});
+ dialog.addEventListener('close',()=>{cancelComputer();trilhaMotion?.cancel();document.body.style.overflow=previousOverflow;if(!document.querySelector('dialog[open]'))document.dispatchEvent(new CustomEvent('resume:skill-close'));(previousFocus?.isConnected?previousFocus:document.getElementById('stage-canvas'))?.focus({preventScroll:true});});
  dialog.querySelector('[data-ludo-players]').addEventListener('change',event=>{ludoPlayers=Number(event.target.value);});
 }
 export function openBoardGames(){
  ensureDialog();if(dialog.open||document.querySelector('dialog[open]'))return;
  previousFocus=document.activeElement;previousOverflow=document.body.style.overflow;document.dispatchEvent(new CustomEvent('resume:skill-open'));document.body.style.overflow='hidden';showPicker();dialog.showModal();dialog.querySelector('[data-board-game]').focus({preventScroll:true});
 }
-function showPicker(){dialog.querySelector('[data-board-picker]').hidden=false;dialog.querySelector('[data-board-play]').hidden=true;dialog.querySelector('#board-games-title').textContent='Escolha um jogo';}
+function showPicker(){cancelComputer();trilhaMotion?.cancel();dialog.querySelector('[data-board-picker]').hidden=false;dialog.querySelector('[data-board-play]').hidden=true;dialog.querySelector('#board-games-title').textContent='Escolha um jogo';}
 function start(type,restart=false){
+ cancelComputer();trilhaMotion?.cancel();
  kind=type;if(restart||!sessions.has(type))sessions.set(type,makeGame(type));game=sessions.get(type);selected=null;routeChoices=[];
  dialog.querySelector('[data-board-picker]').hidden=true;dialog.querySelector('[data-board-play]').hidden=false;dialog.querySelector('[data-reset-confirm]').hidden=true;
  dialog.querySelector('#board-games-title').textContent=names[type];dialog.querySelector('[data-board-rules]').textContent=rules[type];dialog.querySelector('[data-promotion-label]').hidden=type!=='xadrez';render();
@@ -35,8 +54,14 @@ function start(type,restart=false){
  dialog.querySelector('[data-board-surface] button:not(:disabled)')?.focus({preventScroll:true});
 }
 function message(value){dialog.querySelector('[data-board-status]').textContent=value;}
-function play(action){const result=game.play(action);if(!result.ok){message(result.message);return;}selected=null;routeChoices=[];render();}
+function play(action){
+ trilhaMotion?.cancel();const surface=dialog.querySelector('[data-board-surface]'),before=kind==='trilha'?snapshotTrilhaAction(surface,action):null;
+ const result=game.play(action);if(!result.ok){message(result.message);return;}selected=null;routeChoices=[];render();
+ if(kind==='trilha')trilhaMotion=animateTrilhaAction(surface,action,before);
+}
 function chooseCell(at){
+ if(trilhaMotion?.active)return;
+ if(computerTurn()){message('Computador pensando… Aguarde a sua vez.');return;}
  const state=game.state,actions=game.legalActions();
  if(state.winner!==null||state.draw){message('Partida encerrada. Reinicie ou escolha outro jogo.');return;}
  if(kind==='trilha'&&(state.capture||actions[0]?.type==='place')){const action=actions.find(a=>(state.capture?a.at:a.to)===at);if(action)play(action);else message(state.capture?'Remova uma peça adversária destacada. Peças em trilhas estão protegidas quando há outra opção.':'Coloque uma peça em uma posição vazia.');return;}
@@ -59,8 +84,8 @@ function click(event){
  switch(target.dataset.boardAction){
   case 'close':dialog.close();break;
   case 'menu':showPicker();dialog.querySelector('[data-board-game]').focus({preventScroll:true});break;
-  case 'restart':dialog.querySelector('[data-reset-confirm]').hidden=false;dialog.querySelector('[data-board-action="cancel-reset"]').focus();break;
-  case 'cancel-reset':if(kind==='ludo'){ludoPlayers=game.state.positions.length;dialog.querySelector('[data-ludo-players]').value=String(ludoPlayers);}dialog.querySelector('[data-reset-confirm]').hidden=true;dialog.querySelector('[data-board-action="restart"]').focus();break;
+  case 'restart':cancelComputer();trilhaMotion?.cancel();dialog.querySelector('[data-reset-confirm]').hidden=false;dialog.querySelector('[data-board-action="cancel-reset"]').focus();break;
+  case 'cancel-reset':if(kind==='ludo'){ludoPlayers=game.state.positions.length;dialog.querySelector('[data-ludo-players]').value=String(ludoPlayers);}dialog.querySelector('[data-reset-confirm]').hidden=true;dialog.querySelector('[data-board-action="restart"]').focus();scheduleComputer();break;
   case 'confirm-reset':start(kind,true);break;
   case 'roll':{const result=game.roll();render();if(!result.ok)message(result.message);break;}
  }
@@ -73,7 +98,13 @@ function render(){
  message(over?'Escolha outro jogo ou reinicie para uma nova partida.':kind==='trilha'?(state.capture?'Trilha formada! Remova uma peça adversária destacada.':state.placed.some(n=>n<9)?`Colocação · brancas ${state.placed[0]}/9 · pretas ${state.placed[1]}/9`:'Selecione uma peça e seu destino. Com três peças, você pode voar.'):kind==='ludo'?'Lance o dado e escolha uma peça destacada.':kind==='damas'&&actions.some(a=>a.captures.length)?'Captura obrigatória: execute a maior sequência destacada.':'Selecione uma peça e um destino destacado.');
  if(kind==='ludo')renderLudo(surface,actions);else renderGrid(surface,actions);
  dialog.querySelector('[data-checker-credit]').hidden=kind!=='damas';
- if(focused!==undefined)surface.querySelector(`[data-cell="${focused}"]`)?.focus({preventScroll:true});
+ dialog.querySelector('[data-damas-opponent]').hidden=kind!=='damas';dialog.querySelector('[data-damas-help]').hidden=kind!=='damas';
+ dialog.querySelector('[data-damas-help]').textContent=damasMode==='computer'?'Você joga com as brancas; o computador joga com as pretas.':'Duas pessoas jogam neste aparelho, alternando os turnos.';
+ if(computerTurn()){
+  dialog.querySelector('[data-board-turn]').textContent='Vez do computador · Pretas';message('Computador pensando… Aguarde a sua vez.');
+  surface.querySelectorAll('button').forEach(button=>{button.disabled=true});surface.firstElementChild?.setAttribute('aria-busy','true');
+  if(focused!==undefined){computerFocus=focused;dialog.querySelector('[data-board-status]').focus({preventScroll:true});}
+ }else if(focused!==undefined)surface.querySelector(`[data-cell="${focused}"]`)?.focus({preventScroll:true});
  dialog.querySelector('[data-ludo-actions]').hidden=kind!=='ludo';
  if(kind==='ludo'){
   dialog.querySelector('[data-board-action="roll"]').disabled=over||state.die!==null;
@@ -83,6 +114,7 @@ function render(){
  }
  const history=dialog.querySelector('[data-board-history]');history.replaceChildren();for(const move of state.history){const li=document.createElement('li');li.textContent=move;history.append(li);}
  const routes=dialog.querySelector('[data-route-choices]');routes.replaceChildren();routeChoices.forEach((move,i)=>{const button=document.createElement('button');button.type='button';button.className='btn';button.dataset.route=i;button.textContent=[move.from,...move.path].map(square).join(' → ');routes.append(button);});
+ scheduleComputer();
 }
 function renderGrid(surface,actions){
  const state=game.state,trilha=kind==='trilha',board=document.createElement('div');board.className=trilha?'morris-board':'classic-board';board.setAttribute('role','group');board.setAttribute('aria-label',`Tabuleiro de ${names[kind]}`);
