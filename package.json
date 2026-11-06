@@ -10,7 +10,7 @@
     "room:new": "node room-version.mjs new",
     "room:previous": "node room-version.mjs previous",
     "check": "node check.mjs",
-    "test": "node --test poster-games.test.mjs skills-modal.test.mjs range.test.mjs cs-portfolio.test.mjs contact.test.mjs mobile-reading.test.mjs room-discoveries.test.mjs inspection-layout.test.mjs inspection-picking.test.mjs snes-controls.test.mjs loading-screen.test.mjs model-optimization.test.mjs mobile-crt.test.mjs",
+    "test": "node --test poster-games.test.mjs skills-modal.test.mjs range.test.mjs cs-portfolio.test.mjs contact.test.mjs mobile-reading.test.mjs room-discoveries.test.mjs inspection-layout.test.mjs inspection-picking.test.mjs snes-controls.test.mjs loading-screen.test.mjs model-optimization.test.mjs mobile-crt.test.mjs crt-curvature.test.mjs",
     "models:optimize": "node optimize-models.mjs"
   },
   "devDependencies": {
