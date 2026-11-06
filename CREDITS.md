@@ -1,5 +1,7 @@
 # Créditos e origem
 
+Pedras da Dama: [Pedra (Jogo de Damas)](https://sketchfab.com/3d-models/pedra-jogo-de-damas-b38d9483544741238067199fce8852ec), de [Guilherme Tognetti](https://sketchfab.com/guilhermetognetti), sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Geometria original compartilhada; material branco adaptado e damas representadas por duas pedras empilhadas.
+
 Versões otimizadas dos quatro objetos importados em `public/models/optimized/`, geradas por `npm run models:optimize`. Os originais, autores e licenças estão preservados nas pastas de cada modelo. Adaptações adicionais: compressão Meshopt, redução e codificação de texturas, remoção de UVs duplicados da Pokédex, cor uniforme do dourado da Bíblia no material e simplificação conservadora de partes estáticas. Nós e pivôs interativos foram preservados.
 
 Bíblia: [“Holy Bible”](https://sketchfab.com/3d-models/holy-bible-091e139f26554be4844712ab50f8ad2a), de [VHM777](https://sketchfab.com/gizacorp01), sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), fornecida pelo usuário em `public/models/holy_bible/`. Geometria, materiais PBR, texturas e licença preservados; escala e orientação ajustadas ao nicho e à inspeção. O link de leitura continua apontando para a Bíblia Online NTLH.

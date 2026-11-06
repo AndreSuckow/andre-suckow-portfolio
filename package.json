@@ -10,7 +10,7 @@
     "room:new": "node room-version.mjs new",
     "room:previous": "node room-version.mjs previous",
     "check": "node check.mjs",
-    "test": "node --test poster-games.test.mjs skills-modal.test.mjs range.test.mjs cs-portfolio.test.mjs contact.test.mjs mobile-reading.test.mjs room-discoveries.test.mjs inspection-layout.test.mjs inspection-picking.test.mjs snes-controls.test.mjs loading-screen.test.mjs model-optimization.test.mjs mobile-crt.test.mjs crt-curvature.test.mjs hero-interactions.test.mjs board-games.test.mjs board-games-ui.test.mjs scene-affordances.test.mjs board-model.test.mjs mobile-game-access.test.mjs mobile-motion.test.mjs poster-rendering.test.mjs",
+    "test": "node --test poster-games.test.mjs skills-modal.test.mjs range.test.mjs cs-portfolio.test.mjs contact.test.mjs mobile-reading.test.mjs room-discoveries.test.mjs inspection-layout.test.mjs inspection-picking.test.mjs snes-controls.test.mjs loading-screen.test.mjs model-optimization.test.mjs mobile-crt.test.mjs crt-curvature.test.mjs hero-interactions.test.mjs board-games.test.mjs board-games-ui.test.mjs scene-affordances.test.mjs board-model.test.mjs mobile-game-access.test.mjs mobile-motion.test.mjs poster-rendering.test.mjs checker-renderer.test.mjs",
     "models:optimize": "node optimize-models.mjs",
     "board:optimize": "node prepare-board-model.mjs"
   },
