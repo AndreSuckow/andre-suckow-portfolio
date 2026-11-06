@@ -126,10 +126,11 @@ export function createCareerMap(T,companies,assets){
    const geometry=new PlaneGeometry(.375,.375);resources.push(geometry);const mesh=new Mesh(geometry,new BasicMaterial({map:texture,transparent:true}));mesh.position.set(0,.58,.103);avatar.add(mesh);logos.set('portrait',mesh);
   }
  }
+ let previousFocused=-1,focusStarted=0;
  return {
   get current(){return journey.current;},get moving(){return journey.moving;},walkTo(index,time){return journey.walkTo(index,time);},update(time){return journey.update(time);},
   draw(ctx,rect,focused,time,reduced){
-   syncArt();focused=Math.max(0,Math.min(companies.length-1,focused));
+   syncArt();focused=Math.max(0,Math.min(companies.length-1,focused));if(focused!==previousFocused){previousFocused=focused;focusStarted=time;}buildings.forEach((building,index)=>{const active=index===focused,elapsed=time-focusStarted;building.position.y=.065+(active?.035:0);building.rotation.z=active&&!reduced&&elapsed<.42?Math.sin(elapsed*42)*.035*(1-elapsed/.42):0;});
    const [x,z]=journey.position,walking=journey.moving,step=walking&&!reduced?Math.sin(time*15)*.55:0;
    avatar.position.set(x,walking&&!reduced?Math.abs(Math.sin(time*15))*.018:0,z);avatar.rotation.y=walking?journey.heading:Math.atan2(1.4,12);
    leftLeg.rotation.x=step;rightLeg.rotation.x=-step;leftArm.rotation.x=-step*.7;rightArm.rotation.x=step*.7;

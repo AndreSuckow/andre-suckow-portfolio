@@ -1,0 +1,11 @@
+Model Information:
+* title:	Xadrez
+* source:	https://sketchfab.com/3d-models/xadrez-69b69c8c199141b9b5a4261e3e269c19
+* author:	Leandro Calazans (https://sketchfab.com/calazans.cg)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Xadrez" (https://sketchfab.com/3d-models/xadrez-69b69c8c199141b9b5a4261e3e269c19) by Leandro Calazans (https://sketchfab.com/calazans.cg) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

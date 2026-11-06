@@ -1,0 +1,11 @@
+Model Information:
+* title:	Pedra (Jogo de Damas)
+* source:	https://sketchfab.com/3d-models/pedra-jogo-de-damas-b38d9483544741238067199fce8852ec
+* author:	Guilherme Tognetti (https://sketchfab.com/guilhermetognetti)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Pedra (Jogo de Damas)" (https://sketchfab.com/3d-models/pedra-jogo-de-damas-b38d9483544741238067199fce8852ec) by Guilherme Tognetti (https://sketchfab.com/guilhermetognetti) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

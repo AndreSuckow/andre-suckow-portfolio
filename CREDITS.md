@@ -37,3 +37,5 @@ Logo MarQ HR: SVG fornecido pelo usuário e salvo em `public/img/marqhr-logo.svg
 
 Logo Pilgrims: arquivo oficial da [empresa](https://pilgrimsconsulting.com.br/wp-content/uploads/2023/08/logo-white.webp), usado em `public/img/pilgrims-logo.webp`.
 Emulação de ROM local: [EmulatorJS](https://github.com/EmulatorJS/EmulatorJS), distribuição aberta 4.2.3 carregada sob demanda de `https://cdn.emulatorjs.org/4.2.3/data/`. O portfólio não inclui ROMs; o visitante seleciona seu próprio arquivo temporário no navegador. O núcleo SNES é fornecido pela distribuição do EmulatorJS.
+
+Tabuleiro de quatro jogos: geometria e textura de madeira criadas em código em `public/new-room.js`. Trilha, Dama e Ludo implementados a partir do manual fornecido pelo usuário em `public/models/tabuleiro/manual_regras_jogos_tabuleiro.txt`. O Xadrez usa [chess.js 1.4.0](https://github.com/jhlywa/chess.js), com licença preservada em `public/vendor/chess-LICENSE.txt`. Partidas locais entre pessoas; não há jogador de IA. A variante de Dama segue a promoção durante captura descrita no manual e é identificada nas regras da interface.

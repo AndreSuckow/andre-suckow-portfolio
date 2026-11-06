@@ -1,0 +1,368 @@
+Manual de regras dos jogos de tabuleiro
+
+Este documento reúne as regras básicas de Trilha, Dama Brasileira, Ludo
+e Xadrez, além de diretrizes para uma IA que precise administrar ou
+implementar esses jogos.
+
+------------------------------------------------------------------------
+
+1. Trilha (Nine Men’s Morris)
+
+Objetivo
+
+Formar linhas de três peças alinhadas para remover peças do adversário
+até deixá-lo sem condições de continuar jogando.
+
+Componentes
+
+-   Tabuleiro com 24 posições.
+-   9 peças para cada jogador.
+-   Dois jogadores: branco e preto.
+
+Regras
+
+Fase de colocação
+
+1.  Os jogadores alternam colocando uma peça em uma posição vazia.
+2.  Cada jogador possui 9 peças.
+3.  Quando um jogador forma uma linha de três peças conectadas, forma
+    uma trilha.
+4.  Ao formar uma trilha, pode remover uma peça adversária.
+
+Remoção de peças
+
+-   Preferencialmente, não se pode remover uma peça que esteja dentro de
+    uma trilha adversária.
+-   Se todas as peças adversárias estiverem em trilhas, qualquer uma
+    pode ser removida.
+-   Uma peça removida não retorna ao jogo.
+
+Fase de movimentação
+
+-   Depois que todas as peças forem colocadas, os jogadores movimentam
+    uma peça por vez.
+-   A peça só pode se deslocar para uma posição adjacente conectada por
+    uma linha.
+-   Não pode saltar posições.
+
+Regra das três peças
+
+Quando um jogador fica com apenas três peças, pode movimentar uma peça
+para qualquer posição vazia do tabuleiro, mesmo que não seja adjacente.
+
+Vitória
+
+Vence quem: - Deixar o adversário com apenas duas peças; ou - Impedir o
+adversário de realizar movimentos legais.
+
+Empate
+
+Pode ocorrer por repetição de posições ou por uma sequência prolongada
+sem capturas, conforme o limite definido pela variante adotada.
+
+------------------------------------------------------------------------
+
+2. Dama Brasileira (Draughts / Checkers)
+
+Objetivo
+
+Capturar todas as peças adversárias ou bloquear todos os movimentos
+legais do oponente.
+
+Componentes
+
+-   Tabuleiro 8x8.
+-   12 peças para cada jogador.
+-   As peças ocupam somente as casas escuras.
+
+Movimentação das peças comuns
+
+-   Movimentam-se uma casa diagonalmente para frente.
+-   Não podem andar para trás em movimentos normais.
+-   Só podem ocupar casas vazias.
+
+Captura
+
+-   A captura acontece saltando diagonalmente sobre uma peça adversária.
+-   A casa imediatamente depois da peça capturada precisa estar vazia.
+-   A peça capturada é removida do tabuleiro.
+-   Na variante brasileira, a captura pode acontecer tanto para frente
+    quanto para trás.
+-   Se houver outra captura possível com a mesma peça, deve continuar
+    capturando.
+
+Obrigatoriedade de captura
+
+-   Se existir uma captura disponível, ela é obrigatória.
+-   Quando houver múltiplas possibilidades, deve-se escolher a sequência
+    de captura que obedeça às prioridades da variante brasileira.
+
+Dama (peça promovida)
+
+-   Uma peça que chega à última linha adversária transforma-se em dama.
+-   A dama pode movimentar-se diagonalmente para frente e para trás,
+    percorrendo várias casas vazias.
+-   Pode capturar peças à distância, desde que exista uma peça
+    adversária na diagonal e uma casa vazia disponível depois dela.
+-   Pode escolher a casa de aterrissagem após a peça capturada, conforme
+    as regras da variante brasileira.
+
+Promoção
+
+Na regra brasileira, se a peça alcançar a última fileira durante uma
+captura e puder continuar capturando, a sequência pode prosseguir já
+como dama.
+
+Vitória
+
+-   Eliminar todas as peças adversárias; ou
+-   Impedir que o adversário tenha movimentos legais.
+
+Empate
+
+Pode ocorrer por repetição de posições, ausência de progresso durante o
+limite regulamentar ou outras situações previstas pela variante
+escolhida.
+
+Observação sobre variantes
+
+Existem variantes de dama internacional, inglesa e brasileira. Este
+documento considera a dama brasileira, com tabuleiro 8x8 e 12 peças por
+jogador.
+
+------------------------------------------------------------------------
+
+3. Ludo
+
+Objetivo
+
+Levar as quatro peças de cada jogador da base inicial até a área final
+correspondente à sua cor.
+
+Componentes
+
+-   Tabuleiro com quatro cores: vermelho, azul, amarelo e verde.
+-   4 peças por jogador.
+-   Um dado de seis faces.
+-   De 2 a 4 jogadores.
+
+Início da partida
+
+-   Todas as peças começam na base de sua respectiva cor.
+-   Os jogadores lançam o dado alternadamente.
+-   Para retirar uma peça da base, normalmente é necessário tirar 6.
+
+Saída da base
+
+-   Ao tirar 6, o jogador pode colocar uma peça na casa inicial da sua
+    cor.
+-   Dependendo da variante, tirar 6 concede outra jogada.
+
+Movimentação
+
+-   O número do dado determina quantas casas a peça deve avançar.
+-   O movimento segue o sentido indicado pelo tabuleiro.
+-   O jogador pode escolher qual peça movimentar, desde que o movimento
+    seja legal.
+
+Captura
+
+-   Se uma peça terminar o movimento em uma casa ocupada por uma peça
+    adversária, captura essa peça.
+-   A peça capturada retorna à base inicial.
+-   Casas seguras não permitem capturas.
+
+Casas seguras
+
+-   Algumas posições do tabuleiro são protegidas.
+-   Peças nessas posições não podem ser capturadas.
+-   A casa inicial de cada cor costuma ser uma casa segura.
+
+Caminho final
+
+-   Depois de completar uma volta no tabuleiro, a peça entra no corredor
+    final da sua cor.
+-   Para chegar à última posição, normalmente é necessário tirar o
+    número exato no dado.
+-   Não é permitido ultrapassar a casa final.
+
+Vitória
+
+Vence o primeiro jogador que colocar as quatro peças na área final.
+
+Observação sobre variantes
+
+Algumas versões permitem jogar novamente ao tirar 6; outras aplicam
+regras adicionais para três resultados consecutivos de 6. A variante
+deve ser definida antes da partida.
+
+------------------------------------------------------------------------
+
+4. Xadrez
+
+Objetivo
+
+Dar xeque-mate no rei adversário, colocando-o sob ataque sem que exista
+qualquer movimento legal para escapar.
+
+Componentes
+
+-   Tabuleiro 8x8.
+-   16 peças brancas.
+-   16 peças pretas.
+-   Dois jogadores.
+
+Peças e movimentos
+
+Rei (K)
+
+-   Movimenta-se uma casa em qualquer direção.
+-   Não pode se movimentar para uma casa atacada pelo adversário.
+
+Dama (Q)
+
+-   Movimenta-se quantas casas quiser.
+-   Pode andar horizontalmente, verticalmente e diagonalmente.
+
+Torre (R)
+
+-   Movimenta-se horizontalmente ou verticalmente.
+-   Pode percorrer várias casas.
+
+Bispo (B)
+
+-   Movimenta-se exclusivamente nas diagonais.
+-   Pode percorrer várias casas.
+
+Cavalo (N)
+
+-   Movimenta-se em formato de L: duas casas em uma direção e uma
+    perpendicular.
+-   Pode saltar sobre outras peças.
+
+Peão (P)
+
+-   Avança uma casa para frente.
+-   No primeiro movimento, pode avançar duas casas.
+-   Captura uma casa diagonalmente para frente.
+
+Regras especiais
+
+Roque
+
+-   Movimento especial envolvendo rei e torre.
+-   O rei anda duas casas em direção à torre e a torre passa para a casa
+    imediatamente ao lado do rei.
+-   Só é permitido se ambos ainda não tiverem se movimentado, o caminho
+    estiver livre e o rei não estiver em xeque nem atravessar casas
+    atacadas.
+
+En passant
+
+-   Captura especial de peão.
+-   Acontece quando um peão adversário avança duas casas e passa por uma
+    casa que poderia ser atacada por um peão seu.
+-   A captura deve ocorrer imediatamente na jogada seguinte.
+
+Promoção
+
+-   Quando um peão alcança a última fileira, pode ser promovido a dama,
+    torre, bispo ou cavalo.
+-   Não é obrigatório promover para dama.
+
+Xeque
+
+-   O rei está sendo atacado.
+-   O jogador precisa eliminar a ameaça.
+-   Pode mover o rei, capturar a peça atacante ou bloquear o ataque,
+    quando possível.
+
+Xeque-mate
+
+O rei está em xeque e não existe nenhuma resposta legal. O jogador que
+aplicou o xeque-mate vence.
+
+Empate
+
+-   Afogamento: o jogador não está em xeque, mas não possui movimentos
+    legais.
+-   Repetição de posição.
+-   Regra dos 50 movimentos sem captura ou movimento de peão, quando
+    reivindicada.
+-   Material insuficiente para dar xeque-mate.
+-   Acordo entre jogadores.
+
+------------------------------------------------------------------------
+
+5. Diretrizes gerais para implementação por uma IA
+
+Você será responsável por administrar quatro jogos de tabuleiro: Trilha,
+Dama Brasileira, Ludo e Xadrez.
+
+Requisitos obrigatórios
+
+1.  Conhecer integralmente as regras de cada jogo.
+2.  Identificar o turno atual e impedir que um jogador jogue fora de sua
+    vez.
+3.  Validar todos os movimentos antes de aceitá-los.
+4.  Impedir movimentos ilegais.
+5.  Atualizar corretamente o estado do tabuleiro após cada jogada.
+6.  Detectar capturas, promoções, condições de vitória e empate.
+7.  Exibir claramente as jogadas possíveis.
+8.  Informar quando um movimento for inválido e explicar o motivo.
+9.  Permitir reiniciar a partida.
+10. Manter o histórico completo das jogadas.
+
+Regras de integridade
+
+-   Nunca modificar o tabuleiro sem validar a jogada.
+-   Nunca permitir que uma peça ocupe uma posição proibida.
+-   Nunca permitir capturas que não estejam previstas nas regras.
+-   Nunca conceder vitória sem que a condição regulamentar seja
+    satisfeita.
+-   Não inventar regras para resolver situações não previstas.
+-   Quando houver variantes, identificar e aplicar a variante
+    selecionada.
+-   Não confundir regras de versões diferentes de um mesmo jogo.
+
+Interface
+
+A interface deve apresentar: - Tabuleiro visual. - Identificação dos
+jogadores. - Indicação do jogador da vez. - Peças e posições atualizadas
+em tempo real. - Histórico de jogadas. - Mensagens de validação. - Botão
+de reiniciar. - Indicador de vitória ou empate.
+
+Inteligência de jogo
+
+Caso exista um jogador controlado pela IA: - A IA deve realizar apenas
+movimentos legais. - Deve analisar as possibilidades antes de jogar. -
+Deve considerar capturas, defesa e estratégia. - Deve reconhecer
+situações de risco. - Deve respeitar todas as regras especiais. - Deve
+conseguir jogar contra um humano ou outra IA.
+
+Prioridade
+
+A prioridade absoluta é a fidelidade às regras oficiais da variante
+selecionada. A aparência visual e a inteligência estratégica são
+secundárias à integridade das partidas.
+
+------------------------------------------------------------------------
+
+6. Organização sugerida do projeto em JavaScript/React
+
+Mantenha cada jogo isolado em seu próprio módulo de regras para evitar
+misturar lógicas diferentes e facilitar os testes.
+
+src/ ├── games/ │ ├── trilha/ │ │ ├── rules.js │ │ ├── engine.js │ │ └──
+constants.js │ ├── dama/ │ │ ├── rules.js │ │ ├── engine.js │ │ └──
+constants.js │ ├── ludo/ │ │ ├── rules.js │ │ ├── engine.js │ │ └──
+constants.js │ └── chess/ │ ├── rules.js │ ├── engine.js │ └──
+constants.js ├── components/ │ ├── Board.jsx │ ├── GameControls.jsx │
+└── GameHistory.jsx └── App.jsx
+
+Observação técnica final
+
+Antes de implementar, defina explicitamente as variantes da Trilha, Dama
+e Ludo. Algumas regras variam entre versões. O motor de regras deve ser
+independente da interface, permitindo testes automatizados e validação
+consistente das partidas.

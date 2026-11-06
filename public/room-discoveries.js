@@ -53,9 +53,13 @@ function cancelOpening(){
  previousFocus?.focus({preventScroll:true});
 }
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&opening){event.preventDefault();cancelOpening();}},{capture:true});
+let boardModule;
+async function showBoardGames(){try{boardModule??=import('./board-games/ui.js?v=cs-mode-3');const {openBoardGames}=await boardModule;await openBoardGames();}catch(error){boardModule=null;console.warn('Board games unavailable',error);document.getElementById('announcer').textContent='N?o foi poss?vel abrir os jogos. Clique novamente para tentar.';}}
 document.addEventListener('room:discover',event=>{
+ if(event.detail==='board'){showBoardGames();return;}
  openNotebook(event.detail);
 });
+document.querySelector('[data-room-board]')?.addEventListener('click',showBoardGames);
 document.querySelector('[data-room-notebook]').addEventListener('click',()=>openNotebook());
 document.querySelectorAll('[data-room-inspect]').forEach(button=>button.addEventListener('click',()=>openNotebook(button.dataset.roomInspect)));
 dialog.querySelector('[data-notebook-close]').addEventListener('click',()=>dialog.close());
@@ -71,6 +75,6 @@ new MutationObserver(()=>{if(document.documentElement.dataset.mode!=='3d')cancel
 
 // Keyboard access highlights the same physical objects without revealing a menu.
 for(const trigger of document.querySelectorAll('.room-object-access button')){
- trigger.addEventListener('focus',()=>document.dispatchEvent(new CustomEvent('room:focus',{detail:trigger.dataset.roomInspect||'notebook'})));
+ trigger.addEventListener('focus',()=>document.dispatchEvent(new CustomEvent('room:focus',{detail:trigger.hasAttribute('data-room-board')?'board':trigger.dataset.roomInspect||'notebook'})));
  trigger.addEventListener('blur',()=>document.dispatchEvent(new CustomEvent('room:focus',{detail:null})));
 }

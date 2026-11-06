@@ -153,7 +153,10 @@ export function createNewRoom(T){
  function discovery(id,object,label,lift=.014){
   const surfaces=[];
   object.traverse(mesh=>{if(!mesh.isMesh)return;action(mesh,id,label);const clone=mat=>{const copy=mat.clone();rememberPropAppearance(copy);resources.push(copy);surfaces.push(copy);return copy;};mesh.material=Array.isArray(mesh.material)?mesh.material.map(clone):clone(mesh.material);});
-  discoveries.set(id,{object,surfaces,restY:object.position.y,lift});
+  object.updateWorldMatrix(true,true);
+  const bounds=new T.Box3().setFromObject(object),cue=box('Interaction cue · '+id,(bounds.min.x+bounds.max.x)/2,bounds.max.y+.026,(bounds.min.z+bounds.max.z)/2,.009,.009,.009,material('#ffb547'),interactive);
+  cue.rotation.z=Math.PI/4;cue.userData.interactionCue=true;action(cue,id,label);
+  discoveries.set(id,{object,surfaces,restY:object.position.y,restZ:object.rotation.z,lift,cue,cueScale:cue.scale.clone()});
  }
  discovery('bible',bibleObject,'Bíblia · examinar em 3D · NTLH');
  discovery('pokedex',pokedex,'Pokédex · segurar e girar');
@@ -165,11 +168,16 @@ export function createNewRoom(T){
   for(const [key,item] of discoveries){
    const active=key===id,y=item.restY+(active?item.lift:0);
    if(T.animate&&!reduced)T.animate(item.object.position,{y,duration:.2,ease:'power2.out',overwrite:'auto'});else item.object.position.y=y;
+   if(T.animate&&!reduced&&active&&item.lift)T.animate(item.object.rotation,{keyframes:[{z:item.restZ+.035,duration:.08},{z:item.restZ-.025,duration:.1},{z:item.restZ+.012,duration:.1},{z:item.restZ,duration:.1}],overwrite:'auto'});
+   else if(T.animate&&!reduced)T.animate(item.object.rotation,{z:item.restZ,duration:.12,overwrite:'auto'});else item.object.rotation.z=item.restZ;
    for(const mat of item.surfaces){
     if(!mat.emissive)continue;if(active){mat.emissive.set('#ffb547');mat.emissiveIntensity=0;}else restorePropAppearance(mat);const intensity=active?.16:(mat.userData.roomAppearance?.intensity??0);
     if(T.animate&&!reduced)T.animate(mat,{emissiveIntensity:intensity,duration:.2,overwrite:'auto'});else mat.emissiveIntensity=intensity;
    }
   }
+ }
+ function updateInteractionCues(time,reduced=false){
+  let index=0;for(const [key,item]of discoveries){const active=key===highlighted,pulse=reduced?1:1+Math.sin(time*2.6+index++)*.12;item.cue.scale.copy(item.cueScale).multiplyScalar((active?1.65:1)*pulse);item.cue.visible=!['notebook','discman'].includes(key)||!item.object.userData.drawerOpen;}
  }
  for(let i=0;i<3;i++){
   box('Wardrobe center drawer',wx,.24+i*.155,-.736,.33,.142,.028,oak);
@@ -230,6 +238,20 @@ export function createNewRoom(T){
  }
  bed('Front plaid bed',-.91,1.05,true);
  bed('Window bed',.99,.54,false);
+ // A physical four-game board rests on the floor and leans beside the bed.
+ const board=new Group();board.name='Four-game wooden board';interactive.add(board);board.position.set(-.29,.21,1.86);board.rotation.set(-.38,-.28,.025);
+ box('Board wooden back',0,0,0,.42,.42,.026,material('#785231'),board);
+ const boardMap=texture((c,w,h)=>{
+  c.fillStyle='#b58b51';c.fillRect(0,0,w,h);const cell=w*.76/8,start=w*.12;
+  for(let row=0;row<8;row++)for(let col=0;col<8;col++){c.fillStyle=(row+col)%2?'#35445b':'#ead6ae';c.fillRect(start+col*cell,start+row*cell,cell,cell);}
+  for(const [x,y,color]of [[1,2,'#fbebcf'],[3,2,'#fbebcf'],[2,5,'#26324b'],[4,5,'#26324b']]){c.beginPath();c.arc(start+(x+.5)*cell,start+(y+.5)*cell,cell*.34,0,Math.PI*2);c.fillStyle=color;c.fill();}
+  c.fillStyle='#33251d';c.font='bold 25px Arial';c.textAlign='center';c.fillText('JOGOS DE TABULEIRO',w/2,40);c.font='bold 18px Arial';c.fillText('TRILHA · DAMA · LUDO · XADREZ',w/2,h-25);
+ },640,640);
+ plane('Four game board surface',0,0,.014,.404,.404,material('#ffffff',boardMap),[0,0,0],board);
+ for(const x of [-.205,.205])box('Board side rim',x,0,.02,.014,.42,.016,material('#9b6c3f'),board);
+ for(const y of [-.205,.205])box('Board top bottom rim',0,y,.02,.42,.014,.016,material('#9b6c3f'),board);
+ board.updateWorldMatrix(true,true);board.position.y-=new T.Box3().setFromObject(board).min.y;
+ discovery('board',board,'Tabuleiro · clique para escolher um jogo',.022);
  box('Bedside bench',.19,.24,1.65,.58,.065,.25,darkOak);
  for(const x of [-.02,.4])for(const z of [1.57,1.73])box('Bench leg',x,.12,z,.035,.24,.035,oak);
  // Window: dark glass, frames and wooden shutters on the right wall.
@@ -326,5 +348,5 @@ export function createNewRoom(T){
   if(T.animate&&!reduced)T.animate(musicDrawer.position,{z:open?-.51:-.743,duration:.7,ease:'power3.inOut',overwrite:true,onComplete:open?ready:undefined});else{musicDrawer.position.z=open?-.51:-.743;if(open)ready();}
   if(!open){if(T.animate&&!reduced)T.animate(discman.root.position,{y:discmanRestY,duration:.2,overwrite:true});else discman.root.position.y=discmanRestY;}
  }
- return {root,targets:[...new Set(targets)],highlight,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
+ return {root,targets:[...new Set(targets)],highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
 }

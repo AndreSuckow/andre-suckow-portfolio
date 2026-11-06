@@ -53,3 +53,9 @@ test('Rejected orientation lock returns from fullscreen with manual guidance',as
  assert(d.querySelector('.mobile-reading__status').textContent.includes('manualmente'));
  assert(d.querySelector('dialog').open);dom.window.close();
 });
+
+test('board games keep portrait play free of the TV orientation prompt',async()=>{
+ const {dom,w,d}=setup();const board=d.createElement('dialog');board.id='board-games-dialog';d.body.append(board);board.showModal();
+ d.documentElement.dataset.chapter='sobre';await flush();w.dispatchEvent(new w.Event('resize'));
+ assert(!d.querySelector('.mobile-reading').open);board.close();assert(d.querySelector('.mobile-reading').open);dom.window.close();
+});
