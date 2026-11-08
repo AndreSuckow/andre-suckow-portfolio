@@ -1,3 +1,4 @@
+import {createGameBoyModel} from './gameboy-model.js?v=cs-mode-3';
 import {createDiscman} from "./discman.js?v=cs-mode-3";
 import {interactionShake,automaticInteractionShake} from './interaction-motion.js?v=cs-mode-3';
 import {createFamilyFrame} from "./family-frame.js?v=cs-mode-3";
@@ -161,6 +162,8 @@ export function createNewRoom(T){
   object.updateWorldMatrix(true,true);
   discoveries.set(id,{object,surfaces,restY:object.position.y,restZ:object.rotation.z,lift});
  }
+ const gameboy=createGameBoyModel(T);interactive.add(gameboy.root);
+ discovery('gameboy',gameboy.root,'Game Boy ? clique para jogar',.012);
  discovery('bible',bibleObject,'Bíblia · examinar em 3D · NTLH');
  discovery('pokedex',pokedex,'Pokédex · segurar e girar');
  discovery('family',frame,'Quadro da família · segurar e girar');
@@ -362,5 +365,5 @@ export function createNewRoom(T){
   if(T.animate&&!reduced)T.animate(musicDrawer.position,{z:open?-.51:-.743,duration:.7,ease:'power3.inOut',overwrite:true,onComplete:open?ready:undefined});else{musicDrawer.position.z=open?-.51:-.743;if(open)ready();}
   if(!open){if(T.animate&&!reduced)T.animate(discman.root.position,{y:discmanRestY,duration:.2,overwrite:true});else discman.root.position.y=discmanRestY;}
  }
- return {root,targets:[...new Set(targets)],get focused(){return highlighted;},interactionObjects(){return [...discoveries].map(([key,item])=>({key,root:item.object}));},automaticHighlight(id,time=lastCueTime){automatic=id;automaticStarted=time;},highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;discman.dispose();importedBoard?.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
+ return {root,targets:[...new Set(targets)],get focused(){return highlighted;},interactionObjects(){return [...discoveries].map(([key,item])=>({key,root:item.object}));},automaticHighlight(id,time=lastCueTime){automatic=id;automaticStarted=time;},highlight,updateInteractionCues,setDiscmanOpen,getInspectionModel,setDrawerOpen,dispose(){drawerSequence++;musicSequence++;gameboy.dispose();discman.dispose();importedBoard?.dispose();importedFrame?.dispose();importedBible?.dispose();importedPokedex?.dispose();for(const value of materials.values())value.dispose();for(const resource of resources)resource.dispose();}};
 }

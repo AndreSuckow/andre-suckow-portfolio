@@ -54,9 +54,13 @@ function cancelOpening(){
  previousFocus?.focus({preventScroll:true});
 }
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&opening){event.preventDefault();cancelOpening();}},{capture:true});
+let gameboyModule;
+async function showGameBoy(){try{gameboyModule??=import('./gameboy.js?v=cs-mode-3');const {openGameBoy}=await gameboyModule;openGameBoy();}catch(error){gameboyModule=null;console.warn('Game Boy unavailable',error);document.getElementById('announcer').textContent='Não foi possível abrir o Game Boy. Clique novamente para tentar.';}}
+document.querySelector('[data-room-gameboy]')?.addEventListener('click',showGameBoy);
 let boardModule;
 async function showBoardGames(){try{boardModule??=import('./board-games/ui.js?v=cs-mode-3');const {openBoardGames}=await boardModule;await openBoardGames();}catch(error){boardModule=null;console.warn('Board games unavailable',error);document.getElementById('announcer').textContent='N?o foi poss?vel abrir os jogos. Clique novamente para tentar.';}}
 document.addEventListener('room:discover',event=>{
+ if(event.detail==='gameboy'){showGameBoy();return;}
  if(event.detail==='board'){showBoardGames();return;}
  openNotebook(event.detail);
 });
@@ -76,6 +80,6 @@ new MutationObserver(()=>{if(document.documentElement.dataset.mode!=='3d')cancel
 
 // Keyboard access highlights the same physical objects without revealing a menu.
 for(const trigger of document.querySelectorAll('.room-object-access button')){
- trigger.addEventListener('focus',()=>document.dispatchEvent(new CustomEvent('room:focus',{detail:trigger.hasAttribute('data-room-board')?'board':trigger.dataset.roomInspect||'notebook'})));
+ trigger.addEventListener('focus',()=>document.dispatchEvent(new CustomEvent('room:focus',{detail:trigger.hasAttribute('data-room-gameboy')?'gameboy':trigger.hasAttribute('data-room-board')?'board':trigger.dataset.roomInspect||'notebook'})));
  trigger.addEventListener('blur',()=>document.dispatchEvent(new CustomEvent('room:focus',{detail:null})));
 }

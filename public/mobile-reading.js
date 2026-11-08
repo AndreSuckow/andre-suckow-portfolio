@@ -44,7 +44,7 @@ function releaseOrientation(){
  if(ownsFullscreen){ownsFullscreen=false;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});}
 }
 function update(){
- if(document.getElementById('games-notebook')?.open||document.getElementById('board-games-dialog')?.open){updateTvPreview(false);closePrompt();return;}
+ if(document.getElementById('games-notebook')?.open||document.getElementById('board-games-dialog')?.open||document.getElementById('gameboy-dialog')?.open){updateTvPreview(false);closePrompt();return;}
  const reading=root.dataset.mode==='3d'&&chapters.has(root.dataset.chapter)&&smallTouch();
  root.toggleAttribute('data-mobile-reading',reading&&landscape());
  updateTvPreview(reading);
