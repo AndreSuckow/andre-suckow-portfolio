@@ -1,5 +1,5 @@
 import {createDiscman} from "./discman.js?v=cs-mode-3";
-import {interactionShake} from './interaction-motion.js?v=cs-mode-3';
+import {interactionShake,automaticInteractionShake} from './interaction-motion.js?v=cs-mode-3';
 import {createFamilyFrame} from "./family-frame.js?v=cs-mode-3";
 import {createImportedProp,rememberPropAppearance,restorePropAppearance} from "./imported-props.js?v=cs-mode-3";
 // Novo Quarto 3D — original geometry and textures inspired by André's room reference.
@@ -180,7 +180,7 @@ export function createNewRoom(T){
  function updateInteractionCues(time,reduced=false){
   lastCueTime=time;
   for(const [key,item]of discoveries){
-   const manual=key===highlighted,active=manual||key===automatic,shake=active?interactionShake(time-(manual?focusStarted:automaticStarted),reduced):0;
+   const manual=key===highlighted,active=manual||key===automatic,shake=manual?interactionShake(time-focusStarted,reduced):key===automatic?automaticInteractionShake(time-automaticStarted,reduced):0;
    const strength=item.lift>0||key.startsWith('poster-')?1:item.object.userData.drawerOpen?0:.25;
    const rotation=item.restZ+shake*strength;if(item.object.rotation.z!==rotation){item.object.rotation.z=rotation;T.invalidateShadows?.();}
   }

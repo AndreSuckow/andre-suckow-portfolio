@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {interactionShake,interactionShakeFrames,interactionShakeDuration,createInteractionCascade} from './public/interaction-motion.js';
+import {interactionShake,automaticInteractionShake,interactionShakeFrames,interactionShakeDuration,createInteractionCascade} from './public/interaction-motion.js';
 import {createSceneAffordances} from './public/scene-affordances.js';
 
 test('room objects shake without markers, and open drawers stay anchored',()=>{
@@ -16,30 +16,36 @@ test('room objects shake without markers, and open drawers stay anchored',()=>{
  api.focus('board');api.update(.6,true);assert.equal(board.object.rotation.z,.025);
 });
 
-test('cascade starts just one object every five seconds and repeats its order',()=>{
+test('cascade waits two seconds, shakes for two seconds and waits two seconds between objects',()=>{
  const starts=[],ends=[],cascade=createInteractionCascade({items:['one','two','three'],onStart:(item,time)=>starts.push([item,time]),onEnd:item=>ends.push(item)});
- assert.equal(cascade.tick(0),null);assert.equal(cascade.tick(4.99),null);assert.equal(cascade.tick(5).item,'one');assert.equal(cascade.tick(5.2).item,'one');assert.equal(cascade.tick(5.5),null);
- assert.equal(cascade.tick(10).item,'two');assert.equal(cascade.tick(15).item,'three');assert.equal(cascade.tick(20).item,'one');
- assert.deepEqual(starts,[['one',5],['two',10],['three',15],['one',20]]);assert.deepEqual(ends,['one','two','three']);cascade.dispose();assert.equal(ends.at(-1),'one');
+ assert.equal(cascade.tick(0),null);assert.equal(cascade.tick(1.99),null);
+ assert.equal(cascade.tick(2).item,'one');assert.equal(cascade.tick(3.99).item,'one');assert.equal(cascade.tick(4),null);
+ assert.equal(cascade.tick(5.99),null);assert.equal(cascade.tick(6).item,'two');assert.equal(cascade.tick(8),null);
+ assert.equal(cascade.tick(10).item,'three');assert.equal(cascade.tick(12),null);assert.equal(cascade.tick(14).item,'one');
+ assert.deepEqual(starts,[['one',2],['two',6],['three',10],['one',14]]);assert.deepEqual(ends,['one','two','three']);cascade.dispose();assert.equal(ends.at(-1),'one');
+ for(const elapsed of [.1,.6,1.1,1.6,1.99]){assert.notEqual(automaticInteractionShake(elapsed),0);assert.equal(automaticInteractionShake(elapsed,true),0);}
+ assert.equal(automaticInteractionShake(2),0);assert.equal(automaticInteractionShake(-1),0);
 });
 
-test('cascade skips occluded items, cancels on interaction and never catches up in a simultaneous burst',()=>{
+test('cascade skips occluded items, cancels on interaction and never catches up in a burst',()=>{
  const starts=[],ends=[],cascade=createInteractionCascade({items:['hidden','a','b'],eligible:item=>item!=='hidden',onStart:item=>starts.push(item),onEnd:item=>ends.push(item)});
- assert.equal(cascade.tick(5).item,'a');cascade.interrupt(5.1);assert.equal(cascade.current,null);assert.deepEqual(ends,['a']);assert.equal(cascade.tick(10),null);assert.equal(cascade.tick(10.1).item,'b');
- assert.equal(cascade.tick(100).item,'a');assert.equal(starts.length,3);assert.equal(cascade.tick(100.1).item,'a');assert.equal(starts.length,3);
- cascade.tick(100.2,{blocked:true});assert.equal(cascade.current,null);assert.equal(cascade.tick(103),null);
- cascade.tick(200,{reduced:true});assert.equal(cascade.current,null);assert.equal(cascade.tick(204.99),null);assert.equal(cascade.tick(205).item,'b');cascade.dispose();
+ assert.equal(cascade.tick(2).item,'a');cascade.interrupt(2.1);assert.equal(cascade.current,null);assert.deepEqual(ends,['a']);assert.equal(cascade.tick(4),null);assert.equal(cascade.tick(4.1).item,'b');
+ assert.equal(cascade.tick(100),null);assert.equal(cascade.tick(101.99),null);assert.equal(cascade.tick(102).item,'a');assert.equal(starts.length,3);
+ cascade.tick(102.2,{blocked:true});assert.equal(cascade.current,null);assert.equal(cascade.tick(104),null);
+ cascade.tick(200,{reduced:true});assert.equal(cascade.current,null);assert.equal(cascade.tick(201.99),null);assert.equal(cascade.tick(202).item,'b');cascade.dispose();
 });
 
-test('scene cascade is available at the shelf and opening, while reading and insertion suspend it',()=>{
+test('scene cascade runs only in Projects and suspends during reading or insertion',()=>{
  const source=fs.readFileSync('src/engine.js','utf8'),expression=source.match(/createRoomCascade\(\{[\s\S]*?isAvailable:\(\)=>([\s\S]*?)\}\);let me=/)[1];
  const available=new Function('projectBusy','w','O','M','return ('+expression+')');
  const carts={busy:false,inserted:null},state={focus:0};
- assert.equal(available(false,carts,{cameraChapter:'intro',active:'intro'},state),true);
+ assert.equal(available(false,carts,{cameraChapter:'intro',active:'intro'},state),false);
  assert.equal(available(false,carts,{cameraChapter:'projetos',active:'projetos'},state),true);
  assert.equal(available(true,carts,{cameraChapter:'projetos',active:'projetos'},state),false);
  assert.equal(available(false,carts,{cameraChapter:'skills',active:'skills'},state),false);
- assert.equal(available(false,{busy:false,inserted:{}},{cameraChapter:'projetos',active:'projetos'},state),false);
+ assert.equal(available(false,{busy:false,inserted:{}},{active:'projetos'},state),false);
+ assert.equal(available(false,carts,{active:'projetos'},{focus:.2}),false);
+ const cascade=fs.readFileSync('public/room-cascade.js','utf8');assert(cascade.includes("item.key!=='tv'"));assert(!cascade.includes("'pointermove'"));
 });
 
 test('shared shake preserves the companies motion and ends after one brief pulse',()=>{
@@ -55,8 +61,8 @@ test('equipment shake is subtle, resets exactly and leaves cartridge transforms 
  class Material{dispose(){}}
  class Mesh{constructor(geometry){this.geometry=geometry;this.position=new Vector3();this.rotation={z:0};this.userData={};this.scale={x:1,setScalar(n){this.x=n}}}removeFromParent(){}}
  const make=()=>({rotation:{z:.1},children:[],updateWorldMatrix(){},worldToLocal(){},add(mesh){this.children.push(mesh)}}),tv=make(),cart=make();
- const cues=createSceneAffordances({Box3,Vector3,BoxGeometry,Mesh,Material},[{key:'tv',root:tv,shakeScale:.22},{key:'cart/one',root:cart}]);
- cues.highlight('tv');cues.update(.04,false);assert.equal(tv.rotation.z,.1+interactionShake(.04)*.22);assert.equal(cart.rotation.z,.1);assert.equal(tv.children.length,0);assert.equal(cart.children.length,0);
+ const cues=createSceneAffordances({Box3,Vector3,BoxGeometry,Mesh,Material},[{key:'tv',root:tv},{key:'cart/one',root:cart}]);
+ cues.highlight('tv');cues.update(.04,false);assert.equal(tv.rotation.z,.1);cues.automaticHighlight('tv',0);cues.update(1.1,false);assert.equal(tv.rotation.z,.1);assert.equal(cart.rotation.z,.1);assert.equal(tv.children.length,0);assert.equal(cart.children.length,0);
  cues.update(.5,false);assert.equal(tv.rotation.z,.1);cues.highlight(null);cues.update(.55,false);assert.equal(tv.rotation.z,.1);
  cues.highlight('tv');cues.update(.57,true);assert.equal(tv.rotation.z,.1);cues.dispose();assert.equal(tv.rotation.z,.1);
 });

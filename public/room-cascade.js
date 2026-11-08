@@ -1,11 +1,11 @@
-import {createInteractionCascade,interactionShake} from './interaction-motion.js?v=cs-mode-3';
+import {createInteractionCascade,automaticInteractionShake} from './interaction-motion.js?v=cs-mode-3';
 
 export function createRoomCascade(T,{doc=document}={}){
  const {room,equipment,carts,camera,canvas,pick,Box3,Vector3,isAvailable}=T;
  const ray=new T.Raycaster(),occluders=[];
  T.scene.traverseVisible(object=>{if(object.isMesh&&!object.userData.interactionCue)occluders.push(object);});
  const cartItems=carts.carts.map(cart=>({key:'cart/'+cart.slug,root:cart.root,cart}));
- const items=[...cartItems,...(room?.interactionObjects()||[]),...equipment.objects().filter(item=>!item.key.startsWith('cart/'))];
+ const items=[...cartItems,...(room?.interactionObjects()||[]),...equipment.objects().filter(item=>item.key!=='tv'&&!item.key.startsWith('cart/'))];
  let latestTime=0;
  const clear=item=>{
   room?.automaticHighlight(null);equipment.automaticHighlight(null);
@@ -29,7 +29,7 @@ export function createRoomCascade(T,{doc=document}={}){
  });
  const interrupt=()=>cascade.interrupt(latestTime);
  const reducedMedia=doc.defaultView.matchMedia('(prefers-reduced-motion: reduce)');reducedMedia.addEventListener('change',interrupt);
- const events=['pointerdown','pointermove','click','keydown','wheel','touchstart','focusin','room:focus','resume:skill-open','visibilitychange'];
+ const events=['pointerdown','click','keydown','wheel','touchstart','focusin','room:focus','resume:skill-open','visibilitychange'];
  for(const name of events)doc.addEventListener(name,interrupt,{capture:true,passive:true});
  const modes=new MutationObserver(interrupt);modes.observe(doc.documentElement,{attributes:true,attributeFilter:['data-mode']});
  return {get current(){return cascade.current;},interrupt,
@@ -37,7 +37,7 @@ export function createRoomCascade(T,{doc=document}={}){
    latestTime=time;
    reduced=reduced||reducedMedia.matches;
    const pulse=cascade.tick(time,{reduced,blocked:doc.hidden||doc.documentElement.dataset.mode!=='3d'||!!doc.documentElement.dataset.paused||!!doc.querySelector('dialog[open]')||!isAvailable()});
-   if(pulse?.item.cart&&!carts.busy&&pulse.item.cart!==carts.inserted){pulse.item.root.rotation.z=interactionShake(pulse.elapsed,reduced);T.invalidateShadows?.();}
+   if(pulse?.item.cart&&!carts.busy&&pulse.item.cart!==carts.inserted){pulse.item.root.rotation.z=automaticInteractionShake(pulse.elapsed,reduced);T.invalidateShadows?.();}
   },
   dispose(){cascade.dispose();modes.disconnect();reducedMedia.removeEventListener('change',interrupt);for(const name of events)doc.removeEventListener(name,interrupt,true);}
  };
