@@ -54,6 +54,6 @@ Emulação de ROM local: [EmulatorJS](https://github.com/EmulatorJS/EmulatorJS),
 
 ## Game Boy
 
-Emulação local: [jsGBC-core 0.7.0](https://github.com/ardean/jsGBC-core), de ardean, MIT. O núcleo informa uso da implementação Z80 de [GameBoy-Online](https://github.com/taisel/GameBoy-Online). Bundle para navegador em `public/vendor/gameboy/jsgbc.js`, com licença e avisos das dependências preservados na mesma pasta. Sem ROMs comerciais ou boot ROMs incluídas.
+Emulação local: [jsGBC-core 0.7.0](https://github.com/ardean/jsGBC-core), de ardean, MIT. O núcleo informa uso da implementação Z80 de [GameBoy-Online](https://github.com/taisel/GameBoy-Online). Bundle para navegador em `public/vendor/gameboy/jsgbc.js`, com licença e avisos das dependências preservados na mesma pasta. Sem boot ROMs incluídas. O arquivo de Pokémon Blue foi fornecido pelo usuário e incluído por solicitação explícita de publicação; não é abrangido pela licença MIT do emulador. Pokémon pertence aos respectivos titulares.
 
 Modelo 3D do aparelho, carcaça da interface, controles e cartucho de diagnóstico: criados em código para este portfólio. Game Boy e Nintendo são marcas de seus respectivos titulares.

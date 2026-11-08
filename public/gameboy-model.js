@@ -19,3 +19,15 @@ export function createGameBoyModel(T){
  root.scale.setScalar(.85);root.rotation.set(-Math.PI/2,0,-.22);root.position.set(.48,.523,-.82);
  return {root,dispose(){for(const resource of resources)resource.dispose();}};
 }
+
+export function createBlueCartridge(T){
+ const {Group,Mesh,BoxGeometry,PlaneGeometry,Material,BasicMaterial,CanvasTexture,SRGB}=T;
+ const root=new Group();root.name='Pokemon Blue cartridge';const resources=[];
+ const shell=new Material({color:'#2860a8',roughness:.75});resources.push(shell);
+ const shape=new BoxGeometry(.057,.064,.011);resources.push(shape);const body=new Mesh(shape,shell);root.add(body);body.castShadow=body.receiveShadow=true;
+ const image=document.createElement('canvas');image.width=256;image.height=224;const c=image.getContext('2d');
+ c.fillStyle='#e5d99d';c.fillRect(0,0,256,224);c.fillStyle='#2450a4';c.fillRect(8,8,240,208);c.fillStyle='#f5db5a';c.textAlign='center';c.font='bold 34px monospace';c.fillText('POKÉMON',128,70);c.fillStyle='#fff4cd';c.font='bold 27px monospace';c.fillText('BLUE',128,119);c.font='18px monospace';c.fillText('GAME BOY',128,182);
+ const map=new CanvasTexture(image);map.colorSpace=SRGB;resources.push(map);const label=new BasicMaterial({map,toneMapped:false});resources.push(label);const geometry=new PlaneGeometry(.047,.041);resources.push(geometry);const front=new Mesh(geometry,label);front.position.set(0,-.004,.0056);root.add(front);
+ root.rotation.set(-Math.PI/2,0,.22);root.position.set(.61,.509,-.79);
+ return {root,dispose(){for(const resource of resources)resource.dispose();}};
+}

@@ -70,6 +70,9 @@ test('handheld dialog loads a local cart, keeps it on validation failure, pauses
  assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'true');assert(!dialog.querySelector('[data-gb-action="A"]').disabled);
  await dialog.querySelector('[data-gb-pause]').onclick();assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'false');
  await dialog.querySelector('[data-gb-pause]').onclick();assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'true');
+ w.fetch=async url=>{assert.equal(url.pathname,'/site-cs-portfolio/games/gameboy/pokemon-blue.gb');return {ok:true,arrayBuffer:async()=>bytes.buffer};};
+ await dialog.querySelector('[data-gb-blue]').onclick();assert.equal(dialog.querySelector('[data-gb-name]').textContent,'Pokémon Blue');
+ assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'true');
  let resolve;const loading=w.chooseFile({name:'late.gb',size:bytes.length,arrayBuffer:()=>new Promise(r=>resolve=r)});
  dialog.close();resolve(bytes.buffer);await loading;assert(!dialog.open);assert.equal(w.document.body.style.overflow,'auto');assert.equal(w.document.activeElement,trigger);
  w.openGameBoy();assert(dialog.querySelector('[data-gb-action="A"]').disabled);dialog.close();
@@ -78,4 +81,16 @@ test('handheld dialog loads a local cart, keeps it on validation failure, pauses
 
 test('storage denial is reported without claiming a successful save',async()=>{
  const t=setup();try{await t.session.start(rom());t.w.Storage.prototype.setItem=()=>{throw Error('quota');};assert.equal(await t.session.save(),false);}finally{t.close();}
+});
+
+test('the supplied Blue cartridge boots, renders and responds to Start in the real core',async()=>{
+ const bytes=new Uint8Array(fs.readFileSync('public/games/gameboy/pokemon-blue.gb'));validateGameBoyRom(bytes,'pokemon-blue.gb');
+ const t=setup();try{
+ await t.session.start(bytes);assert(t.session.core.cartridge.name.startsWith('POKEMON'));
+ for(let i=1;i<=2400;i++){if(i===1000||i===1800)t.session.press('Start');if(i===1020||i===1820)t.session.lift('Start');t.frame(i*17);}
+ assert(t.session.playing,'the supplied game remains running without a core error');
+ const context=t.canvas.getContext('2d'),pixels=context.getImageData(0,0,160,144).data;
+ assert(new Set(pixels).size>4,'the game produces a detailed frame');
+ fs.mkdirSync('tmp',{recursive:true});fs.writeFileSync('tmp/pokemon-blue-test.png',context.canvas.toBuffer('image/png'));
+ }finally{t.close();}
 });
