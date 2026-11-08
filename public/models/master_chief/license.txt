@@ -1,0 +1,11 @@
+Model Information:
+* title:	Master Chief
+* source:	https://sketchfab.com/3d-models/master-chief-a321fd10909245a09670bac81d64113a
+* author:	Glitchdust (https://sketchfab.com/GlitchDust)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Master Chief" (https://sketchfab.com/3d-models/master-chief-a321fd10909245a09670bac81d64113a) by Glitchdust (https://sketchfab.com/GlitchDust) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

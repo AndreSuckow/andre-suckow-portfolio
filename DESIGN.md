@@ -6,6 +6,7 @@ Movimento: `public/mobile-motion.js` oferece fades de entrada/saída nos blocos 
 
 O retrato e a certificação de Sobre formam um bloco centralizado, com largura máxima de 280 px e imagem quadrada. A navegação mostra os seis destinos sem rolagem horizontal: três colunas na vertical e seis na horizontal ampla. As habilidades usam uma coluna, nomes em Inter e alvos de pelo menos 48 px. Ações iniciais e de apresentação ficam empilhadas; cartões e campos preservam a largura disponível. Espaçamentos menores liberam área de leitura e cabeçalhos dos modais permanecem acessíveis durante a rolagem. As regras em `public/custom.css` são restritas ao modo 2D e ao breakpoint mobile compartilhado com o CRT; desktop e cena 3D preservam suas regras.
 
+
 O portfólio atual de André Luis Suckow apresenta Customer Success, onboarding, implantação, adoção e retenção. A assinatura é o quarto 3D com TV de tubo; a versão 2D mantém o mesmo conteúdo e os mesmos contatos.
 
 ## Fontes e tokens
@@ -21,8 +22,6 @@ Descoberta automática no quarto: uma única sequência global destaca um objeto
 Os objetos clicáveis compartilham a chacoalhada das empresas do mapa: seno amortecido de 420 ms e amplitude máxima de 0,035 rad, definido em `public/interaction-motion.js`. Bíblia, Pokédex, porta-retrato, tabuleiro, pôsteres e fitas usam essa base ao receber destaque; TV e console usam amplitudes menores, sem deslocamento. Gavetas fechadas usam amplitude menor; abertas permanecem paradas. A animação ocorre uma vez por mudança de foco, volta à rotação original, preserva escalas e desaparece com movimento reduzido. A inserção de cartuchos continua podendo cancelar a animação da fita.
 
 Na Dama, as pedras usam a geometria original de “Pedra (Jogo de Damas)”, de Guilherme Tognetti. Um material independente em branco cria a segunda equipe; o material preto e o arquivo original permanecem preservados. Um único canvas transparente, com renderização sob demanda e o Three.js compartilhado do quarto, acompanha as casas HTML acessíveis. Promoção empilha duas pedras e mantém a indicação D. Falha de WebGL ou do asset conserva as peças HTML e as regras existentes. O modelo é carregado somente ao escolher Dama; não há loop de animação contínua.
-
-Os quatro pôsteres 3D preservam as imagens na resolução original e usam anisotropia até 16, limitada pela GPU, com mipmaps. A impressão fica 1 mm à frente do suporte e usa deslocamento de profundidade para evitar a disputa de superfícies durante a rolagem. O material da arte é opaco, escreve/testa profundidade e preserva as cores sem sombras projetadas sobre a impressão; paredes e objetos continuam ocluindo os pôsteres. O verso de papel e a inspeção 3D são preservados.
 
 O pôster de Mega Man X usa a imagem fornecida em `public/img/megamanx.webp` no lugar do Twisted Metal, na parede lateral em x=1.589, y=1.47, z=.62. Mantém largura de .32 e altura derivada da proporção original, sem recorte.
 

@@ -55,14 +55,24 @@ test('career information stays at the visited company while hovering or walking'
 });
 test('Projects keeps the cartridge view at every scroll position; Skills stays close to the TV',()=>{
  const source=fs.readFileSync('src/engine.js','utf8'),start=source.indexOf('frame(e,t,n){'),end=source.indexOf('update(e,t,n=!1)',start);
- const frame=new Function('Kh','Uh','return function'+source.slice(start+'frame'.length,end))((from,to,blend)=>({from:from.id,to:to.id,blend}),value=>Math.max(0,Math.min(1,value)));
- const views=Object.fromEntries(['wide','screen','desk','door'].map(id=>[id,{id}]));
+ const document={documentElement:{dataset:{}}};
+ const frame=new Function('Kh','Uh','document','return function'+source.slice(start+'frame'.length,end))((from,to,blend)=>({from:from.id,to:to.id,blend}),value=>Math.max(0,Math.min(1,value)),document);
+ const views=Object.fromEntries(['wide','screen','desk','door','reading'].map(id=>[id,{id}]));
  const pose=result=>result.blend===1?result.to:result.from;
  for(const reduced of [false,true])for(const mobileReading of [false,true])for(const progress of [0,.08,.5,.95,1]){
   const camera={views,goal:{},reduced,mobileReading};
   assert.equal(pose(frame.call(camera,'projetos',progress,0)),'desk');
   assert.equal(pose(frame.call(camera,'projetos',progress,1)),'screen');
   assert.equal(pose(frame.call(camera,'skills',progress,0)),'screen');
+ }
+ for(const reduced of [false,true])for(const mobileReading of [false,true]){
+  const camera={views,goal:{},reduced,mobileReading};
+  for(const [preview,expected] of [['screen','reading'],['room','wide']]){
+   document.documentElement.dataset.mobileTvPreview=preview;
+   assert.equal(pose(frame.call(camera,'skills',0,0)),mobileReading?expected:'screen');
+   assert.equal(pose(frame.call(camera,'projetos',0,0)),'desk');
+   assert.equal(pose(frame.call(camera,'projetos',0,1)),'screen');
+  }
  }
 });
 test('project loading and camera dive wait for the visible cartridge insertion; ejection waits for the shelf',async()=>{

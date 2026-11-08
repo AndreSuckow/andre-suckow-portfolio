@@ -10,7 +10,7 @@
     "room:new": "node room-version.mjs new",
     "room:previous": "node room-version.mjs previous",
     "check": "node check.mjs",
-    "test": "node --test poster-games.test.mjs skills-modal.test.mjs range.test.mjs cs-portfolio.test.mjs contact.test.mjs mobile-reading.test.mjs room-discoveries.test.mjs inspection-layout.test.mjs inspection-picking.test.mjs snes-controls.test.mjs loading-screen.test.mjs model-optimization.test.mjs mobile-crt.test.mjs crt-curvature.test.mjs hero-interactions.test.mjs board-games.test.mjs board-games-ui.test.mjs scene-affordances.test.mjs board-model.test.mjs mobile-game-access.test.mjs mobile-motion.test.mjs poster-rendering.test.mjs checker-renderer.test.mjs board-opponents.test.mjs",
+    "test": "node --test poster-games.test.mjs skills-modal.test.mjs range.test.mjs cs-portfolio.test.mjs contact.test.mjs mobile-reading.test.mjs room-discoveries.test.mjs inspection-layout.test.mjs inspection-picking.test.mjs snes-controls.test.mjs loading-screen.test.mjs model-optimization.test.mjs mobile-crt.test.mjs crt-curvature.test.mjs career-models.test.mjs career-orbit.test.mjs hero-interactions.test.mjs board-games.test.mjs board-games-ui.test.mjs scene-affordances.test.mjs board-model.test.mjs mobile-game-access.test.mjs mobile-motion.test.mjs poster-rendering.test.mjs checker-renderer.test.mjs board-opponents.test.mjs",
     "models:optimize": "node optimize-models.mjs",
     "board:optimize": "node prepare-board-model.mjs"
   },
@@ -20,12 +20,12 @@
     "@gltf-transform/functions": "^4.5.1",
     "@napi-rs/canvas": "^1.0.11",
     "adm-zip": "^0.6.1",
+    "chess.js": "1.4.0",
     "fast-xml-parser": "^5.11.2",
     "jsdom": "^30.1.2",
     "meshoptimizer": "^1.3.0",
     "pdfjs-dist": "^6.4.299",
     "pdfkit": "^0.20.2",
-    "sharp": "^0.35.5",
-    "chess.js": "1.4.0"
+    "sharp": "^0.35.5"
   }
 }
