@@ -14,11 +14,11 @@ function rom(){
  let sum=0;for(let i=0x134;i<=0x14c;i++)sum=(sum-data[i]-1)&255;data[0x14d]=sum;return data;
 }
 function audio(){const node=()=>({connect(){},disconnect(){},gain:{setTargetAtTime(){}}});return {audioWorklet:{},sampleRate:44100,currentTime:0,createGain:node,createScriptProcessor:node,async resume(){this.state='running';},async suspend(){this.state='suspended';},async close(){this.state='closed';}};}
-function setup(){
+function setup(sampleRate=44100){
  const dom=new JSDOM('<!doctype html><canvas></canvas>',{url:'https://example.test/site-cs-portfolio/',runScripts:'outside-only'}),w=dom.window;
  const canvases=new WeakMap();w.HTMLCanvasElement.prototype.getContext=function(){if(!canvases.has(this))canvases.set(this,createCanvas(this.width||160,this.height||144));return canvases.get(this).getContext('2d');};
  w.eval(fs.readFileSync('public/vendor/gameboy/jsgbc.js','utf8'));
- const jobs=new Map();let id=0;const context=audio(),canvas=w.document.querySelector('canvas');
+ const jobs=new Map();let id=0;const context=audio(),canvas=w.document.querySelector('canvas');context.sampleRate=sampleRate;
  const session=createGameBoySession({Core:w.PortfolioGameBoy,canvas,audioContext:context,storage:w.localStorage,prefix:'test/',requestFrame:fn=>{jobs.set(++id,fn);return id;},cancelFrame:id=>jobs.delete(id)});
  return {session,context,canvas,w,jobs,frame(time){const [id,fn]=jobs.entries().next().value;jobs.delete(id);fn(time);},close(){session.dispose();w.close();}};
 }
@@ -83,11 +83,19 @@ test('storage denial is reported without claiming a successful save',async()=>{
  const t=setup();try{await t.session.start(rom());t.w.Storage.prototype.setItem=()=>{throw Error('quota');};assert.equal(await t.session.save(),false);}finally{t.close();}
 });
 
-test('the supplied Blue cartridge boots, renders and responds to Start in the real core',async()=>{
+for(const rate of [44100,48000])test(`the supplied Blue cartridge renders, plays audio at ${rate} Hz and responds to Start`,async()=>{
  const bytes=new Uint8Array(fs.readFileSync('public/games/gameboy/pokemon-blue.gb'));validateGameBoyRom(bytes,'pokemon-blue.gb');
- const t=setup();try{
+ const t=setup(rate);try{
  await t.session.start(bytes);assert(t.session.core.cartridge.name.startsWith('POKEMON'));
- for(let i=1;i<=2400;i++){if(i===1000||i===1800)t.session.press('Start');if(i===1020||i===1820)t.session.lift('Start');t.frame(i*17);}
+ const device=t.session.core.audioDevice;
+ assert(device.inputBuffer.length>0,'audio input is allocated after configuring the cartridge');
+ assert(Number.isFinite(device.resampler.ratioWeight),'audio resampling has a valid source frequency');
+ let audible=false;const channels=[new Float32Array(device.samplesPerCallback),new Float32Array(device.samplesPerCallback)];
+ for(let i=1;i<=2400;i++){
+  if(i===1000||i===1800)t.session.press('Start');if(i===1020||i===1820)t.session.lift('Start');t.frame(i*17);
+  if(i%3===0){device.processAudio({outputBuffer:{getChannelData:channel=>channels[channel]}});audible||=channels.some(samples=>samples.some(value=>Number.isFinite(value)&&Math.abs(value)>.001));}
+ }
+ assert(audible,'the supplied game sends non-silent PCM samples to the audio output');
  assert(t.session.playing,'the supplied game remains running without a core error');
  const context=t.canvas.getContext('2d'),pixels=context.getImageData(0,0,160,144).data;
  assert(new Set(pixels).size>4,'the game produces a detailed frame');

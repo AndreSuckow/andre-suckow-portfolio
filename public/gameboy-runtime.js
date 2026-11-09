@@ -25,7 +25,15 @@ export function createGameBoySession({Core,canvas,audioContext,storage,prefix,on
  function pause(){playing=false;cancelFrame(frame);frame=0;release();gb.debouncedAutoSave.clear();gb.autoSave();audioContext.suspend().catch(()=>{});}
  return {
   get playing(){return playing;},get core(){return gb;},
-  async start(bytes){await gb.audioDevice.init();if(disposed)return;gb.insertCartridge(bytes);playing=true;gb.turnOn();gb.loadRam();gb.loadRtc();audioContext.resume().catch(()=>{});},
+  // turnOn configures the source sample rate and buffer sizes before init.
+  // Initializing the device earlier leaves a zero-length buffer and silent audio.
+  async start(bytes){
+   if(disposed)return;gb.insertCartridge(bytes);playing=true;gb.turnOn();await gb.audioDevice.init();if(disposed)return;
+   // jsGBC 0.7 only seeds this phase when upsampling. At 44.1 kHz the
+   // source is slightly faster, so an undefined phase otherwise silences it.
+   const resampler=gb.audioDevice.resampler;if(!Number.isFinite(resampler.lastWeight))resampler.lastWeight=1;
+   gb.loadRam();gb.loadRtc();audioContext.resume().catch(()=>{});
+  },
   async resume(){if(disposed||playing)return;await audioContext.resume();if(disposed)return;playing=true;gb.lastRun=0;gb.requestFrame(gb.frameHandler);},
   pause,release,
   press(action){if(playing&&!held.has(action)){audioContext.resume().catch(()=>{});held.add(action);gb.actionDown(action);}},

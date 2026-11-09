@@ -59,4 +59,6 @@ O formulário envia diretamente pelo FormSubmit para andre.suckow.dev@gmail.com,
 
 `node verify-portfolio.mjs` verifica a TV, tooltips, Hobbies, Game Over, reinício e o modo móvel em Chrome. `node verify-contact.mjs` verifica o formulário com respostas simuladas, sem enviar e-mails reais. No ambiente isolado, a opção `GAME_TEST_NO_SANDBOX=1` é aceita somente para a origem local.
 
+`node verify-gameboy.mjs` verifica o Pokémon Blue em Chrome: áudio real, centralização em desktop e celular, geometria e toque nos botões, pausa, retomada, mudo e fechamento. Capturas ficam em `tmp/portfolio-browser/`; o servidor local deve estar ativo.
+
 Veja [CREDITS.md](CREDITS.md) para a origem do motor e dos assets.

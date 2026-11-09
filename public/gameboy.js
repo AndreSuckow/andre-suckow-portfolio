@@ -22,17 +22,19 @@ function sync(){
 }
 async function chooseFile(file){
  if(!file)return;
- const token=++generation;let candidate;loading=true;sync();status('Conferindo o cartucho…');
+ const token=++generation;let candidate,context;loading=true;sync();status('Conferindo o cartucho…');
  try{
   if(file.size>8*1024*1024)throw Error('O jogo deve ter até 8 MB.');
+  // Unlock in the initiating click/tap, before fetch, hashing or core loading.
+  const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('Este navegador não oferece áudio compatível com o Game Boy.');
+  context=new Audio();context.resume().catch(()=>{});
   const data=await file.arrayBuffer();if(token!==generation||!dialog.open)return;
   const bytes=validateGameBoyRom(new Uint8Array(data),file.name);
   const [Core,digest]=await Promise.all([loadCore(),crypto.subtle.digest('SHA-256',bytes)]);
   if(token!==generation||!dialog.open)return;
   const prefix='portfolio-gameboy/'+Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('')+'/';
   session?.dispose();session=null;
-  const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('Este navegador não oferece áudio compatível com o Game Boy.');
-  const context=new Audio();let savesAvailable=true;
+  let savesAvailable=true;
   candidate=createGameBoySession({Core,canvas:dialog.querySelector('canvas'),audioContext:context,storage:{getItem:key=>window.localStorage.getItem(key),setItem:(key,value)=>window.localStorage.setItem(key,value)},prefix,onStorageError(){savesAvailable=false;status('O navegador não permitiu salvar. Exporte seu save antes de sair.');},onError(){status('O emulador encontrou uma falha e pausou. Exporte seu save e tente carregar o cartucho novamente.');sync();}});session=candidate;
   await candidate.start(bytes);
   if(token!==generation||!dialog.open){candidate.dispose();if(session===candidate)session=null;return;}
@@ -40,7 +42,7 @@ async function chooseFile(file){
   status(savesAvailable?'Pronto! Setas para mover · Z: A · X: B · Enter: Start · Shift: Select.':'Salvamento local indisponível. Exporte seu save antes de sair.');
   dialog.querySelector('[data-gb-playfield]').focus({preventScroll:true});
  }catch(error){candidate?.dispose();if(token===generation){if(session===candidate)session=null;status(error.message||'Não foi possível iniciar este jogo. Escolha outra ROM.');}}
- finally{if(token===generation){loading=false;sync();}}
+ finally{if(context&&!candidate)context.close().catch(()=>{});if(token===generation){loading=false;sync();}}
 }
 function buildDialog(){
  dialog=document.createElement('dialog');dialog.id='gameboy-dialog';dialog.className='dialog gameboy-dialog';dialog.setAttribute('aria-labelledby','gameboy-title');dialog.setAttribute('aria-describedby','gameboy-description');dialog.setAttribute('data-lenis-prevent','');
