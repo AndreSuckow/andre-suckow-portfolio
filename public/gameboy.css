@@ -6,7 +6,6 @@
 
 /* Molded controls: shared geometry on desktop and touch screens. */
 .gb-dpad{position:relative;isolation:isolate;flex-shrink:0}
-.gb-dpad::before{content:"";position:absolute;inset:-5px;background:#aaa99f;clip-path:polygon(33% 0,67% 0,67% 33%,100% 33%,100% 67%,67% 67%,67% 100%,33% 100%,33% 67%,0 67%,0 33%,33% 33%);z-index:-1;filter:drop-shadow(0 2px 2px #0006)}
 .gb-dpad button{width:44px;height:44px;background:linear-gradient(145deg,#48484d,#242429 75%);box-shadow:inset 1px 2px 1px #ffffff38,inset -2px -2px 1px #101014,0 4px 0 #17171c,0 6px 4px #0005;text-shadow:0 1px 1px #000}
 .gb-dpad span{position:relative;background:linear-gradient(145deg,#37373d,#29292e);box-shadow:0 4px 0 #17171c}
 .gb-dpad span::after{content:"";position:absolute;inset:12px;border-radius:50%;box-shadow:inset 1px 2px 3px #1119,0 1px 1px #fff2}
