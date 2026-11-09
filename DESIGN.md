@@ -121,6 +121,8 @@ No celular, o efeito CRT fica desativado e seu botão não aparece, tanto na ver
 
 A curvatura CRT mantém as bordas da imagem dentro dos limites do vidro, evitando recortes e cunhas escuras nos cantos. O shader e a transformação de coordenadas do ponteiro usam a mesma deformação com bordas fixas; a curvatura suave do interior, scanlines e demais efeitos permanecem disponíveis no desktop.
 
+O chiado leve da TV é aplicado no próprio shader, com intensidade de 0,045, independente do pós-processamento e da qualidade adaptativa do cenário. Os picos de estática ao ligar ou carregar cartuchos se somam a esse chiado persistente. A faixa clara percorre a altura inteira e reaparece pela borda sem ciclos vazios; velocidade de 0,12 telas/s e largura de 0,26 da altura preservam uma passagem suave. Navegar entre as telas não desliga esses efeitos. Desativar CRT, a regra já existente de celular e a preferência por movimento reduzido continuam sendo respeitados.
+
 Na abertura 3D, o início do fade torna a seção `.hero` inerte: os links deixam de receber cliques, toque e foco, sem interromper a animação visual. A interação volta ao retornar ao início ou escolher o modo 2D. Se o foco estava na abertura ao desaparecer, ele retorna ao canvas da cena.
 
 Objetos interativos do quarto chamam atenção pela própria chacoalhada, sem pontos flutuantes. A sequência destaca um objeto visível por vez, a cada cinco segundos. Hover e foco mantêm cursor de clique, rótulo e realce; os acessos semânticos continuam disponíveis pelo teclado. Movimento reduzido elimina a oscilação. As casas do mapa mantêm seu destaque e cursor de clique.

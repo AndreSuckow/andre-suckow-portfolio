@@ -4488,12 +4488,17 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
     // flicker + rolling bar + static
     float t = uTime * uMotion;
     float flicker = 1.0 - 0.018 * uIntensity * uMotion * sin(t * 61.0) * sin(t * 13.0);
-    float roll = smoothstep(0.0, 0.08, fract(uv.y * 0.6 - t * 0.07)) * (1.0 - smoothstep(0.08, 0.16, fract(uv.y * 0.6 - t * 0.07)));
+    // One complete screen per cycle: the band wraps at the edge without
+    // spending part of each cycle outside the visible raster.
+    float rollPhase = fract(uv.y - t * 0.12);
+    float roll = smoothstep(0.0, 0.13, rollPhase) * (1.0 - smoothstep(0.13, 0.26, rollPhase));
     col *= flicker;
     col += vec3(0.035) * roll * uIntensity * uMotion;
     float n = hash(floor(uv * vec2(320.0, 240.0)) + floor(t * 30.0));
-    col = mix(col, vec3(n), clamp(uNoise, 0.0, 1.0));
-    col += (n - 0.5) * 0.03 * uIntensity * uMotion;
+    // Keep the tube's grain independent of boot bursts and scene postprocessing
+    // (which adaptive quality may disable). Explicit CRT/motion settings win.
+    float grain = 0.045 * uIntensity * uMotion;
+    col = mix(col, vec3(n), clamp(uNoise + grain, 0.0, 1.0));
 
     // vignette inside the raster
     vec2 vg = uv * (1.0 - uv);

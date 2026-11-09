@@ -61,4 +61,6 @@ O formulário envia diretamente pelo FormSubmit para andre.suckow.dev@gmail.com,
 
 `node verify-gameboy.mjs` verifica o Pokémon Blue em Chrome: áudio real, centralização em desktop e celular, geometria e toque nos botões, pausa, retomada, mudo e fechamento. Capturas ficam em `tmp/portfolio-browser/`; o servidor local deve estar ativo.
 
+`node verify-crt-persistence.mjs` percorre duas vezes as seis telas no Chrome, acompanha a animação do CRT, testa seu botão e a volta de celular para desktop. Também compila o shader real em WebGL e mede 160 quadros dos ciclos da faixa, chiado persistente e respeito a CRT desligado e movimento reduzido. Requer o servidor local; `GAME_TEST_URL` permite conferir a versão publicada.
+
 Veja [CREDITS.md](CREDITS.md) para a origem do motor e dos assets.
