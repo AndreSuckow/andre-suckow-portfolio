@@ -48,6 +48,7 @@ try{
   await until(`document.documentElement.dataset.chapter==='${tab}'`,'chapter '+tab);
   const before=await evaluate(`${state}.u.uTime`);await wait(350);
   await until(`${state}.u.uTime>${before}`,'animation continues in '+tab);
+  await until(`${state}.u.uPower===1`,'TV warmup complete in '+tab);
   const current=await evaluate(state);assert.equal(current.u.uIntensity,1,'CRT stays enabled in '+tab);assert.equal(current.u.uMotion,1);assert.equal(current.u.uPower,1);
   console.log('PASS navigation:',pass+1,tab,'quality',current.u.uLevel,'time',current.u.uTime.toFixed(2));
   if(pass===1)fs.writeFileSync(path.join(output,'crt-'+tab+'.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
@@ -70,6 +71,9 @@ try{
 }finally{page?.close();if(browser){await browser.send('Browser.close').catch(()=>{});browser.close();}else child?.kill();}
 
 function verifyShader(fragment){
+ // This signal probe runs in linear space. The end-to-end brightness check
+ // exercises Three's real colorspace chunk and the composer bypass together.
+ fragment=fragment.replace('#include <colorspace_fragment>','');
  const size=128,canvas=document.createElement('canvas');canvas.width=canvas.height=size;
  const gl=canvas.getContext('webgl',{preserveDrawingBuffer:true});if(!gl)throw Error('WebGL unavailable');
  gl.getExtension('OES_standard_derivatives');

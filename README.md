@@ -72,6 +72,8 @@ O formulário envia diretamente pelo FormSubmit para andre.suckow.dev@gmail.com,
 
 `node verify-crt-persistence.mjs` percorre duas vezes as seis telas no Chrome, acompanha a animação do CRT, testa seu botão e a volta de celular para desktop. Também compila o shader real em WebGL e mede 160 quadros dos ciclos da faixa, chiado persistente e respeito a CRT desligado e movimento reduzido. Requer o servidor local; `GAME_TEST_URL` permite conferir a versão publicada.
 
+`node verify-tv-brightness.mjs` mede os pixels da tela no renderizador real, incluindo a passagem do pós-processamento para renderização direta. Compara brilho e granulação após Experiência → Projetos → Experiência por menu externo, menu da TV e teclado, inserção/substituição/ejeção de cartucho e desligar/religar a TV, nos níveis alto, médio e baixo. O relógio da amostra e a câmera são fixados somente durante a captura para permitir comparação; os controles de diagnóstico são injetados apenas no navegador isolado e não são publicados. Capturas ficam em `tmp/portfolio-browser/brightness-*.png`.
+
 `node verify-routes.mjs` verifica a apresentação compartilhada na raiz e em `/cs/`, o modo 3D/2D, o layout mobile, atualização direta, redirecionamento de `/cs` e retorno das fichas e versões para impressão. Nesse script, `GAME_TEST_URL` recebe a raiz; nos demais verificadores, pode receber qualquer uma das duas rotas.
 
 Veja [CREDITS.md](CREDITS.md) para a origem do motor e dos assets.
