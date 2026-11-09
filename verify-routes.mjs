@@ -32,7 +32,8 @@ try{
  const cs=new URL('cs/',base),homePath=new URL(base).pathname;
  for(const [width,height] of [[1440,1000],[390,844]]){
   await page.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<700});
-  await page.send('Page.navigate',{url:base});await until('document.querySelector(".resume-home__content")','curriculum home');
+  await page.send('Page.navigate',{url:base});await until('document.readyState==="complete" && document.querySelector(".resume-home__content")','curriculum home');
+  await evaluate('document.fonts.ready');
   const home=await evaluate('({path:location.pathname,game:!!document.querySelector("#stage-canvas"),scripts:document.scripts.length,overflow:document.documentElement.scrollWidth>innerWidth,link:document.querySelector(".resume-home a").href,height:document.querySelector(".resume-home a").getBoundingClientRect().height})');
   assert.equal(home.path,homePath);assert.equal(home.game,false);assert.equal(home.scripts,0);assert.equal(home.overflow,false);assert.equal(home.link,cs.href);assert(home.height>=44);
   await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});await page.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
