@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 const data={name:'Recrutador',email:'pessoa@example.com',message:'Temos uma oportunidade para você.',website:'',requestId:'12345678-1234-1234-1234-123456789abc'};
 function setup(fetchImpl){
- const dom=new JSDOM(fs.readFileSync('public/index.html','utf8'),{url:'http://localhost:4173/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
+ const dom=new JSDOM(fs.readFileSync('public/cs/index.html','utf8'),{url:'http://localhost:4173/',runScripts:'outside-only',pretendToBeVisual:true}),w=dom.window;
  w.fetch=fetchImpl;w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','');};w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');this.dispatchEvent(new w.Event('close'));};
  w.eval(fs.readFileSync('public/contact-form.js','utf8'));return {dom,w,d:w.document};
 }

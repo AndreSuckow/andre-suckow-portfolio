@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
-const html=fs.readFileSync('public/index.html','utf8');
+const html=fs.readFileSync('public/cs/index.html','utf8');
 const tick=()=>new Promise(resolve=>setTimeout(resolve,5));
 async function until(check){for(let i=0;i<100;i++){if(check())return;await tick();}assert.fail('Loading screen did not finish');}
 function setup({webgl=true,reducedMotion=true,controlTransitions=false}={}){

@@ -14,7 +14,10 @@ const server=http.createServer(async(req,res)=>{
     const pathname=decodeURIComponent(new URL(req.url,'http://local').pathname);
     let file=path.resolve(root,'.'+pathname);
     if(file!==root&&!file.startsWith(root+path.sep)){res.writeHead(403);res.end('Forbidden');return;}
-    let info=await stat(file);if(info.isDirectory()){file=path.join(file,'index.html');info=await stat(file);}
+    let info=await stat(file);if(info.isDirectory()){
+      if(!pathname.endsWith('/')){res.writeHead(308,{'Location':pathname+'/'+new URL(req.url,'http://local').search});res.end();return;}
+      file=path.join(file,'index.html');info=await stat(file);
+    }
     const range=parseRange(req.headers.range,info.size);
     if(range===null){res.writeHead(416,{'Content-Range':`bytes */${info.size}`,'Accept-Ranges':'bytes','Content-Length':0});res.end();return;}
     const headers={'Content-Type':types[path.extname(file)]||'application/octet-stream','X-Content-Type-Options':'nosniff','Accept-Ranges':'bytes','Content-Length':range?range.end-range.start+1:info.size};

@@ -95,7 +95,7 @@ test('the approved dynamic-code permission is confined to the local emulator pag
  const runner=fs.readFileSync('public/emulator/index.html','utf8');
  assert(runner.includes("'unsafe-eval'"));assert(runner.includes("form-action 'none'"));
  assert(!fs.readFileSync('src/room-discoveries.html','utf8').includes("'unsafe-eval'"));
- assert(!fs.readFileSync('public/index.html','utf8').includes("'unsafe-eval'"));
+ assert(!fs.readFileSync('public/cs/index.html','utf8').includes("'unsafe-eval'"));
 });
 
 test('the original games use published embeds while unavailable Super Mario World retains its existing provider',()=>{

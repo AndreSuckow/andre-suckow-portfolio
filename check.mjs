@@ -49,7 +49,10 @@ for(const file of gltfs){
   if(ref.byteLength!==undefined)assert.equal(fs.statSync(asset).size,ref.byteLength,`Incomplete glTF buffer: ${asset}`);
  }
 }
-const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const html=fs.readFileSync(path.join(root,'cs/index.html'),'utf8');
+const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
+assert(home.includes('href="/cs/"'),'Home must link to the CS portfolio');
+assert(!home.includes('id="stage-canvas"')&&!home.includes('src="/boot.js'),'Root must stay separate from the CS engine');
 for(const id of ['stage-canvas','inicio','boot','sobre','experiencia','projetos','skills','contato','fim','contact-dialog','announcer'])assert(html.includes(`id="${id}"`),`Missing engine contract: ${id}`);
 const engine=fs.readFileSync(path.join(root,'engine.js'),'utf8');
 for(const company of JSON.parse(fs.readFileSync('profile.json','utf8')).experience.map(x=>x.org))assert(engine.includes(company),`Missing professional experience ${company}`);

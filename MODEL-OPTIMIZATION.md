@@ -31,7 +31,7 @@ O realce âmbar é temporário no quarto. A inspeção restaura as propriedades 
 
 ## Validação
 
-- `SITE_BASE_PATH=/andre-cs-portfolio/` nos testes, check e build.
+- `SITE_BASE_PATH=/andre-suckow-portfolio/` nos testes, check e build.
 - Decodificação, integridade dos assets, orçamento de tamanho, nomes e pivô da tampa, UVs, alpha e materiais.
 - Navegador: cliques físicos, inspeção, giro, zoom, créditos, link NTLH, retrato e paisagem no celular, ausência de fallback silencioso e de downloads dos recursos clássicos.
 - Discman: OPEN, reprodução/pausa, retrocesso, rodinha de volume, controles móveis e limites de zoom.

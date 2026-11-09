@@ -5,7 +5,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 const executable=process.env.GAME_TEST_CHROME||'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const base=process.env.GAME_TEST_URL||'http://127.0.0.1:4173/';
+const base=process.env.GAME_TEST_URL||'http://127.0.0.1:4173/cs/';
 const output=path.resolve('tmp/portfolio-browser');fs.mkdirSync(output,{recursive:true});
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function connect(url){
@@ -35,7 +35,7 @@ try{
  await page.send('Page.navigate',{url:base});
  await until('document.querySelector("[data-room-gameboy]")','room access');
  await until('document.querySelector("[data-loader]").hidden','loader ready');
- await evaluate('(async()=>{document.querySelectorAll("dialog[open]").forEach(d=>d.close());const m=await import(new URL("gameboy.js",location.href));m.openGameBoy();})()');
+ await evaluate(`(async()=>{document.querySelectorAll("dialog[open]").forEach(d=>d.close());const m=await import(new URL("gameboy.js",document.querySelector('link[href*="gameboy.css"]').href));m.openGameBoy();})()`);
  await until('document.querySelector("#gameboy-dialog")?.open','Game Boy opens');
  const click=async selector=>{await evaluate('document.querySelector('+JSON.stringify(selector)+').scrollIntoView({block:"center",behavior:"instant"})');await wait(250);const r=await evaluate('(()=>{const r=document.querySelector('+JSON.stringify(selector)+').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');await page.send('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...r});await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...r});};
  await click('[data-gb-blue]');

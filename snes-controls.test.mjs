@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 
 test('Touch help pauses, blocks a second overlay and restores focus and navigation on close',async()=>{
- const dom=new JSDOM(fs.readFileSync('public/index.html','utf8'),{url:'http://localhost/',runScripts:'outside-only'});
+ const dom=new JSDOM(fs.readFileSync('public/cs/index.html','utf8'),{url:'http://localhost/',runScripts:'outside-only'});
  const w=dom.window,d=w.document;
  d.querySelector('.snes-pad').hidden=false;
  w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','');};

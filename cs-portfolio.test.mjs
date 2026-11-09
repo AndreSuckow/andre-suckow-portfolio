@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 import {whatsappMessage} from './public/cs-model.js';
 import {createCareerJourney,drawCareerScreen} from './public/career-map.js';
-const html=fs.readFileSync('public/index.html','utf8');
+const html=fs.readFileSync('public/cs/index.html','utf8');
 test('all resume facts are shared by the website and printable curriculum',()=>{
  const profile=JSON.parse(fs.readFileSync('profile.json','utf8'));
  const dom=new JSDOM(html),d=dom.window.document;

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const html=fs.readFileSync('public/index.html','utf8');
+const html=fs.readFileSync('public/cs/index.html','utf8');
 const enhancements=fs.readFileSync('public/enhancements.js','utf8');
 const engine=fs.readFileSync('public/engine.js','utf8');
 const profile=JSON.parse(fs.readFileSync('profile.json','utf8'));

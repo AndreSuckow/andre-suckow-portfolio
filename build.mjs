@@ -9,7 +9,7 @@ await mkdir('dist',{recursive:true});
 await cp('public','dist',{recursive:true});
 // Project Pages serves the site below /repository/, while local development stays at /.
 const base=process.env.SITE_BASE_PATH||'/';
-const runtimeVersion=(await readFile('public/index.html','utf8')).match(/boot\.js\?v=([a-f0-9]+)/)?.[1];
+const runtimeVersion=(await readFile('public/cs/index.html','utf8')).match(/boot\.js\?v=([a-f0-9]+)/)?.[1];
 if(!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base))throw Error('Invalid SITE_BASE_PATH');
 if(base!=='/'){
  const entries=await readdir('public');
