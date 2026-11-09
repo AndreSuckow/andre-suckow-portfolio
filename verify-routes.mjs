@@ -29,28 +29,34 @@ try{
  await page.send('Page.enable');await page.send('Runtime.enable');await page.send('Network.enable');
  const evaluate=async expression=>{const result=await page.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;};
  const until=async(expression,label)=>{for(let i=0;i<150;i++){if(await evaluate(expression))return;await wait(60);}throw Error(`Timed out: ${label}`);};
- const cs=new URL('cs/',base),homePath=new URL(base).pathname;
- for(const [width,height] of [[1440,1000],[390,844]]){
-  await page.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<700});
-  await page.send('Page.navigate',{url:base});await until('document.readyState==="complete" && document.querySelector(".resume-home__content")','curriculum home');
-  await evaluate('document.fonts.ready');
-  const home=await evaluate('({path:location.pathname,game:!!document.querySelector("#stage-canvas"),scripts:document.scripts.length,overflow:document.documentElement.scrollWidth>innerWidth,link:document.querySelector(".resume-home a").href,height:document.querySelector(".resume-home a").getBoundingClientRect().height})');
-  assert.equal(home.path,homePath);assert.equal(home.game,false);assert.equal(home.scripts,0);assert.equal(home.overflow,false);assert.equal(home.link,cs.href);assert(home.height>=44);
-  await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});await page.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
-  assert.equal(await evaluate('document.activeElement.tagName'),'A','home link is keyboard reachable');
-  await evaluate('document.fonts.ready');
-  fs.writeFileSync(path.join(output,'routes-home-'+width+'.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
+
+ const cs=new URL('cs/',base);
+ const signatures=[];
+ await page.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+ for(const [route,kind] of [[base,'curriculo'],[cs.href,'cs']]){
+  await page.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
+  await page.send('Page.navigate',{url:route});
+  await until('document.querySelector("#stage-canvas") && document.querySelector("[data-loader]")?.hidden','portfolio '+kind);
+  const signature=await evaluate('({kind:document.documentElement.dataset.portfolio,styles:[...document.querySelectorAll("link[rel=stylesheet]")].map(e=>e.href),chapters:[...document.querySelectorAll("section[data-chapter]")].map(e=>({id:e.id,class:e.className})),scripts:[...document.querySelectorAll("script[src]")].map(e=>e.src),placeholder:!!document.querySelector(".resume-home__content")})');
+  assert.equal(signature.kind,kind);assert.equal(signature.placeholder,false);delete signature.kind;signatures.push(signature);
+  await evaluate('document.querySelector("[data-nav-tab=experiencia]").click()');await until('document.documentElement.dataset.chapter==="experiencia"','experience '+kind);
+  await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+  fs.writeFileSync(path.join(output,'routes-'+kind+'-desktop.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  await evaluate('document.querySelector("[data-toggle=mode]").click()');await until('document.documentElement.dataset.mode==="2d"','2D '+kind);
+  await page.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await wait(150);
+  assert.equal(await evaluate('document.documentElement.scrollWidth>innerWidth'),false,'mobile fits '+kind);
+  fs.writeFileSync(path.join(output,'routes-'+kind+'-mobile.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  for(const detail of ['curriculo/','cases/onboarding/']){
+   const details=await evaluate('(async()=>{const r=await fetch('+JSON.stringify(new URL(detail,route).href)+');const d=new DOMParser().parseFromString(await r.text(),"text/html");return {status:r.status,back:d.querySelector(".document-actions a").getAttribute("href")};})()');
+   assert.equal(details.status,200);assert.equal(details.back,new URL(route).pathname,'detail returns to '+kind);
+  }
+  await page.send('Page.reload');await until('document.querySelector("#stage-canvas") && document.querySelector("[data-loader]")?.hidden','direct reload '+kind);
+  console.log('PASS:',kind,'shared 3D/2D layout, mobile, details and direct reload');
  }
+ assert.deepEqual(signatures[0],signatures[1],'root and CS load the same presentation and runtime');
  await page.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
- await evaluate('document.querySelector(".resume-home a").click()');
- await until('document.querySelector("#stage-canvas") && document.querySelector("[data-loader]").hidden','CS portfolio through home link');
- assert.equal(await evaluate('location.pathname'),cs.pathname);
- await page.send('Page.reload');await until('document.querySelector("#stage-canvas") && document.querySelector("[data-loader]").hidden','direct CS refresh');
  await page.send('Page.navigate',{url:new URL('cs',base).href});
- await until(`location.pathname===${JSON.stringify(cs.pathname)} && document.querySelector("[data-loader]")?.hidden`,'CS without trailing slash');
- fs.writeFileSync(path.join(output,'routes-cs.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- const details=await evaluate(`(async()=>{const response=await fetch(${JSON.stringify(new URL('curriculo/',base).href)});const html=await response.text();const document=new DOMParser().parseFromString(html,'text/html');return {status:response.status,back:document.querySelector('.document-actions a').getAttribute('href')};})()`);
- assert.equal(details.status,200);assert.equal(details.back,cs.pathname);
+ await until('location.pathname==='+JSON.stringify(cs.pathname)+' && document.querySelector("[data-loader]")?.hidden','CS without trailing slash');
  assert.equal(page.errors.length,0,JSON.stringify(page.errors));
- console.log('PASS: separate curriculum home, desktop/mobile, keyboard link, CS entry, refresh, /cs redirect and printable CV return link.');
+ console.log('PASS: identical presentation at root and /cs/, independent route identity, responsive layout and route-specific document return links.');
 }finally{page?.close();if(browser){await browser.send('Browser.close').catch(()=>{});browser.close();}else child?.kill();}

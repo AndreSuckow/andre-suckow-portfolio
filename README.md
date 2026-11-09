@@ -14,7 +14,7 @@ npm run check
 npm test
 ```
 
-O site abre em http://localhost:4173/. A raiz fica reservada para o currículo e mostra uma página provisória; o portfólio atual de Customer Success está em http://localhost:4173/cs/. O build regenera o conteúdo e substitui `dist/` para impedir a permanência de arquivos antigos.
+O currículo abre em http://localhost:4173/ e o portfólio de Customer Success em http://localhost:4173/cs/. As duas rotas usam o mesmo template, estilos, quarto 3D e alternativa 2D; atualmente têm o mesmo conteúdo. O build regenera o conteúdo e substitui `dist/` para impedir a permanência de arquivos antigos.
 
 ## Publicar no GitHub Pages
 
@@ -22,10 +22,10 @@ O workflow `.github/workflows/pages.yml` verifica e publica o site a cada push p
 
 | Rota | Conteúdo |
 | --- | --- |
-| `/andre-suckow-portfolio/` | Currículo; página provisória até seu desenvolvimento. |
+| `/andre-suckow-portfolio/` | Currículo com a mesma apresentação interativa de CS. |
 | `/andre-suckow-portfolio/cs/` | Versão atual do portfólio de Customer Success. |
 
-O GitHub Pages resolve `/cs` para `/cs/`. Os assets compartilhados permanecem na raiz do projeto e as fichas de experiência e o currículo para impressão retornam a `/cs/`.
+O GitHub Pages resolve `/cs` para `/cs/`. Os assets e o motor são compartilhados. A raiz usa `profile-curriculo.json` e `skill-details-curriculo.json`; CS usa `profile.json` e `skill-details.json`. Esses arquivos começam com os mesmos dados e podem receber experiências e empresas distintas. Cada HTML incorpora seus dados para o motor 3D, que lê o conteúdo da rota ativa. As fichas e a versão para impressão também usam o perfil e o link de retorno da própria rota: `/cases/` e `/curriculo/` na raiz, `/cs/cases/` e `/cs/curriculo/` para CS.
 
 Após concluir uma alteração local, envie-a pelo painel de Controle de Código-Fonte do VS Code (commit e sincronização), ou pelo terminal:
 
@@ -51,8 +51,9 @@ O **Novo Quarto 3D** usa um cenário criado em código a partir da referência e
 
 - `profile.json`: conteúdo profissional, contatos e hobbies.
 - `skill-details.json`: explicações e relatos das habilidades de CS.
+- `profile-curriculo.json` e `skill-details-curriculo.json`: conteúdo independente da raiz, inicialmente igual ao de CS.
 - `src/portfolio.html`, `src/boot.js`, `src/engine.js`: fontes do portfólio e do motor 3D adaptado.
-- `src/home.html` e `public/home.css`: página inicial reservada para o futuro currículo. O build gera `public/index.html` para essa página e `public/cs/index.html` para o portfólio atual.
+- `customize.cjs`: gera `public/index.html` e `public/cs/index.html` a partir do mesmo template e dos perfis de cada rota, além das respectivas fichas e versões para impressão.
 - `customize.cjs` e `cs-portfolio.cjs`: geração de HTML, dados da TV e estudos de caso.
 - `public/`: scripts, estilos, fontes, modelos e imagens usados pelo site.
 - `documents/curriculo-original.docx`: documento original preservado. `create-cv-pdf.mjs` permite regenerar e verificar o PDF; imagens de verificação vão para `tmp/`.
@@ -71,6 +72,6 @@ O formulário envia diretamente pelo FormSubmit para andre.suckow.dev@gmail.com,
 
 `node verify-crt-persistence.mjs` percorre duas vezes as seis telas no Chrome, acompanha a animação do CRT, testa seu botão e a volta de celular para desktop. Também compila o shader real em WebGL e mede 160 quadros dos ciclos da faixa, chiado persistente e respeito a CRT desligado e movimento reduzido. Requer o servidor local; `GAME_TEST_URL` permite conferir a versão publicada.
 
-`node verify-routes.mjs` verifica a raiz em desktop e celular, o acesso por teclado ao portfólio, atualização direta de `/cs/`, redirecionamento de `/cs` e retorno da versão para impressão. Nesse script, `GAME_TEST_URL` recebe a raiz; nos verificadores do portfólio, recebe a URL completa de `/cs/`.
+`node verify-routes.mjs` verifica a apresentação compartilhada na raiz e em `/cs/`, o modo 3D/2D, o layout mobile, atualização direta, redirecionamento de `/cs` e retorno das fichas e versões para impressão. Nesse script, `GAME_TEST_URL` recebe a raiz; nos demais verificadores, pode receber qualquer uma das duas rotas.
 
 Veja [CREDITS.md](CREDITS.md) para a origem do motor e dos assets.

@@ -77,5 +77,7 @@ skillDialog.addEventListener('close', () => {
 const dialog = document.getElementById('contact-dialog');
 dialog?.addEventListener('click', event => { if(event.target === dialog) dialog.close(); });
 document.querySelectorAll('[data-action="insert"]').forEach(button => button.addEventListener('click', () => {
-  if(document.documentElement.dataset.mode === '2d') window.location.assign(`/cases/${encodeURIComponent(button.dataset.cart)}/`);
+  if(document.documentElement.dataset.mode !== '2d') return;
+  const study=Array.from(document.querySelectorAll('a[data-tv]')).find(link=>link.dataset.tv===`projetos/case/${button.dataset.cart}`);
+  if(study)window.location.assign(study.href);
 }));

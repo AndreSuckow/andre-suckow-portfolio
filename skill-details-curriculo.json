@@ -1,0 +1,197 @@
+{
+  "Implantação SaaS": {
+    "definition": "É colocar uma plataforma de software como serviço em operação, considerando a rotina da empresa e a preparação dos usuários.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios.",
+        "logo": "/img/marqhr-logo.svg"
+      },
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Parametrização": {
+    "definition": "É configurar o sistema conforme as regras e os processos de cada empresa.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Treinamento de usuários": {
+    "definition": "É capacitar usuários para compreender e utilizar a plataforma, individualmente ou em grupo. Ferramentas: Zoom e Google Meet.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, inclusive com mais de 30 participantes; liderei a criação e implementação do onboarding gravado.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Onboarding gravado": {
+    "definition": "É orientar os primeiros passos dos clientes por conteúdo gravado, como parte do processo de onboarding.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Liderei a criação e implementação do onboarding gravado, além dos treinamentos individuais e coletivos da plataforma de ponto.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Customer Success (CS)": {
+    "definition": "É acompanhar o uso do produto para apoiar a adoção e a permanência dos clientes.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Customer Experience (CX)": {
+    "definition": "É a experiência do cliente nos contatos com a empresa e com o produto, incluindo atendimento e implantação.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail.",
+        "logo": "/img/marqhr-logo.svg"
+      },
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Jornada do cliente": {
+    "definition": "É o percurso do cliente desde seus primeiros passos na plataforma até o uso cotidiano.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios. Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn.",
+        "logo": "/img/marqhr-logo.svg"
+      },
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Adoção de produto": {
+    "definition": "É o uso da plataforma na rotina do cliente, apoiado pela identificação e resolução de dificuldades.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Retenção de clientes": {
+    "definition": "É acompanhar clientes e atuar nas dificuldades que podem levar ao cancelamento, também chamado de churn.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Relacionamento com clientes": {
+    "definition": "É manter contato com os clientes para compreender demandas e orientar o uso da plataforma.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail.",
+        "logo": "/img/marqhr-logo.svg"
+      },
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Suporte Técnico N2": {
+    "definition": "É a análise de solicitações técnicas de maior complexidade, em colaboração com os envolvidos na operação.",
+    "experiences": [
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Analisei demandas técnicas de maior complexidade como suporte N2, incluindo Nota Fiscal Eletrônica (NF-e) e processos operacionais de e-commerce. Atuei na interface entre empresas em implantação e Suporte N1 para análise, acompanhamento e resolução de solicitações.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Nota Fiscal Eletrônica (NF-e)": {
+    "definition": "É um dos conhecimentos técnicos aplicados ao suporte a processos operacionais de e-commerce.",
+    "experiences": [
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Analisei demandas técnicas de maior complexidade como suporte N2, incluindo Nota Fiscal Eletrônica (NF-e) e processos operacionais de e-commerce.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Atendimento multicanal": {
+    "definition": "É prestar atendimento por diferentes canais. Ferramentas de atendimento e suporte do currículo: Intercom, JivoChat e WhatsApp.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail.",
+        "logo": "/img/marqhr-logo.svg"
+      },
+      {
+        "company": "Pilgrim’s Consultoria de Tecnologia",
+        "period": "Dez 2025 – Jul 2026",
+        "description": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
+        "logo": "/img/pilgrims-logo.webp"
+      }
+    ]
+  },
+  "Colaboração com Produto": {
+    "definition": "É conectar solicitações dos clientes à equipe de Produto. Ferramentas de gestão de processos: Monday.com, Trello, ClickUp e Notion. Produtividade e colaboração: Excel, Google Sheets, Google Docs, Microsoft Teams, Slack e Discord.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Registrei e acompanhei chamados e solicitações de melhorias em interface com a equipe de Produto, utilizando Trello para controle e identificação de duplicidades.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  },
+  "Cobrança consultiva": {
+    "definition": "É acompanhar valores pendentes junto aos clientes, buscando sua recuperação de forma consultiva.",
+    "experiences": [
+      {
+        "company": "MarQ HR (antiga MarQPonto)",
+        "period": "Jan 2018 – Jan 2024",
+        "description": "Gerenciei a régua de cobrança de clientes e a recuperação consultiva de valores pendentes, com foco em redução da inadimplência.",
+        "logo": "/img/marqhr-logo.svg"
+      }
+    ]
+  }
+}

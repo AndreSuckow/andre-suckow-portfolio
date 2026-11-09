@@ -1,0 +1,397 @@
+{
+  "name": "André Luis Suckow",
+  "shortName": "André Suckow",
+  "role": "CS | CX | Onboarding | SaaS",
+  "roleLong": "Customer Success (CS) | Customer Experience (CX) | Onboarding | Implantação SaaS",
+  "location": "Curitiba – PR",
+  "available": true,
+  "availability": "Disponível para novos projetos e oportunidades",
+  "email": "andre.suckow.dev@gmail.com",
+  "phone": "+55 (41) 99583-0758",
+  "whatsapp": "https://wa.me/5541995830758",
+  "cvPdf": "/curriculo-andre-suckow.pdf",
+  "photo": "/img/andre-pixel.png",
+  "headline": "Customer Success, Customer Experience, onboarding e implantação SaaS.",
+  "intro": "Profissional com experiência em Customer Success, onboarding, implantação e suporte a plataformas SaaS de controle de ponto e e-commerce.",
+  "bio": [
+    "Profissional com experiência em Customer Success, onboarding, implantação e suporte a plataformas SaaS de controle de ponto e e-commerce.",
+    "Atuação em parametrização, capacitação de usuários, adoção de produto, retenção de clientes e suporte técnico N2. Realizei mais de 300 treinamentos, incluindo turmas com mais de 30 participantes, e liderei a criação de um onboarding gravado. Experiência na interface entre clientes, suporte e equipes de Produto."
+  ],
+  "mission": "Ouvir para entender. Orientar para gerar valor. Acompanhar para que o cliente escolha ficar.",
+  "missionShort": "Ouvir para entender. Orientar para gerar valor. Acompanhar para que o cliente escolha ficar.",
+  "stats": [
+    {
+      "label": "Customer Success",
+      "value": 5,
+      "description": "Acompanhava a adoção da plataforma, identificava gargalos de utilização e orientava clientes para apoiar a retenção."
+    },
+    {
+      "label": "Onboarding",
+      "value": 5,
+      "description": "Conduzia onboarding, implantação e parametrização de uma plataforma SaaS de controle de ponto e apoiava novas empresas em plataforma integrada de e-commerce."
+    },
+    {
+      "label": "Implantação SaaS",
+      "value": 4,
+      "description": "Parametrizava jornadas, escalas, banco de horas, fechamento de ponto e relatórios conforme as regras de cada empresa."
+    },
+    {
+      "label": "Retenção / churn",
+      "value": 4,
+      "description": "Na MarQ HR, realizava abordagens proativas voltadas à retenção e prevenção de churn, identificando gargalos de utilização."
+    },
+    {
+      "label": "Treinamentos",
+      "value": 5,
+      "description": "Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, incluindo turmas com mais de 30 participantes, e liderei a criação e implementação do onboarding gravado."
+    }
+  ],
+  "experience": [
+    {
+      "id": "marq",
+      "phase": "Fase 1",
+      "title": "A jornada do cliente",
+      "role": "Suporte",
+      "org": "MarQ HR (antiga MarQPonto)",
+      "period": "Jan 2018 – Jan 2024",
+      "start": 2018,
+      "summary": "Atendimento, onboarding, implantação e adoção de plataforma SaaS de ponto eletrônico.",
+      "bullets": [
+        "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail.",
+        "Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios.",
+        "Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, inclusive com mais de 30 participantes; liderei a criação e implementação do onboarding gravado.",
+        "Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn.",
+        "Registrei e acompanhei chamados e solicitações de melhorias em interface com a equipe de Produto, utilizando Trello para controle e identificação de duplicidades.",
+        "Gerenciei a régua de cobrança de clientes e a recuperação consultiva de valores pendentes, com foco em redução da inadimplência."
+      ],
+      "logo": "/img/marqhr-logo.svg",
+      "location": "Curitiba – PR",
+      "workMode": "CLT · presencial, híbrido e remoto",
+      "tvBullets": [
+        "Atendimento via WhatsApp, JivoChat, telefone e e-mail.",
+        "Onboarding e parametrização: jornadas, escalas, banco de horas, fechamento e relatórios.",
+        "Mais de 300 treinamentos; turmas com mais de 30 pessoas; criação do onboarding gravado.",
+        "Adoção, identificação de gargalos e prevenção de churn.",
+        "Chamados e melhorias com Produto; controle de duplicidades no Trello.",
+        "Régua de cobrança e recuperação consultiva de valores pendentes."
+      ]
+    },
+    {
+      "id": "pilgrims",
+      "phase": "Fase 2",
+      "title": "Missão de implantação",
+      "role": "Analista de Suporte a Sistemas Pleno N2",
+      "org": "Pilgrim’s Consultoria de Tecnologia",
+      "period": "Dez 2025 – Jul 2026",
+      "start": 2025,
+      "summary": "Onboarding e suporte técnico N2 em plataforma integrada de e-commerce.",
+      "bullets": [
+        "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
+        "Analisei demandas técnicas de maior complexidade como suporte N2, incluindo Nota Fiscal Eletrônica (NF-e) e processos operacionais de e-commerce.",
+        "Atuei na interface entre empresas em implantação e Suporte N1 para análise, acompanhamento e resolução de solicitações."
+      ],
+      "logo": "/img/pilgrims-logo.webp",
+      "location": "Curitiba – PR",
+      "workMode": "Remoto · PJ",
+      "tvBullets": [
+        "Onboarding de novas empresas em plataforma integrada de e-commerce; orientação por WhatsApp.",
+        "Suporte técnico N2: demandas complexas, Nota Fiscal Eletrônica (NF-e) e rotinas de e-commerce.",
+        "Interface entre empresas em implantação e Suporte N1 para acompanhar e resolver solicitações."
+      ]
+    },
+    {
+      "id": "next",
+      "phase": "Fase 3",
+      "title": "A próxima missão",
+      "role": "Customer Success na sua companhia",
+      "org": "Sua companhia",
+      "period": "O próximo capítulo",
+      "invitation": true,
+      "summary": "Uma oportunidade para construir novas jornadas de sucesso.",
+      "bullets": [
+        "Quero contribuir com o onboarding, a adoção e a retenção dos seus clientes.",
+        "Vamos conversar sobre os desafios de Customer Success da sua companhia."
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "id": "onboarding",
+      "name": "Onboarding e Implantação",
+      "color": 5,
+      "skills": [
+        {
+          "name": "Implantação SaaS",
+          "note": "Implantação de ponto eletrônico e apoio ao onboarding de e-commerce."
+        },
+        {
+          "name": "Parametrização",
+          "note": "Jornadas, escalas, banco de horas, fechamento de ponto e relatórios."
+        },
+        {
+          "name": "Treinamento de usuários",
+          "note": "Mais de 300 treinamentos por Zoom e Google Meet; turmas com mais de 30 participantes."
+        },
+        {
+          "name": "Onboarding gravado",
+          "note": "Liderei a criação e implementação do onboarding gravado."
+        }
+      ]
+    },
+    {
+      "id": "cs",
+      "name": "Customer Success e CX",
+      "color": 9,
+      "skills": [
+        {
+          "name": "Customer Success (CS)",
+          "note": "Adoção de produto, retenção de clientes e prevenção de churn."
+        },
+        {
+          "name": "Customer Experience (CX)",
+          "note": "Experiência do cliente no atendimento, no onboarding e no uso da plataforma."
+        },
+        {
+          "name": "Jornada do cliente",
+          "note": "Onboarding, implantação, capacitação e acompanhamento da adoção."
+        },
+        {
+          "name": "Adoção de produto",
+          "note": "Identificação de gargalos e abordagens proativas para apoiar o uso."
+        },
+        {
+          "name": "Retenção de clientes",
+          "note": "Abordagens proativas voltadas à retenção e prevenção de churn."
+        },
+        {
+          "name": "Relacionamento com clientes",
+          "note": "Atendimento multicanal e orientação durante a implantação."
+        }
+      ]
+    },
+    {
+      "id": "business",
+      "name": "Competências Complementares",
+      "color": 15,
+      "skills": [
+        {
+          "name": "Suporte Técnico N2",
+          "note": "Análise de demandas complexas de e-commerce e interface com Suporte N1."
+        },
+        {
+          "name": "Nota Fiscal Eletrônica (NF-e)",
+          "note": "Análise de demandas técnicas envolvendo NF-e e processos de e-commerce."
+        },
+        {
+          "name": "Atendimento multicanal",
+          "note": "Atendimento por WhatsApp, JivoChat, telefone e e-mail."
+        },
+        {
+          "name": "Colaboração com Produto",
+          "note": "Chamados e melhorias em interface com Produto; controle pelo Trello."
+        },
+        {
+          "name": "Cobrança consultiva",
+          "note": "Régua de cobrança e recuperação de valores com foco na redução da inadimplência."
+        }
+      ]
+    }
+  ],
+  "achievements": [
+    {
+      "id": "ads",
+      "icon": "scroll",
+      "title": "Tecnólogo em ADS",
+      "text": "Tecnólogo em Análise e Desenvolvimento de Sistemas · Estácio de Sá · Jun 2019 – Dez 2021"
+    },
+    {
+      "id": "training",
+      "icon": "book",
+      "title": "300+ treinamentos",
+      "text": "Mais de 300 treinamentos individuais e coletivos, incluindo turmas com mais de 30 participantes; criação e implementação do onboarding gravado."
+    },
+    {
+      "id": "sebrae",
+      "icon": "scroll",
+      "title": "CS · Sebrae",
+      "text": "SEBRAE – Customer Success: Como conquistar e manter clientes"
+    },
+    {
+      "id": "english",
+      "icon": "book",
+      "title": "Inglês · B1",
+      "text": "Inglês Intermediário Avançado (B1)"
+    }
+  ],
+  "projects": [
+    {
+      "slug": "onboarding",
+      "cartTitle": "ONBOARDING",
+      "title": "Onboarding de clientes",
+      "subtitle": "MarQ HR (antiga MarQPonto)",
+      "status": "done",
+      "statusLabel": "Experiência profissional",
+      "summary": "Onboarding, implantação e parametrização de plataforma SaaS de ponto eletrônico. Mais de 300 treinamentos, criação do onboarding gravado e acompanhamento da adoção para retenção e prevenção de churn.",
+      "stack": [
+        "SaaS",
+        "Onboarding",
+        "Treinamento",
+        "Retenção"
+      ],
+      "labelArt": "/img/marqhr-logo.svg",
+      "shellColor": "#3A3D44",
+      "labelColor": "#C8642A",
+      "screenColor": 10,
+      "demoUrl": "https://marqhr.com/",
+      "screenshot": {
+        "src": "/img/marqhr-site.png",
+        "width": 1426,
+        "height": 900,
+        "alt": "Site da MarQ HR"
+      },
+      "caseStory": "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail. Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios. Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, inclusive com mais de 30 participantes; liderei a criação e implementação do onboarding gravado. Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn. Registrei e acompanhei chamados e solicitações de melhorias em interface com a equipe de Produto, utilizando Trello para controle e identificação de duplicidades. Gerenciei a régua de cobrança de clientes e a recuperação consultiva de valores pendentes, com foco em redução da inadimplência.",
+      "labelArtIsLogo": true,
+      "labelAlt": "Logo da MarQ HR",
+      "company": "MarQ HR (antiga MarQPonto)",
+      "mission": "Onboarding, treinamento e adoção de produto",
+      "caseHeading": "Minha atuação"
+    },
+    {
+      "slug": "implantacao",
+      "cartTitle": "IMPLANTAÇÃO",
+      "title": "Implantação de software SaaS",
+      "subtitle": "Pilgrim’s Consultoria de Tecnologia · 2025–2026",
+      "status": "done",
+      "statusLabel": "Suporte N2 · e-commerce",
+      "summary": "Onboarding e suporte técnico N2 em plataforma integrada de e-commerce. Orientação por WhatsApp, análise de demandas envolvendo NF-e e interface com Suporte N1 durante a implantação.",
+      "stack": [
+        "E-commerce",
+        "Onboarding",
+        "Suporte N2",
+        "NF-e"
+      ],
+      "labelArt": "/img/pilgrims-logo.webp",
+      "shellColor": "#C9C6BF",
+      "labelColor": "#1F2550",
+      "screenColor": 4,
+      "demoUrl": "https://pilgrimsconsulting.com.br/",
+      "screenshot": {
+        "src": "/img/pilgrims-site.png",
+        "width": 1328,
+        "height": 664,
+        "alt": "Site da Pilgrims Consulting"
+      },
+      "company": "Pilgrim’s Consultoria de Tecnologia",
+      "mission": "Onboarding e suporte técnico N2",
+      "labelArtIsLogo": true,
+      "labelAlt": "Logo da Pilgrims Consulting",
+      "caseStory": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação. Analisei demandas técnicas de maior complexidade como suporte N2, incluindo Nota Fiscal Eletrônica (NF-e) e processos operacionais de e-commerce. Atuei na interface entre empresas em implantação e Suporte N1 para análise, acompanhamento e resolução de solicitações.",
+      "caseHeading": "Minha atuação"
+    }
+  ],
+  "linkedin": "https://www.linkedin.com/in/andresuckow/",
+  "church": {
+    "name": "Torre Forte Church Campo Largo",
+    "url": "https://www.instagram.com/tf.church/"
+  },
+  "hobbies": [
+    {
+      "title": "Família",
+      "text": "Meus pais, minha esposa e meus quatro filhos são minha família e com quem gosto de dividir meus momentos. ❤️",
+      "icon": "family"
+    },
+    {
+      "title": "Fé em Cristo",
+      "text": "Minha fé em Cristo faz parte de quem sou. Frequento a Torre Forte Church Campo Largo, onde cultivo minha fé e a convivência em comunidade.",
+      "url": "https://www.instagram.com/tf.church/",
+      "action": "Conhecer a igreja",
+      "icon": "faith"
+    },
+    {
+      "title": "Jogos online",
+      "text": "Gosto de jogar online, compartilhar partidas e me conectar com amigos.",
+      "icon": "gaming"
+    },
+    {
+      "title": "Futebol",
+      "text": "Campo, society ou salão: gosto de estar em quadra, jogar em equipe e aproveitar uma boa partida.",
+      "icon": "football"
+    },
+    {
+      "title": "Academia",
+      "text": "Treinar faz parte da minha rotina de cuidado com a saúde e disciplina.",
+      "icon": "gym"
+    },
+    {
+      "title": "Praia",
+      "text": "Gosto de ir à praia, descansar e aproveitar o tempo ao ar livre.",
+      "icon": "beach"
+    }
+  ],
+  "roomVersion": "novo-quarto-3d",
+  "competencies": [
+    "Customer Success (CS)",
+    "Customer Experience (CX)",
+    "Onboarding de clientes",
+    "Implantação SaaS",
+    "Jornada e adoção do cliente",
+    "Retenção e prevenção de churn",
+    "Treinamento de usuários",
+    "Atendimento multicanal",
+    "Relacionamento com clientes",
+    "Interface com Produto"
+  ],
+  "tools": [
+    {
+      "name": "Atendimento e suporte",
+      "items": [
+        "Intercom",
+        "JivoChat",
+        "WhatsApp",
+        "Suporte Técnico N2"
+      ]
+    },
+    {
+      "name": "Gestão de processos",
+      "items": [
+        "Monday.com",
+        "Trello",
+        "ClickUp",
+        "Notion"
+      ]
+    },
+    {
+      "name": "Produtividade e colaboração",
+      "items": [
+        "Excel",
+        "Google Sheets",
+        "Google Docs",
+        "Microsoft Teams",
+        "Slack",
+        "Discord"
+      ]
+    },
+    {
+      "name": "Treinamento e comunicação",
+      "items": [
+        "Zoom",
+        "Google Meet"
+      ]
+    },
+    {
+      "name": "Conhecimentos técnicos",
+      "items": [
+        "Plataformas SaaS de controle de ponto e e-commerce",
+        "Parametrização de sistemas",
+        "Nota Fiscal Eletrônica (NF-e)"
+      ]
+    }
+  ],
+  "education": {
+    "title": "Tecnólogo em Análise e Desenvolvimento de Sistemas",
+    "institution": "Estácio de Sá",
+    "period": "Jun 2019 – Dez 2021"
+  },
+  "certification": "SEBRAE – Customer Success: Como conquistar e manter clientes",
+  "language": "Inglês Intermediário Avançado (B1)"
+}

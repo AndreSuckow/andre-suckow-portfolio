@@ -14,10 +14,13 @@ test('the server separates home and CS routes, redirects directories and streams
  try{
   const base=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Test server did not start')),6000);child.once('error',reject);child.stdout.on('data',data=>{const match=String(data).match(/http:\/\/127\.0\.0\.1:\d+/);if(match){clearTimeout(timer);resolve(match[0]);}});});
   const size=(await stat('public/curriculo-andre-suckow.pdf')).size;
-  const home=await(await fetch(base+'/')).text();assert(home.includes('Currículo em preparação'));assert(!home.includes('id="stage-canvas"'));assert(home.includes('href="/cs/"'));
+  const home=await(await fetch(base+'/')).text();assert(home.includes('data-portfolio="curriculo"'));assert(home.includes('id="stage-canvas"'));
   const direct=await fetch(base+'/cs?test=1',{redirect:'manual'});assert.equal(direct.status,308);assert.equal(direct.headers.get('location'),'/cs/?test=1');
-  const portfolio=await(await fetch(base+'/cs/')).text();assert(portfolio.includes('id="stage-canvas"'));assert(!portfolio.includes('resume-home__content'));
-  const printable=await(await fetch(base+'/curriculo/')).text();assert(printable.includes('href="/cs/"'),'printable CV returns to CS');
+  const portfolio=await(await fetch(base+'/cs/')).text();assert(portfolio.includes('id="stage-canvas"'));assert(portfolio.includes('data-portfolio="cs"'));
+  for(const route of ['/','/cs/']){
+   const printable=await(await fetch(base+route+'curriculo/')).text();assert(printable.includes(`href="${route}"`),'printable CV returns to its own route');
+   const study=await(await fetch(base+route+'cases/onboarding/')).text();assert(study.includes(`href="${route}"`),'case study returns to its own route');
+  }
   const chunk=await fetch(`${base}/curriculo-andre-suckow.pdf`,{headers:{Range:'bytes=0-31'}});assert.equal(chunk.status,206);assert.equal(chunk.headers.get('content-type'),'application/pdf');assert.equal(chunk.headers.get('content-range'),`bytes 0-31/${size}`);assert.equal((await chunk.arrayBuffer()).byteLength,32);
   const head=await fetch(`${base}/curriculo-andre-suckow.pdf`,{method:'HEAD'});assert.equal(head.status,200);assert.equal(Number(head.headers.get('content-length')),size);assert.equal((await head.arrayBuffer()).byteLength,0);
   const invalid=await fetch(`${base}/curriculo-andre-suckow.pdf`,{headers:{Range:`bytes=${size}-`}});assert.equal(invalid.status,416);assert.equal((await invalid.arrayBuffer()).byteLength,0);

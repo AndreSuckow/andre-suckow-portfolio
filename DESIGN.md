@@ -11,7 +11,7 @@ O portfólio atual de André Luis Suckow apresenta Customer Success, onboarding,
 
 ## Fontes e tokens
 
-O projeto `andre-suckow-portfolio` separa duas apresentações por rota. A raiz fica reservada para o currículo que será desenvolvido depois; por enquanto, `src/home.html` apresenta uma página provisória estática com nome, estado de preparação e link para `/cs/`. Space Grotesk, Inter, fundo `--ink-950`, texto `--tv-paper` e acento `--amber-400` vêm de `public/style.css`; `public/home.css` adapta apenas a composição dessa entrada. A raiz não inicia o quarto ou carrega o motor 3D. O portfólio atual de Customer Success permanece em `/cs/`, com a experiência completa em 2D e 3D. As fichas e a versão para impressão retornam a essa rota. Assets são compartilhados na raiz do projeto.
+O projeto `andre-suckow-portfolio` usa a mesma apresentação visual na raiz e em `/cs/`: quarto, TV, jogos, estilos, navegação e modos 2D/3D compartilham o template `src/portfolio.html` e o mesmo motor. Apenas os dados profissionais variam. A raiz lê `profile-curriculo.json` e `skill-details-curriculo.json`; CS lê `profile.json` e `skill-details.json`. Inicialmente os dados são iguais. Cada página incorpora seu conteúdo em `#portfolio-data`, usado também pela TV. Fichas e versões para impressão permanecem ligadas ao perfil da rota e retornam a ela. Mudanças visuais devem se aplicar a ambas as rotas.
 
 `public/style.css` é a fonte canônica de cores, tipografia e espaçamento. Space Grotesk nos títulos, Inter na leitura e Pixelify Sans na TV e nos detalhes de jogo. Fontes locais em `public/_astro/`. Acento âmbar em `--amber-400`, painéis em `--ink-850`, contornos em `--ink-600`, tooltips em `--tv-navy` e texto em `--tv-paper`. `public/custom.css` estende esses tokens.
 
