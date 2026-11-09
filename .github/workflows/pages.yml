@@ -26,7 +26,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          SITE_BASE_PATH: /site-cs-portfolio/
+          SITE_BASE_PATH: /andre-cs-portfolio/
       - run: npm run check
       - run: npm test
       - uses: actions/configure-pages@v5

@@ -15,7 +15,7 @@ function rom(){
 }
 function audio(){const node=()=>({connect(){},disconnect(){},gain:{setTargetAtTime(){}}});return {audioWorklet:{},sampleRate:44100,currentTime:0,createGain:node,createScriptProcessor:node,async resume(){this.state='running';},async suspend(){this.state='suspended';},async close(){this.state='closed';}};}
 function setup(sampleRate=44100){
- const dom=new JSDOM('<!doctype html><canvas></canvas>',{url:'https://example.test/site-cs-portfolio/',runScripts:'outside-only'}),w=dom.window;
+ const dom=new JSDOM('<!doctype html><canvas></canvas>',{url:'https://example.test/andre-cs-portfolio/',runScripts:'outside-only'}),w=dom.window;
  const canvases=new WeakMap();w.HTMLCanvasElement.prototype.getContext=function(){if(!canvases.has(this))canvases.set(this,createCanvas(this.width||160,this.height||144));return canvases.get(this).getContext('2d');};
  w.eval(fs.readFileSync('public/vendor/gameboy/jsgbc.js','utf8'));
  const jobs=new Map();let id=0;const context=audio(),canvas=w.document.querySelector('canvas');context.sampleRate=sampleRate;
@@ -60,7 +60,7 @@ test('handheld dialog loads a local cart, keeps it on validation failure, pauses
  w.validateGameBoyRom=validateGameBoyRom;
  w.createGameBoySession=options=>createGameBoySession({...options,requestFrame:fn=>w.setTimeout(()=>fn(17),10000),cancelFrame:id=>w.clearTimeout(id)});
  let source=fs.readFileSync('public/gameboy.js','utf8').replace(/^import .*;\r?\n/,'').replace('export function openGameBoy','function openGameBoy');
- w.eval(source.replaceAll('import.meta.url',JSON.stringify('https://example.test/site-cs-portfolio/gameboy.js'))+'\nwindow.openGameBoy=openGameBoy;window.chooseFile=chooseFile;');
+ w.eval(source.replaceAll('import.meta.url',JSON.stringify('https://example.test/andre-cs-portfolio/gameboy.js'))+'\nwindow.openGameBoy=openGameBoy;window.chooseFile=chooseFile;');
  const trigger=w.document.createElement('button');w.document.body.append(trigger);trigger.focus();w.document.body.style.overflow='auto';
  w.openGameBoy();const dialog=w.document.querySelector('#gameboy-dialog');assert(dialog.open);assert.equal(w.document.body.style.overflow,'hidden');
  assert(dialog.querySelector('[data-gb-action="A"]').disabled);
@@ -70,7 +70,7 @@ test('handheld dialog loads a local cart, keeps it on validation failure, pauses
  assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'true');assert(!dialog.querySelector('[data-gb-action="A"]').disabled);
  await dialog.querySelector('[data-gb-pause]').onclick();assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'false');
  await dialog.querySelector('[data-gb-pause]').onclick();assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'true');
- w.fetch=async url=>{assert.equal(url.pathname,'/site-cs-portfolio/games/gameboy/pokemon-blue.gb');return {ok:true,arrayBuffer:async()=>bytes.buffer};};
+ w.fetch=async url=>{assert.equal(url.pathname,'/andre-cs-portfolio/games/gameboy/pokemon-blue.gb');return {ok:true,arrayBuffer:async()=>bytes.buffer};};
  await dialog.querySelector('[data-gb-blue]').onclick();assert.equal(dialog.querySelector('[data-gb-name]').textContent,'Pokémon Blue');
  assert.equal(dialog.querySelector('[data-gb-led]').dataset.on,'true');
  let resolve;const loading=w.chooseFile({name:'late.gb',size:bytes.length,arrayBuffer:()=>new Promise(r=>resolve=r)});

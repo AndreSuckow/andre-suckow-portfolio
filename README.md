@@ -18,7 +18,7 @@ O site abre em http://localhost:4173/. O build regenera o conteúdo e substitui 
 
 ## Publicar no GitHub Pages
 
-O workflow `.github/workflows/pages.yml` verifica e publica o site a cada push para `main`. Nas configurações do repositório, Pages deve usar **GitHub Actions**. O endereço previsto é https://andresuckow.github.io/site-cs-portfolio/.
+O workflow `.github/workflows/pages.yml` verifica e publica o site a cada push para `main`. Nas configurações do repositório, Pages deve usar **GitHub Actions**. O endereço previsto é https://andresuckow.github.io/andre-cs-portfolio/.
 
 Após concluir uma alteração local, envie-a pelo painel de Controle de Código-Fonte do VS Code (commit e sincronização), ou pelo terminal:
 
@@ -33,7 +33,7 @@ O GitHub executa build, verificações e testes antes de atualizar o site. A pub
 Para gerar o build com os mesmos caminhos do Pages no PowerShell:
 
 ```powershell
-$env:SITE_BASE_PATH='/site-cs-portfolio/'
+$env:SITE_BASE_PATH='/andre-cs-portfolio/'
 npm run build
 Remove-Item Env:SITE_BASE_PATH
 ```
