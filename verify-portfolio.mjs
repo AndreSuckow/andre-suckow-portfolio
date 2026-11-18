@@ -1,319 +1,1092 @@
 // Optional real-browser gameplay check using an isolated headless Chrome profile.
-import {spawn} from 'node:child_process';
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import os from 'node:os';
-const executable=process.env.GAME_TEST_CHROME||'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const base=process.env.GAME_TEST_URL||'http://127.0.0.1:4173/cs/';
-const output=path.resolve('tmp/portfolio-browser');fs.mkdirSync(output,{recursive:true});
-const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-async function connect(url){
- const ws=new WebSocket(url),pending=new Map();let next=0;const errors=[];
- await new Promise((resolve,reject)=>{ws.addEventListener('open',resolve,{once:true});ws.addEventListener('error',reject,{once:true});});
- ws.addEventListener('message',event=>{const message=JSON.parse(event.data);if(message.id){const request=pending.get(message.id);if(request){clearTimeout(request.timeout);pending.delete(message.id);message.error?request.reject(Error(JSON.stringify(message.error))):request.resolve(message.result);}}else if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails);});
- return {errors,send:(method,params={})=>new Promise((resolve,reject)=>{const id=++next,timeout=setTimeout(()=>{pending.delete(id);reject(Error(`Timeout: ${method}`));},12000);pending.set(id,{resolve,reject,timeout});ws.send(JSON.stringify({id,method,params}));}),close:()=>ws.close()};
+const executable =
+  process.env.GAME_TEST_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4173/cs/';
+const output = path.resolve('tmp/portfolio-browser');
+fs.mkdirSync(output, { recursive: true });
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function connect(url) {
+  const ws = new WebSocket(url),
+    pending = new Map();
+  let next = 0;
+  const errors = [];
+  await new Promise((resolve, reject) => {
+    ws.addEventListener('open', resolve, { once: true });
+    ws.addEventListener('error', reject, { once: true });
+  });
+  ws.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data);
+    if (message.id) {
+      const request = pending.get(message.id);
+      if (request) {
+        clearTimeout(request.timeout);
+        pending.delete(message.id);
+        message.error
+          ? request.reject(Error(JSON.stringify(message.error)))
+          : request.resolve(message.result);
+      }
+    } else if (message.method === 'Runtime.exceptionThrown')
+      errors.push(message.params.exceptionDetails);
+  });
+  return {
+    errors,
+    send: (method, params = {}) =>
+      new Promise((resolve, reject) => {
+        const id = ++next,
+          timeout = setTimeout(() => {
+            pending.delete(id);
+            reject(Error(`Timeout: ${method}`));
+          }, 12000);
+        pending.set(id, { resolve, reject, timeout });
+        ws.send(JSON.stringify({ id, method, params }));
+      }),
+    close: () => ws.close(),
+  };
 }
-let browser,page,child;
-try{
- assert(fs.existsSync(executable),'Chrome not found; set GAME_TEST_CHROME.');
- const response=await fetch(base);assert.equal(response.status,200,'Start npm run dev before this check.');
- const profile=fs.mkdtempSync(path.join(os.tmpdir(),'cv-game-browser-'));
- const localTest=new URL(base).hostname==='127.0.0.1'||new URL(base).hostname==='localhost';
- const testSandboxArgs=process.env.GAME_TEST_NO_SANDBOX==='1'&&localTest?['--no-sandbox']:[];
- child=spawn(executable,['--headless=new',...testSandboxArgs,'--disable-extensions','--disable-background-networking','--no-first-run','--no-default-browser-check','--use-angle=swiftshader','--enable-unsafe-swiftshader','--remote-debugging-address=127.0.0.1','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{windowsHide:true,stdio:['ignore','ignore','pipe']});
- const endpoint=await new Promise((resolve,reject)=>{let buffer='';const timer=setTimeout(()=>reject(Error('Chrome did not start within 15 seconds.')),15000);child.once('error',reject);child.stderr.on('data',data=>{buffer+=data;const match=buffer.match(/DevTools listening on (ws:\/\/[^\s]+)/);if(match){clearTimeout(timer);resolve(match[1]);}});});
- browser=await connect(endpoint);
- const targets=await (await fetch(`http://${new URL(endpoint).host}/json/list`)).json();
- page=await connect(targets.find(target=>target.type==='page').webSocketDebuggerUrl);
- await page.send('Page.enable');await page.send('Runtime.enable');await page.send('Network.enable');
- await page.send('Page.addScriptToEvaluateOnNewDocument',{source:'try{localStorage.setItem("andre:prefs",JSON.stringify({...JSON.parse(localStorage.getItem("andre:prefs")||"{}"),mode:"2d"}))}catch{}'});
- const evaluate=async expression=>{const result=await page.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;};
- const until=async(expression,label)=>{for(let i=0;i<150;i++){if(await evaluate(expression))return;await wait(60);}throw Error(`Timed out: ${label}`);};
- const key=async(value,type='keyDown')=>{const codes={ArrowRight:'ArrowRight',Enter:'Enter',e:'KeyE'};await page.send('Input.dispatchKeyEvent',{type,key:value,code:codes[value]||value,windowsVirtualKeyCode:value==='Enter'?13:value==='ArrowRight'?39:69});};
+let browser, page, child;
+try {
+  assert(fs.existsSync(executable), 'Chrome not found; set GAME_TEST_CHROME.');
+  const response = await fetch(base);
+  assert.equal(response.status, 200, 'Start npm run dev before this check.');
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'cv-game-browser-'));
+  const localTest =
+    new URL(base).hostname === '127.0.0.1' || new URL(base).hostname === 'localhost';
+  const testSandboxArgs =
+    process.env.GAME_TEST_NO_SANDBOX === '1' && localTest ? ['--no-sandbox'] : [];
+  child = spawn(
+    executable,
+    [
+      '--headless=new',
+      ...testSandboxArgs,
+      '--disable-extensions',
+      '--disable-background-networking',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--use-angle=swiftshader',
+      '--enable-unsafe-swiftshader',
+      '--remote-debugging-address=127.0.0.1',
+      '--remote-debugging-port=0',
+      `--user-data-dir=${profile}`,
+      'about:blank',
+    ],
+    { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] },
+  );
+  const endpoint = await new Promise((resolve, reject) => {
+    let buffer = '';
+    const timer = setTimeout(() => reject(Error('Chrome did not start within 15 seconds.')), 15000);
+    child.once('error', reject);
+    child.stderr.on('data', (data) => {
+      buffer += data;
+      const match = buffer.match(/DevTools listening on (ws:\/\/[^\s]+)/);
+      if (match) {
+        clearTimeout(timer);
+        resolve(match[1]);
+      }
+    });
+  });
+  browser = await connect(endpoint);
+  const targets = await (await fetch(`http://${new URL(endpoint).host}/json/list`)).json();
+  page = await connect(targets.find((target) => target.type === 'page').webSocketDebuggerUrl);
+  await page.send('Page.enable');
+  await page.send('Runtime.enable');
+  await page.send('Network.enable');
+  await page.send('Page.addScriptToEvaluateOnNewDocument', {
+    source:
+      'try{localStorage.setItem("andre:prefs",JSON.stringify({...JSON.parse(localStorage.getItem("andre:prefs")||"{}"),mode:"2d"}))}catch{}',
+  });
+  const evaluate = async (expression) => {
+    const result = await page.send('Runtime.evaluate', {
+      expression,
+      returnByValue: true,
+      awaitPromise: true,
+    });
+    if (result.exceptionDetails) throw Error(JSON.stringify(result.exceptionDetails));
+    return result.result.value;
+  };
+  const until = async (expression, label) => {
+    for (let i = 0; i < 150; i++) {
+      if (await evaluate(expression)) return;
+      await wait(60);
+    }
+    throw Error(`Timed out: ${label}`);
+  };
+  const key = async (value, type = 'keyDown') => {
+    const codes = { ArrowRight: 'ArrowRight', Enter: 'Enter', e: 'KeyE' };
+    await page.send('Input.dispatchKeyEvent', {
+      type,
+      key: value,
+      code: codes[value] || value,
+      windowsVirtualKeyCode: value === 'Enter' ? 13 : value === 'ArrowRight' ? 39 : 69,
+    });
+  };
 
- await page.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
- await page.send('Page.navigate',{url:base});
- await until('document.querySelector("#stage-canvas") && document.querySelectorAll(".skill-item").length===15','restored portfolio');
- await until('document.readyState==="complete" && document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden','3D engine initialized');
- assert.equal(await evaluate('!!document.querySelector("#retro-intro")'),false,'Home must not include the RPG intro');
- await wait(2500);
- fs.writeFileSync(path.join(output,'desktop.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('window.scrollTo(0,document.getElementById("boot").offsetTop*.42)');
- await wait(2200);
- fs.writeFileSync(path.join(output,'room-discoveries.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- const findRoomTarget=async(label,xs,ys)=>{
-  for(const y of ys)for(const x of xs){await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});if(await evaluate(`!document.querySelector('[data-hud-tooltip]').hidden && document.querySelector('[data-hud-tooltip]').textContent.includes(${JSON.stringify(label)})`))return {x,y};}
-  throw Error('Room target was not reachable through raycast: '+label+' '+JSON.stringify(page.errors.slice(0,1))+' '+await evaluate('document.querySelector("[data-hud-tooltip]").outerHTML'));
- };
- await findRoomTarget('NTLH',[650,655,660,665,670,675,680],[470,474,478,482,486,490]);
- const drawerHit=await findRoomTarget('Abrir gaveta',[958,964,970,976,982,988,994],[463,469,475,481,487,493,499]);
- await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...drawerHit,button:'left',clickCount:1});
- await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',...drawerHit,button:'left',clickCount:1});
- assert.equal(await evaluate('document.querySelector("#games-notebook").open'),false,'Drawer click starts the physical opening before showing the modal');
- await until('document.querySelector("[data-drawer-focus]").dataset.phase==="fading"','drawer opens then surroundings fade');
- assert.equal(await evaluate('document.querySelector("#games-notebook").open'),false,'Notebook modal waits while the notebook rises from the drawer');
- fs.writeFileSync(path.join(output,'drawer-opening.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await until('document.querySelector("#games-notebook").open','drawer notebook opens');
- await until('document.querySelector("[data-notebook-canvas]").dataset.ready==="true"','3D notebook ready');
-  assert.equal(await evaluate('getComputedStyle(document.querySelector("#games-notebook")).backgroundColor'),'rgba(0, 0, 0, 0)','Floating inspection has no panel background');
-  assert.equal(await evaluate('getComputedStyle(document.querySelector(".notebook-inspector__viewport")).borderTopWidth'),'0px');
-  assert.equal(await evaluate('getComputedStyle(document.querySelector("#games-notebook"),"::backdrop").backdropFilter'),'blur(9px)','Existing room is blurred');
-  assert.equal(await evaluate('document.querySelector("[data-notebook-close]").textContent.includes("Voltar")'),true);
-  assert.equal(await evaluate('document.querySelectorAll(".notebook-inspector__tools button").length'),2,'Only plus/minus controls remain');
-  assert.equal(await evaluate('document.querySelectorAll("[data-notebook-tool],[data-notebook-view=reset],[data-notebook-view=left],[data-notebook-view=right]").length'),0);
- await wait(250);
- assert.equal(await evaluate('document.querySelectorAll(".games-notebook__completed s").length'),4);
- assert.equal(await evaluate('document.querySelectorAll("#games-pending-title + ul li").length'),10);
- fs.writeFileSync(path.join(output,'games-notebook.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- const notebookImage=()=>evaluate('document.querySelector("[data-notebook-canvas]").toDataURL()');
- const initialNotebook=await notebookImage();
- const untilNotebookImage=async expected=>{for(let i=0;i<60;i++){if(await notebookImage()===expected)return;await wait(60);}assert.fail('Notebook did not return to its original readable pose');};
- const notebookCenter=await evaluate('(()=>{const r=document.querySelector("[data-notebook-canvas]").getBoundingClientRect();return {x:r.left+r.width/2-(document.querySelector(".notebook-inspector__actions").getBoundingClientRect().width+32)/2,y:r.top+r.height/2}})()');
- await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',...notebookCenter});
- await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...notebookCenter,button:'left',clickCount:1});
- await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:notebookCenter.x+100,y:notebookCenter.y+32,button:'left',buttons:1});
- await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:notebookCenter.x+100,y:notebookCenter.y+32,button:'left',clickCount:1});
- await wait(150);
- assert.notEqual(await notebookImage(),initialNotebook,'Dragging rotates real 3D notebook geometry');
- fs.writeFileSync(path.join(output,'games-notebook-rotated.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector("[data-notebook-canvas]").focus()');await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home',windowsVirtualKeyCode:36});await wait(100);
- await untilNotebookImage(initialNotebook);
- await evaluate('document.querySelector("[data-notebook-view=in]").click()');await wait(100);
- assert.notEqual(await notebookImage(),initialNotebook,'Plus button zooms the notebook');
- await evaluate('document.querySelector("[data-notebook-view=out]").click();document.querySelector("[data-notebook-canvas]").focus()');await wait(100);await untilNotebookImage(initialNotebook);
- await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});await wait(100);
- assert.notEqual(await notebookImage(),initialNotebook,'Keyboard arrows rotate the notebook');
- await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home',windowsVirtualKeyCode:36});await wait(100);
- await untilNotebookImage(initialNotebook);
- await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
- await page.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
- await until('!document.querySelector("#games-notebook").open','notebook closes with Escape');
- await until('document.body.style.overflow!=="hidden"','notebook restores scroll');
- const musicHit=await findRoomTarget('segunda gaveta',[962,968,974,980,986,992],[485,490,495,500,505,510]);
- await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...musicHit,button:'left',clickCount:1});await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',...musicHit,button:'left',clickCount:1});
- assert.equal(await evaluate('document.querySelector("#games-notebook").open'),false,'Second drawer animates before the Discman opens');
- await until('document.querySelector("#games-notebook").open && document.querySelector("#games-notebook").dataset.object==="discman" && document.querySelectorAll("[data-discman-track]").length===5','Discman and five track positions');
- await wait(200);const displayBefore=await notebookImage();await wait(350);assert.notEqual(await notebookImage(),displayBefore,'Discman LCD scrolls the song title');
- fs.writeFileSync(path.join(output,'discman.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- const discmanBounds=await evaluate('(()=>{const c=document.querySelector("[data-notebook-canvas]"),r=c.getBoundingClientRect(),copy=document.createElement("canvas");copy.width=c.width;copy.height=c.height;const ctx=copy.getContext("2d");ctx.drawImage(c,0,0);const data=ctx.getImageData(0,0,c.width,c.height).data;let left=c.width,top=c.height,right=0,bottom=0;for(let y=0;y<c.height;y+=2)for(let x=0;x<c.width;x+=2)if(data[(y*c.width+x)*4+3]>40){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}return {x:r.left+left/c.width*r.width,y:r.top+top/c.height*r.height,w:(right-left)/c.width*r.width,h:(bottom-top)/c.height*r.height}})()');
- await page.send('Network.setBlockedURLs',{urls:['*audio/discman/*.mp3*']});
- await evaluate('document.addEventListener("discman:control",e=>window.__testedDiscmanAction=e.detail)');
- let hardwarePlay=null;for(const y of [.9,.94,.86,.98]){for(const x of [.7,.74,.78,.82]){const point={x:discmanBounds.x+x*discmanBounds.w,y:discmanBounds.y+y*discmanBounds.h};await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',...point});if(await evaluate('document.querySelector("[data-notebook-canvas]").style.cursor==="pointer"')){
-  await evaluate('window.__testedDiscmanAction=null;document.querySelector(`[data-discman-track="0"]`)?.click()');
-  await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
-  if(await evaluate('window.__testedDiscmanAction==="toggle"')){hardwarePlay=point;break;}
- }}if(hardwarePlay)break;}
- assert(hardwarePlay,'Physical D150 play/pause button is reachable');
- await until('document.querySelector("[data-discman-status]").textContent.includes("MP3 autorizado")','Missing MP3 is explained');
- assert.equal(await evaluate('document.querySelector("[data-discman-toggle]").getAttribute("aria-pressed")'),'false','Missing audio never claims playback');
- await page.send('Network.setBlockedURLs',{urls:[]});
- const reservedTrack=JSON.parse(fs.readFileSync('public/audio/discman/playlist.json','utf8')).findIndex(track=>!track.file);
- if(reservedTrack>=0){await evaluate(`document.querySelectorAll('[data-discman-track]')[${reservedTrack}].click();document.querySelector('[data-discman-toggle]').click()`);
- await until('document.querySelector("[data-discman-status]").textContent.includes("reservada")','Unassigned music slot remains reserved');}
- await evaluate('document.querySelector("[data-notebook-close]").click()');await until('!document.querySelector("#games-notebook").open && document.body.style.overflow!=="hidden"','Discman closes');await wait(800);
- for(const kind of ['bible','pokedex','family']){
-  const locations={bible:{label:'NTLH',xs:[650,655,660,665,670,675,680],ys:[470,474,478,482,486,490]},pokedex:{label:'Pokédex',xs:[955,960,965,970,975,980],ys:[432,436,440,444,448]},family:{label:'Quadro',xs:[966,970,974,978,982],ys:[398,403,408,413,418]}};
-  const target=locations[kind];const hit=await findRoomTarget(target.label,target.xs,target.ys);
-  assert.equal(await evaluate('document.querySelector("#stage-canvas").style.cursor'),'pointer','Physical object shows a pointer');
+  await page.send('Emulation.setDeviceMetricsOverride', {
+    width: 1440,
+    height: 1000,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await page.send('Page.navigate', { url: base });
+  await until(
+    'document.querySelector("#stage-canvas") && document.querySelectorAll(".skill-item").length===15',
+    'restored portfolio',
+  );
+  await until(
+    'document.readyState==="complete" && document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden',
+    '3D engine initialized',
+  );
+  assert.equal(
+    await evaluate('!!document.querySelector("#retro-intro")'),
+    false,
+    'Home must not include the RPG intro',
+  );
+  await wait(2500);
+  fs.writeFileSync(
+    path.join(output, 'desktop.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('window.scrollTo(0,document.getElementById("boot").offsetTop*.42)');
+  await wait(2200);
+  fs.writeFileSync(
+    path.join(output, 'room-discoveries.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  const findRoomTarget = async (label, xs, ys) => {
+    for (const y of ys)
+      for (const x of xs) {
+        await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+        if (
+          await evaluate(
+            `!document.querySelector('[data-hud-tooltip]').hidden && document.querySelector('[data-hud-tooltip]').textContent.includes(${JSON.stringify(label)})`,
+          )
+        )
+          return { x, y };
+      }
+    throw Error(
+      'Room target was not reachable through raycast: ' +
+        label +
+        ' ' +
+        JSON.stringify(page.errors.slice(0, 1)) +
+        ' ' +
+        (await evaluate('document.querySelector("[data-hud-tooltip]").outerHTML')),
+    );
+  };
+  await findRoomTarget('NTLH', [650, 655, 660, 665, 670, 675, 680], [470, 474, 478, 482, 486, 490]);
+  const drawerHit = await findRoomTarget(
+    'Abrir gaveta',
+    [958, 964, 970, 976, 982, 988, 994],
+    [463, 469, 475, 481, 487, 493, 499],
+  );
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...drawerHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    ...drawerHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  assert.equal(
+    await evaluate('document.querySelector("#games-notebook").open'),
+    false,
+    'Drawer click starts the physical opening before showing the modal',
+  );
+  await until(
+    'document.querySelector("[data-drawer-focus]").dataset.phase==="fading"',
+    'drawer opens then surroundings fade',
+  );
+  assert.equal(
+    await evaluate('document.querySelector("#games-notebook").open'),
+    false,
+    'Notebook modal waits while the notebook rises from the drawer',
+  );
+  fs.writeFileSync(
+    path.join(output, 'drawer-opening.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await until('document.querySelector("#games-notebook").open', 'drawer notebook opens');
+  await until(
+    'document.querySelector("[data-notebook-canvas]").dataset.ready==="true"',
+    '3D notebook ready',
+  );
+  assert.equal(
+    await evaluate('getComputedStyle(document.querySelector("#games-notebook")).backgroundColor'),
+    'rgba(0, 0, 0, 0)',
+    'Floating inspection has no panel background',
+  );
+  assert.equal(
+    await evaluate(
+      'getComputedStyle(document.querySelector(".notebook-inspector__viewport")).borderTopWidth',
+    ),
+    '0px',
+  );
+  assert.equal(
+    await evaluate(
+      'getComputedStyle(document.querySelector("#games-notebook"),"::backdrop").backdropFilter',
+    ),
+    'blur(9px)',
+    'Existing room is blurred',
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("[data-notebook-close]").textContent.includes("Voltar")',
+    ),
+    true,
+  );
+  assert.equal(
+    await evaluate('document.querySelectorAll(".notebook-inspector__tools button").length'),
+    2,
+    'Only plus/minus controls remain',
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelectorAll("[data-notebook-tool],[data-notebook-view=reset],[data-notebook-view=left],[data-notebook-view=right]").length',
+    ),
+    0,
+  );
   await wait(250);
-  fs.writeFileSync(path.join(output,'hover-'+kind+'.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
-  await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...hit,button:'left',clickCount:1});
-  await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',...hit,button:'left',clickCount:1});
-  await until(`document.querySelector('#games-notebook').open && document.querySelector('#games-notebook').dataset.object==='${kind}' && document.querySelector('[data-notebook-canvas]').dataset.ready==='true'`,'3D object opens: '+kind);
+  assert.equal(
+    await evaluate('document.querySelectorAll(".games-notebook__completed s").length'),
+    4,
+  );
+  assert.equal(
+    await evaluate('document.querySelectorAll("#games-pending-title + ul li").length'),
+    10,
+  );
+  fs.writeFileSync(
+    path.join(output, 'games-notebook.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  const notebookImage = () =>
+    evaluate('document.querySelector("[data-notebook-canvas]").toDataURL()');
+  const initialNotebook = await notebookImage();
+  const untilNotebookImage = async (expected) => {
+    for (let i = 0; i < 60; i++) {
+      if ((await notebookImage()) === expected) return;
+      await wait(60);
+    }
+    assert.fail('Notebook did not return to its original readable pose');
+  };
+  const notebookCenter = await evaluate(
+    '(()=>{const r=document.querySelector("[data-notebook-canvas]").getBoundingClientRect();return {x:r.left+r.width/2-(document.querySelector(".notebook-inspector__actions").getBoundingClientRect().width+32)/2,y:r.top+r.height/2}})()',
+  );
+  await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...notebookCenter });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...notebookCenter,
+    button: 'left',
+    clickCount: 1,
+  });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    x: notebookCenter.x + 100,
+    y: notebookCenter.y + 32,
+    button: 'left',
+    buttons: 1,
+  });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    x: notebookCenter.x + 100,
+    y: notebookCenter.y + 32,
+    button: 'left',
+    clickCount: 1,
+  });
+  await wait(150);
+  assert.notEqual(
+    await notebookImage(),
+    initialNotebook,
+    'Dragging rotates real 3D notebook geometry',
+  );
+  fs.writeFileSync(
+    path.join(output, 'games-notebook-rotated.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector("[data-notebook-canvas]").focus()');
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'Home',
+    code: 'Home',
+    windowsVirtualKeyCode: 36,
+  });
+  await wait(100);
+  await untilNotebookImage(initialNotebook);
+  await evaluate('document.querySelector("[data-notebook-view=in]").click()');
+  await wait(100);
+  assert.notEqual(await notebookImage(), initialNotebook, 'Plus button zooms the notebook');
+  await evaluate(
+    'document.querySelector("[data-notebook-view=out]").click();document.querySelector("[data-notebook-canvas]").focus()',
+  );
+  await wait(100);
+  await untilNotebookImage(initialNotebook);
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'ArrowRight',
+    code: 'ArrowRight',
+    windowsVirtualKeyCode: 39,
+  });
+  await wait(100);
+  assert.notEqual(await notebookImage(), initialNotebook, 'Keyboard arrows rotate the notebook');
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'Home',
+    code: 'Home',
+    windowsVirtualKeyCode: 36,
+  });
+  await wait(100);
+  await untilNotebookImage(initialNotebook);
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'Escape',
+    code: 'Escape',
+    windowsVirtualKeyCode: 27,
+  });
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyUp',
+    key: 'Escape',
+    code: 'Escape',
+    windowsVirtualKeyCode: 27,
+  });
+  await until('!document.querySelector("#games-notebook").open', 'notebook closes with Escape');
+  await until('document.body.style.overflow!=="hidden"', 'notebook restores scroll');
+  const musicHit = await findRoomTarget(
+    'segunda gaveta',
+    [962, 968, 974, 980, 986, 992],
+    [485, 490, 495, 500, 505, 510],
+  );
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...musicHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    ...musicHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  assert.equal(
+    await evaluate('document.querySelector("#games-notebook").open'),
+    false,
+    'Second drawer animates before the Discman opens',
+  );
+  await until(
+    'document.querySelector("#games-notebook").open && document.querySelector("#games-notebook").dataset.object==="discman" && document.querySelectorAll("[data-discman-track]").length===5',
+    'Discman and five track positions',
+  );
   await wait(200);
-  assert.equal(await evaluate('document.querySelector("#games-notebook").dataset.viewer'),undefined,'Object renderer loaded');
-  assert.equal(await evaluate('document.querySelector("[data-room-bible]").hidden'),kind!=='bible');
-  assert.equal(await evaluate('(()=>{const r=document.querySelector(".notebook-inspector__actions").getBoundingClientRect();return r.left>innerWidth/2 && r.right<=innerWidth && r.top>=0 && r.bottom<=innerHeight})()'),true,'Actions stay to the right and inside the viewport');
-  if(kind==='bible')assert.equal(await evaluate('document.querySelector("[data-room-bible]").href'),'https://www.bibliaonline.com.br/ntlh/livros');
-  const beforeObject=await notebookImage();
-  const center=await evaluate('(()=>{const r=document.querySelector("[data-notebook-canvas]").getBoundingClientRect();return {x:r.left+r.width/2-(document.querySelector(".notebook-inspector__actions").getBoundingClientRect().width+32)/2,y:r.top+r.height/2}})()');
-  await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...center,button:'left',clickCount:1});
-  await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:center.x+80,y:center.y+25,button:'left',buttons:1});
-  await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:center.x+80,y:center.y+25,button:'left',clickCount:1});await wait(100);
-  assert.notEqual(await notebookImage(),beforeObject,'Mouse rotates '+kind);
-  fs.writeFileSync(path.join(output,'inspect-'+kind+'.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  const displayBefore = await notebookImage();
+  await wait(350);
+  assert.notEqual(await notebookImage(), displayBefore, 'Discman LCD scrolls the song title');
+  fs.writeFileSync(
+    path.join(output, 'discman.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  const discmanBounds = await evaluate(
+    '(()=>{const c=document.querySelector("[data-notebook-canvas]"),r=c.getBoundingClientRect(),copy=document.createElement("canvas");copy.width=c.width;copy.height=c.height;const ctx=copy.getContext("2d");ctx.drawImage(c,0,0);const data=ctx.getImageData(0,0,c.width,c.height).data;let left=c.width,top=c.height,right=0,bottom=0;for(let y=0;y<c.height;y+=2)for(let x=0;x<c.width;x+=2)if(data[(y*c.width+x)*4+3]>40){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}return {x:r.left+left/c.width*r.width,y:r.top+top/c.height*r.height,w:(right-left)/c.width*r.width,h:(bottom-top)/c.height*r.height}})()',
+  );
+  await page.send('Network.setBlockedURLs', { urls: ['*audio/discman/*.mp3*'] });
+  await evaluate(
+    'document.addEventListener("discman:control",e=>window.__testedDiscmanAction=e.detail)',
+  );
+  let hardwarePlay = null;
+  for (const y of [0.9, 0.94, 0.86, 0.98]) {
+    for (const x of [0.7, 0.74, 0.78, 0.82]) {
+      const point = {
+        x: discmanBounds.x + x * discmanBounds.w,
+        y: discmanBounds.y + y * discmanBounds.h,
+      };
+      await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+      if (
+        await evaluate('document.querySelector("[data-notebook-canvas]").style.cursor==="pointer"')
+      ) {
+        await evaluate(
+          'window.__testedDiscmanAction=null;document.querySelector(`[data-discman-track="0"]`)?.click()',
+        );
+        await page.send('Input.dispatchMouseEvent', {
+          type: 'mousePressed',
+          ...point,
+          button: 'left',
+          clickCount: 1,
+        });
+        await page.send('Input.dispatchMouseEvent', {
+          type: 'mouseReleased',
+          ...point,
+          button: 'left',
+          clickCount: 1,
+        });
+        if (await evaluate('window.__testedDiscmanAction==="toggle"')) {
+          hardwarePlay = point;
+          break;
+        }
+      }
+    }
+    if (hardwarePlay) break;
+  }
+  assert(hardwarePlay, 'Physical D150 play/pause button is reachable');
+  await until(
+    'document.querySelector("[data-discman-status]").textContent.includes("MP3 autorizado")',
+    'Missing MP3 is explained',
+  );
+  assert.equal(
+    await evaluate('document.querySelector("[data-discman-toggle]").getAttribute("aria-pressed")'),
+    'false',
+    'Missing audio never claims playback',
+  );
+  await page.send('Network.setBlockedURLs', { urls: [] });
+  const reservedTrack = JSON.parse(
+    fs.readFileSync('public/audio/discman/playlist.json', 'utf8'),
+  ).findIndex((track) => !track.file);
+  if (reservedTrack >= 0) {
+    await evaluate(
+      `document.querySelectorAll('[data-discman-track]')[${reservedTrack}].click();document.querySelector('[data-discman-toggle]').click()`,
+    );
+    await until(
+      'document.querySelector("[data-discman-status]").textContent.includes("reservada")',
+      'Unassigned music slot remains reserved',
+    );
+  }
   await evaluate('document.querySelector("[data-notebook-close]").click()');
-  await until('!document.querySelector("#games-notebook").open && document.body.style.overflow!=="hidden"','object closes: '+kind);
- }
- await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:300,y:300});
- await until('document.querySelector("[data-hud-tooltip]").hidden','object hover clears after mouse leaves');
- await evaluate('document.querySelector("[data-room-inspect=pokedex]").focus()');
- assert.equal(await evaluate('Math.round(document.querySelector(".room-object-access").getBoundingClientRect().width)'),1,'Keyboard access never reveals a button panel');
- await evaluate('document.querySelector("#stage-canvas").focus()');
- assert.equal(await evaluate('!!document.querySelector("[data-room-discoveries]")'),false,'Explore room button removed');
- await wait(350);
- await evaluate('window.scrollTo(0,document.getElementById("boot").offsetTop*.68)');
- await wait(1800);
- fs.writeFileSync(path.join(output,'room-desk-closeup.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector(".skill-item").click()');
- await until('document.querySelector("#skill-dialog").open','skill explanation');
- assert(await evaluate('document.querySelector("#skill-dialog-title").textContent.length>0'));
- await evaluate('document.querySelector("[data-skill-close]").click()');
- assert.equal(await evaluate('document.querySelector("#skill-dialog").open'),false);
- await until('document.body.style.overflow!=="hidden"','skill dialog restores scroll');
- await evaluate(`document.querySelector('.site-nav a[href="#sobre"]').click()`);
- await until('!document.querySelector("[data-hud-chapter]").hidden && document.querySelector("[data-hud-label]").textContent==="SOBRE"','About active on the TV');
- await wait(1800);
- fs.writeFileSync(path.join(output,'cs-about-3d.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- assert.equal(await evaluate('getComputedStyle(document.querySelector(".snes-pad")).display'),'none','Desktop has no controller overlay');
- await key('ArrowRight');
- await until('document.querySelector("[data-hud-label]").textContent==="EXPERIÊNCIA"','SNES X advances a section');
- await wait(1800);
- fs.writeFileSync(path.join(output,'career-map-marq.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- const mapAnnouncement=await evaluate('document.querySelector("#announcer").textContent');
- const companyHit=await findRoomTarget('Pilgrim',[820,860,900,940,980,1020,1060,1100,1140,1180,1220],[250,300,350,400,450,500,550,600,650,700,750,800]);await wait(250);
- assert.equal(await evaluate('document.querySelector("#announcer").textContent'),mapAnnouncement,'Hover does not select or move the character');
- const walkStarted=Date.now();await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...companyHit,button:'left',clickCount:1});await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',...companyHit,button:'left',clickCount:1});
- await until('document.querySelector("#announcer").textContent.includes("Caminhando")','map walk starts on click');await wait(800);
- assert.equal(await evaluate('document.querySelector("[data-hud-tooltip]").hidden'),true,'Hover hint never covers the walking character');
- fs.writeFileSync(path.join(output,'career-map-walking.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await until('document.querySelector("#announcer").textContent.includes("Chegou a Pilgrim")','second company information appears on arrival');assert(Date.now()-walkStarted>=1800,'Journey lasts two seconds');
- await wait(100);
- fs.writeFileSync(path.join(output,'career-map-pilgrims.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await key('ArrowDown');
- await key('Enter');
- await until('document.querySelector("#announcer").textContent.includes("Chegou a Sua companhia")','keyboard activation walks to the next company');
- await wait(100);
- fs.writeFileSync(path.join(output,'career-map-next.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await key('ArrowLeft');
- await until('document.querySelector("[data-hud-label]").textContent==="SOBRE"','SNES Y returns a section');
- await wait(800);
- await evaluate('document.querySelector("#stage-canvas").focus()');
- await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'p',code:'KeyP',windowsVirtualKeyCode:80});
- await until('document.querySelector("#pause-dialog").open','START pauses');
- assert.equal(await evaluate('document.documentElement.dataset.paused'),'true');
- assert.equal(await evaluate('document.activeElement.hasAttribute("data-unpause")'),true);
- fs.writeFileSync(path.join(output,'snes-pause.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
- await page.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
- await until('!document.querySelector("#pause-dialog").open','Escape resumes');
- await until('!document.documentElement.hasAttribute("data-paused")','pause state clears');
- assert.equal(await evaluate('document.activeElement.id'),'stage-canvas');
- await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'p',code:'KeyP',windowsVirtualKeyCode:80});
- await evaluate('document.querySelector("[data-unpause]").click()');
- assert.equal(await evaluate('document.querySelector("#pause-dialog").open'),false);
- await until('!document.documentElement.hasAttribute("data-paused")','button resumes');
- await evaluate(`document.querySelector('.site-nav a[href="#skills"]').click()`);
- await wait(1600);
- fs.writeFileSync(path.join(output,'snes-skills.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await page.send('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
- await page.send('Emulation.setTouchEmulationEnabled',{enabled:true});
- await page.send('Page.navigate',{url:base+'#skills'});
- await until('document.readyState==="complete" && document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden && document.documentElement.dataset.chapter==="skills"','mobile skills initialization');
- await wait(1600);
- assert.equal(await evaluate('getComputedStyle(document.querySelector(".snes-pad")).backgroundImage'),'none');
- assert.equal(await evaluate('getComputedStyle(document.querySelector(".snes-pad")).display'),'block');
- for(const selector of ['.dock__dpad','.snes-pad__face','.snes-pad__center'])assert.equal(await evaluate(`getComputedStyle(document.querySelector('${selector}')).opacity`),'0.25','Mobile controls are translucent at rest');
- const controls=await evaluate('(()=>{const d=document.querySelector(".dock__dpad").getBoundingClientRect(),f=document.querySelector(".snes-pad__face").getBoundingClientRect();return {left:d.right,right:f.left}})()');
- assert(controls.left<180&&controls.right>664,'Mobile controls leave the middle of the TV unobstructed');
- assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),true,'SNES controls fit landscape mobile');
- fs.writeFileSync(path.join(output,'snes-landscape.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector("[data-pad=start]").click()');
- await until('document.querySelector("#pause-dialog").open','landscape pause');
- const pauseBounds=await evaluate('(()=>{const r=document.querySelector("#pause-dialog").getBoundingClientRect();return {top:r.top,bottom:r.bottom}})()');
- assert(pauseBounds.top>=0&&pauseBounds.bottom<=390,'Pause fits mobile viewport');
- await evaluate('document.querySelector("[data-unpause]").click()');
- await until('!document.documentElement.hasAttribute("data-paused")','mobile resumes');
- await evaluate('document.querySelector("[data-room-notebook]").click()');
- await until('document.querySelector("#games-notebook").open','mobile notebook opens');
- await until('document.querySelector("[data-notebook-canvas]").dataset.ready==="true"','mobile 3D notebook ready');await wait(150);
- const mobileNotebook=await notebookImage(),touchCenter=await evaluate('(()=>{const r=document.querySelector("[data-notebook-canvas]").getBoundingClientRect();return {x:r.left+r.width/2-(document.querySelector(".notebook-inspector__actions").getBoundingClientRect().width+32)/2,y:r.top+r.height/2}})()');
- await page.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...touchCenter,id:1}]});
- await page.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:touchCenter.x+60,y:touchCenter.y+15,id:1}]});
- await page.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await wait(150);
- assert.notEqual(await notebookImage(),mobileNotebook,'Touch drag rotates the notebook on mobile');
- assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),true,'Notebook fits mobile width');
- assert.equal(await evaluate('(()=>{const r=document.querySelector(".notebook-inspector__actions").getBoundingClientRect();return r.right<=innerWidth && r.top>=0 && r.bottom<=innerHeight})()'),true,'Mobile zoom controls stay on screen');
- fs.writeFileSync(path.join(output,'games-notebook-mobile.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector("[data-notebook-close]").click()');
- await until('document.body.style.overflow!=="hidden"','mobile notebook restores scroll');
- await page.send('Emulation.setTouchEmulationEnabled',{enabled:false});
- await page.send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
- await page.send('Page.navigate',{url:base+'#sobre'});
- await until('document.readyState==="complete" && document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden','desktop initialization after mobile');
- await evaluate(`document.querySelector('.site-nav a[href="#sobre"]').click()`);
- await wait(1600);
- // The CRT camera eases into position; locate a real bar instead of assuming one pixel.
- let attributeHit=false;
- for(const y of [535,575,615,655,695]){
-  for(const x of [900,1000,1100]){
-   await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});await wait(90);
-   attributeHit=await evaluate('!document.querySelector("[data-hud-tooltip]").hidden && document.querySelector("[data-hud-tooltip]").textContent.length>40');
-   if(attributeHit)break;
-  }if(attributeHit)break;
- }
- await until('!document.querySelector("[data-hud-tooltip]").hidden && document.querySelector("[data-hud-tooltip]").textContent.length>40','attribute tooltip through the real 3D raycast');
- fs.writeFileSync(path.join(output,'cs-tooltip-3d.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await page.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:10,y:80});
- await until('document.querySelector("[data-hud-tooltip]").hidden','attribute tooltip clears on pointer leave');
- await wait(150);
- fs.writeFileSync(path.join(output,'cs-tooltip-cleared-3d.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate(`document.querySelector('.site-nav a[href="#hobbies"]').click()`);
- await until('document.querySelector("[data-hud-label]").textContent==="TEMPO LIVRE"','Hobbies active on the TV');
- await wait(1600);
- fs.writeFileSync(path.join(output,'cs-hobbies-3d.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate(`document.querySelector('.site-nav a[href="#projetos"]').click()`);
- await until('document.querySelector("[data-hud-label]").textContent==="PROJETOS"','Projects active on the TV');
- await wait(1600);
- fs.writeFileSync(path.join(output,'projects-cartridges.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- const cartXs=Array.from({length:16},(_,i)=>800+i*20),cartYs=Array.from({length:10},(_,i)=>520+i*20);
- const cartridgeHit=await findRoomTarget('MarQ HR',cartXs,cartYs);
- await page.send('Input.dispatchMouseEvent',{type:'mousePressed',...cartridgeHit,button:'left',clickCount:1});await page.send('Input.dispatchMouseEvent',{type:'mouseReleased',...cartridgeHit,button:'left',clickCount:1});
- await until('document.querySelector("#announcer").textContent.includes("Inserindo o cartucho")','physical cartridge insertion begins');await wait(120);
- fs.writeFileSync(path.join(output,'project-inserting.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await until('document.querySelector("#announcer").textContent.includes("carregado.")','project loads after insertion');await wait(1400);
- fs.writeFileSync(path.join(output,'cs-project-3d.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector("[data-action=eject]").click()');
- await until('document.querySelector("#announcer").textContent.includes("Cartucho ejetado")','eject returns the cartridge');
- await findRoomTarget('MarQ HR',cartXs,cartYs);
- fs.writeFileSync(path.join(output,'project-ejected.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate(`document.querySelector('.site-nav a[href="#skills"]').click()`);await until('document.documentElement.dataset.chapter==="skills"','Skills after ejection');await wait(1500);
- fs.writeFileSync(path.join(output,'skills-close-up.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('window.scrollTo(0,document.getElementById("projetos").offsetTop+innerHeight*.08)');await until('document.documentElement.dataset.chapter==="projetos"','scroll enters Projects');await wait(1500);
- await findRoomTarget('MarQ HR',cartXs,cartYs);
- fs.writeFileSync(path.join(output,'projects-scroll-browse.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- for(const chapter of ['sobre','experiencia','projetos','skills','hobbies','contato']){
-  await evaluate(`document.querySelector('.site-nav a[href="#${chapter}"]').click()`);
-  await until(`document.documentElement.dataset.chapter==='${chapter}' && document.documentElement.dataset.tvMenu==='visible'`,'TV owns navigation: '+chapter);
-  assert.equal(await evaluate('getComputedStyle(document.querySelector(".site-nav")).display'),'none','No duplicated navigation in '+chapter);
- }
- await evaluate('document.querySelector("[data-toggle=mode]").click()');
- await until('document.documentElement.dataset.mode==="2d"','desktop 2D mode');
- for(const section of ['inicio','sobre','experiencia','projetos','skills','hobbies']){
-  await evaluate(`document.getElementById('${section}').scrollIntoView()`);await wait(100);
-  assert.equal(await evaluate('Math.round(document.querySelector(".site-header").getBoundingClientRect().top)'),0,'2D header stays fixed in '+section);
-  assert.notEqual(await evaluate('getComputedStyle(document.querySelector(".site-nav")).display'),'none');
-  assert.equal(await evaluate('getComputedStyle(document.querySelector(".game-nav")).display'),'none');
- }
- fs.writeFileSync(path.join(output,'fixed-menu-2d.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await page.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
- await evaluate('if(document.documentElement.dataset.mode==="3d")document.querySelector("[data-toggle=mode]")?.click()');
- await wait(250);
- await evaluate('window.scrollTo(0,0)');
- fs.writeFileSync(path.join(output,'mobile.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),true,'Restored portfolio fits mobile width');
- await evaluate('document.querySelector("#sobre").scrollIntoView();document.querySelector(".attribute__trigger").focus();document.querySelector(".attribute__trigger").click()');
- await wait(180);
- assert.equal(await evaluate('getComputedStyle(document.querySelector(".attribute__tooltip")).display'), 'block');
- fs.writeFileSync(path.join(output,'cs-tooltip-mobile.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector("#hobbies").scrollIntoView()');
- await wait(180);
- fs.writeFileSync(path.join(output,'cs-hobbies-mobile.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- assert.equal(await evaluate('document.querySelector("#game-over-dialog").open'),false,'Game Over must not open at Hobbies');
- await evaluate('document.querySelector("#fim").scrollIntoView()');
- await until('document.querySelector("#continue-count").textContent!=="9"','final Continue begins');
- await until('document.querySelector("#game-over-dialog").open','Game Over at zero');
- assert.equal(await evaluate('document.querySelector("#continue-count").textContent'),'0');
- assert.equal(await evaluate('document.activeElement.id'),'game-over-title');
- assert(await evaluate('document.querySelector("#game-over-dialog [data-whatsapp]").href.includes("?text=")'));
- fs.writeFileSync(path.join(output,'cs-game-over.png'),Buffer.from((await page.send('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await evaluate('document.querySelector("[data-game-over-close]").click()');
- assert.equal(await evaluate('document.querySelector("#game-over-dialog").open'),false);
- await evaluate('document.querySelector("[data-reload]").click()');
- await until('document.querySelector("#continue-count")?.textContent==="9" && scrollY<10','restart restores the beginning');
- await until('document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden','reload returns to 3D even after manual 2D and a saved 2D preference');
- assert.equal(page.errors.length,0,JSON.stringify(page.errors));
- fs.writeFileSync(path.join(output,'verification.json'),JSON.stringify({restored:true,checks:['CS home','no RPG introduction','15 skills','skill dialog open and close','about and hobbies in 3D','mobile tooltip','hobbies do not trigger Game Over','final countdown reaches zero','Game Over focus and WhatsApp','reload restarts at the beginning','mobile width'],exceptions:page.errors},null,2));
- console.log('PASS: CS portfolio, SNES navigation, pause/resume, mobile landscape, skill dialogs and zero runtime exceptions.');
-}finally{page?.close();if(browser){await browser.send('Browser.close').catch(()=>{});browser.close();}else child?.kill();}
+  await until(
+    '!document.querySelector("#games-notebook").open && document.body.style.overflow!=="hidden"',
+    'Discman closes',
+  );
+  await wait(800);
+  for (const kind of ['bible', 'pokedex', 'family']) {
+    const locations = {
+      bible: {
+        label: 'NTLH',
+        xs: [650, 655, 660, 665, 670, 675, 680],
+        ys: [470, 474, 478, 482, 486, 490],
+      },
+      pokedex: {
+        label: 'Pokédex',
+        xs: [955, 960, 965, 970, 975, 980],
+        ys: [432, 436, 440, 444, 448],
+      },
+      family: { label: 'Quadro', xs: [966, 970, 974, 978, 982], ys: [398, 403, 408, 413, 418] },
+    };
+    const target = locations[kind];
+    const hit = await findRoomTarget(target.label, target.xs, target.ys);
+    assert.equal(
+      await evaluate('document.querySelector("#stage-canvas").style.cursor'),
+      'pointer',
+      'Physical object shows a pointer',
+    );
+    await wait(250);
+    fs.writeFileSync(
+      path.join(output, 'hover-' + kind + '.png'),
+      Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+    );
+    await page.send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      ...hit,
+      button: 'left',
+      clickCount: 1,
+    });
+    await page.send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      ...hit,
+      button: 'left',
+      clickCount: 1,
+    });
+    await until(
+      `document.querySelector('#games-notebook').open && document.querySelector('#games-notebook').dataset.object==='${kind}' && document.querySelector('[data-notebook-canvas]').dataset.ready==='true'`,
+      '3D object opens: ' + kind,
+    );
+    await wait(200);
+    assert.equal(
+      await evaluate('document.querySelector("#games-notebook").dataset.viewer'),
+      undefined,
+      'Object renderer loaded',
+    );
+    assert.equal(
+      await evaluate('document.querySelector("[data-room-bible]").hidden'),
+      kind !== 'bible',
+    );
+    assert.equal(
+      await evaluate(
+        '(()=>{const r=document.querySelector(".notebook-inspector__actions").getBoundingClientRect();return r.left>innerWidth/2 && r.right<=innerWidth && r.top>=0 && r.bottom<=innerHeight})()',
+      ),
+      true,
+      'Actions stay to the right and inside the viewport',
+    );
+    if (kind === 'bible')
+      assert.equal(
+        await evaluate('document.querySelector("[data-room-bible]").href'),
+        'https://www.bibliaonline.com.br/ntlh/livros',
+      );
+    const beforeObject = await notebookImage();
+    const center = await evaluate(
+      '(()=>{const r=document.querySelector("[data-notebook-canvas]").getBoundingClientRect();return {x:r.left+r.width/2-(document.querySelector(".notebook-inspector__actions").getBoundingClientRect().width+32)/2,y:r.top+r.height/2}})()',
+    );
+    await page.send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      ...center,
+      button: 'left',
+      clickCount: 1,
+    });
+    await page.send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x: center.x + 80,
+      y: center.y + 25,
+      button: 'left',
+      buttons: 1,
+    });
+    await page.send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x: center.x + 80,
+      y: center.y + 25,
+      button: 'left',
+      clickCount: 1,
+    });
+    await wait(100);
+    assert.notEqual(await notebookImage(), beforeObject, 'Mouse rotates ' + kind);
+    fs.writeFileSync(
+      path.join(output, 'inspect-' + kind + '.png'),
+      Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+    );
+    await evaluate('document.querySelector("[data-notebook-close]").click()');
+    await until(
+      '!document.querySelector("#games-notebook").open && document.body.style.overflow!=="hidden"',
+      'object closes: ' + kind,
+    );
+  }
+  await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 300, y: 300 });
+  await until(
+    'document.querySelector("[data-hud-tooltip]").hidden',
+    'object hover clears after mouse leaves',
+  );
+  await evaluate('document.querySelector("[data-room-inspect=pokedex]").focus()');
+  assert.equal(
+    await evaluate(
+      'Math.round(document.querySelector(".room-object-access").getBoundingClientRect().width)',
+    ),
+    1,
+    'Keyboard access never reveals a button panel',
+  );
+  await evaluate('document.querySelector("#stage-canvas").focus()');
+  assert.equal(
+    await evaluate('!!document.querySelector("[data-room-discoveries]")'),
+    false,
+    'Explore room button removed',
+  );
+  await wait(350);
+  await evaluate('window.scrollTo(0,document.getElementById("boot").offsetTop*.68)');
+  await wait(1800);
+  fs.writeFileSync(
+    path.join(output, 'room-desk-closeup.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector(".skill-item").click()');
+  await until('document.querySelector("#skill-dialog").open', 'skill explanation');
+  assert(await evaluate('document.querySelector("#skill-dialog-title").textContent.length>0'));
+  await evaluate('document.querySelector("[data-skill-close]").click()');
+  assert.equal(await evaluate('document.querySelector("#skill-dialog").open'), false);
+  await until('document.body.style.overflow!=="hidden"', 'skill dialog restores scroll');
+  await evaluate(`document.querySelector('.site-nav a[href="#sobre"]').click()`);
+  await until(
+    '!document.querySelector("[data-hud-chapter]").hidden && document.querySelector("[data-hud-label]").textContent==="SOBRE"',
+    'About active on the TV',
+  );
+  await wait(1800);
+  fs.writeFileSync(
+    path.join(output, 'cs-about-3d.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  assert.equal(
+    await evaluate('getComputedStyle(document.querySelector(".snes-pad")).display'),
+    'none',
+    'Desktop has no controller overlay',
+  );
+  await key('ArrowRight');
+  await until(
+    'document.querySelector("[data-hud-label]").textContent==="EXPERIÊNCIA"',
+    'SNES X advances a section',
+  );
+  await wait(1800);
+  fs.writeFileSync(
+    path.join(output, 'career-map-marq.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  const mapAnnouncement = await evaluate('document.querySelector("#announcer").textContent');
+  const companyHit = await findRoomTarget(
+    'Pilgrim',
+    [820, 860, 900, 940, 980, 1020, 1060, 1100, 1140, 1180, 1220],
+    [250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800],
+  );
+  await wait(250);
+  assert.equal(
+    await evaluate('document.querySelector("#announcer").textContent'),
+    mapAnnouncement,
+    'Hover does not select or move the character',
+  );
+  const walkStarted = Date.now();
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...companyHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    ...companyHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  await until(
+    'document.querySelector("#announcer").textContent.includes("Caminhando")',
+    'map walk starts on click',
+  );
+  await wait(800);
+  assert.equal(
+    await evaluate('document.querySelector("[data-hud-tooltip]").hidden'),
+    true,
+    'Hover hint never covers the walking character',
+  );
+  fs.writeFileSync(
+    path.join(output, 'career-map-walking.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await until(
+    'document.querySelector("#announcer").textContent.includes("Chegou a Pilgrim")',
+    'second company information appears on arrival',
+  );
+  assert(Date.now() - walkStarted >= 1800, 'Journey lasts two seconds');
+  await wait(100);
+  fs.writeFileSync(
+    path.join(output, 'career-map-pilgrims.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await key('ArrowDown');
+  await key('Enter');
+  await until(
+    'document.querySelector("#announcer").textContent.includes("Chegou a Sua companhia")',
+    'keyboard activation walks to the next company',
+  );
+  await wait(100);
+  fs.writeFileSync(
+    path.join(output, 'career-map-next.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await key('ArrowLeft');
+  await until(
+    'document.querySelector("[data-hud-label]").textContent==="SOBRE"',
+    'SNES Y returns a section',
+  );
+  await wait(800);
+  await evaluate('document.querySelector("#stage-canvas").focus()');
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'p',
+    code: 'KeyP',
+    windowsVirtualKeyCode: 80,
+  });
+  await until('document.querySelector("#pause-dialog").open', 'START pauses');
+  assert.equal(await evaluate('document.documentElement.dataset.paused'), 'true');
+  assert.equal(await evaluate('document.activeElement.hasAttribute("data-unpause")'), true);
+  fs.writeFileSync(
+    path.join(output, 'snes-pause.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'Escape',
+    code: 'Escape',
+    windowsVirtualKeyCode: 27,
+  });
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyUp',
+    key: 'Escape',
+    code: 'Escape',
+    windowsVirtualKeyCode: 27,
+  });
+  await until('!document.querySelector("#pause-dialog").open', 'Escape resumes');
+  await until('!document.documentElement.hasAttribute("data-paused")', 'pause state clears');
+  assert.equal(await evaluate('document.activeElement.id'), 'stage-canvas');
+  await page.send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'p',
+    code: 'KeyP',
+    windowsVirtualKeyCode: 80,
+  });
+  await evaluate('document.querySelector("[data-unpause]").click()');
+  assert.equal(await evaluate('document.querySelector("#pause-dialog").open'), false);
+  await until('!document.documentElement.hasAttribute("data-paused")', 'button resumes');
+  await evaluate(`document.querySelector('.site-nav a[href="#skills"]').click()`);
+  await wait(1600);
+  fs.writeFileSync(
+    path.join(output, 'snes-skills.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await page.send('Emulation.setDeviceMetricsOverride', {
+    width: 844,
+    height: 390,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  await page.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+  await page.send('Page.navigate', { url: base + '#skills' });
+  await until(
+    'document.readyState==="complete" && document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden && document.documentElement.dataset.chapter==="skills"',
+    'mobile skills initialization',
+  );
+  await wait(1600);
+  assert.equal(
+    await evaluate('getComputedStyle(document.querySelector(".snes-pad")).backgroundImage'),
+    'none',
+  );
+  assert.equal(
+    await evaluate('getComputedStyle(document.querySelector(".snes-pad")).display'),
+    'block',
+  );
+  for (const selector of ['.dock__dpad', '.snes-pad__face', '.snes-pad__center'])
+    assert.equal(
+      await evaluate(`getComputedStyle(document.querySelector('${selector}')).opacity`),
+      '0.25',
+      'Mobile controls are translucent at rest',
+    );
+  const controls = await evaluate(
+    '(()=>{const d=document.querySelector(".dock__dpad").getBoundingClientRect(),f=document.querySelector(".snes-pad__face").getBoundingClientRect();return {left:d.right,right:f.left}})()',
+  );
+  assert(
+    controls.left < 180 && controls.right > 664,
+    'Mobile controls leave the middle of the TV unobstructed',
+  );
+  assert.equal(
+    await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),
+    true,
+    'SNES controls fit landscape mobile',
+  );
+  fs.writeFileSync(
+    path.join(output, 'snes-landscape.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector("[data-pad=start]").click()');
+  await until('document.querySelector("#pause-dialog").open', 'landscape pause');
+  const pauseBounds = await evaluate(
+    '(()=>{const r=document.querySelector("#pause-dialog").getBoundingClientRect();return {top:r.top,bottom:r.bottom}})()',
+  );
+  assert(pauseBounds.top >= 0 && pauseBounds.bottom <= 390, 'Pause fits mobile viewport');
+  await evaluate('document.querySelector("[data-unpause]").click()');
+  await until('!document.documentElement.hasAttribute("data-paused")', 'mobile resumes');
+  await evaluate('document.querySelector("[data-room-notebook]").click()');
+  await until('document.querySelector("#games-notebook").open', 'mobile notebook opens');
+  await until(
+    'document.querySelector("[data-notebook-canvas]").dataset.ready==="true"',
+    'mobile 3D notebook ready',
+  );
+  await wait(150);
+  const mobileNotebook = await notebookImage(),
+    touchCenter = await evaluate(
+      '(()=>{const r=document.querySelector("[data-notebook-canvas]").getBoundingClientRect();return {x:r.left+r.width/2-(document.querySelector(".notebook-inspector__actions").getBoundingClientRect().width+32)/2,y:r.top+r.height/2}})()',
+    );
+  await page.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ ...touchCenter, id: 1 }],
+  });
+  await page.send('Input.dispatchTouchEvent', {
+    type: 'touchMove',
+    touchPoints: [{ x: touchCenter.x + 60, y: touchCenter.y + 15, id: 1 }],
+  });
+  await page.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await wait(150);
+  assert.notEqual(
+    await notebookImage(),
+    mobileNotebook,
+    'Touch drag rotates the notebook on mobile',
+  );
+  assert.equal(
+    await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),
+    true,
+    'Notebook fits mobile width',
+  );
+  assert.equal(
+    await evaluate(
+      '(()=>{const r=document.querySelector(".notebook-inspector__actions").getBoundingClientRect();return r.right<=innerWidth && r.top>=0 && r.bottom<=innerHeight})()',
+    ),
+    true,
+    'Mobile zoom controls stay on screen',
+  );
+  fs.writeFileSync(
+    path.join(output, 'games-notebook-mobile.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector("[data-notebook-close]").click()');
+  await until('document.body.style.overflow!=="hidden"', 'mobile notebook restores scroll');
+  await page.send('Emulation.setTouchEmulationEnabled', { enabled: false });
+  await page.send('Emulation.setDeviceMetricsOverride', {
+    width: 1440,
+    height: 1000,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await page.send('Page.navigate', { url: base + '#sobre' });
+  await until(
+    'document.readyState==="complete" && document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden',
+    'desktop initialization after mobile',
+  );
+  await evaluate(`document.querySelector('.site-nav a[href="#sobre"]').click()`);
+  await wait(1600);
+  // The CRT camera eases into position; locate a real bar instead of assuming one pixel.
+  let attributeHit = false;
+  for (const y of [535, 575, 615, 655, 695]) {
+    for (const x of [900, 1000, 1100]) {
+      await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+      await wait(90);
+      attributeHit = await evaluate(
+        '!document.querySelector("[data-hud-tooltip]").hidden && document.querySelector("[data-hud-tooltip]").textContent.length>40',
+      );
+      if (attributeHit) break;
+    }
+    if (attributeHit) break;
+  }
+  await until(
+    '!document.querySelector("[data-hud-tooltip]").hidden && document.querySelector("[data-hud-tooltip]").textContent.length>40',
+    'attribute tooltip through the real 3D raycast',
+  );
+  fs.writeFileSync(
+    path.join(output, 'cs-tooltip-3d.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 10, y: 80 });
+  await until(
+    'document.querySelector("[data-hud-tooltip]").hidden',
+    'attribute tooltip clears on pointer leave',
+  );
+  await wait(150);
+  fs.writeFileSync(
+    path.join(output, 'cs-tooltip-cleared-3d.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate(`document.querySelector('.site-nav a[href="#hobbies"]').click()`);
+  await until(
+    'document.querySelector("[data-hud-label]").textContent==="TEMPO LIVRE"',
+    'Hobbies active on the TV',
+  );
+  await wait(1600);
+  fs.writeFileSync(
+    path.join(output, 'cs-hobbies-3d.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate(`document.querySelector('.site-nav a[href="#projetos"]').click()`);
+  await until(
+    'document.querySelector("[data-hud-label]").textContent==="PROJETOS"',
+    'Projects active on the TV',
+  );
+  await wait(1600);
+  fs.writeFileSync(
+    path.join(output, 'projects-cartridges.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  const cartXs = Array.from({ length: 16 }, (_, i) => 800 + i * 20),
+    cartYs = Array.from({ length: 10 }, (_, i) => 520 + i * 20);
+  const cartridgeHit = await findRoomTarget('MarQ HR', cartXs, cartYs);
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...cartridgeHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  await page.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    ...cartridgeHit,
+    button: 'left',
+    clickCount: 1,
+  });
+  await until(
+    'document.querySelector("#announcer").textContent.includes("Inserindo o cartucho")',
+    'physical cartridge insertion begins',
+  );
+  await wait(120);
+  fs.writeFileSync(
+    path.join(output, 'project-inserting.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await until(
+    'document.querySelector("#announcer").textContent.includes("carregado.")',
+    'project loads after insertion',
+  );
+  await wait(1400);
+  fs.writeFileSync(
+    path.join(output, 'cs-project-3d.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector("[data-action=eject]").click()');
+  await until(
+    'document.querySelector("#announcer").textContent.includes("Cartucho ejetado")',
+    'eject returns the cartridge',
+  );
+  await findRoomTarget('MarQ HR', cartXs, cartYs);
+  fs.writeFileSync(
+    path.join(output, 'project-ejected.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate(`document.querySelector('.site-nav a[href="#skills"]').click()`);
+  await until('document.documentElement.dataset.chapter==="skills"', 'Skills after ejection');
+  await wait(1500);
+  fs.writeFileSync(
+    path.join(output, 'skills-close-up.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate(
+    'window.scrollTo(0,document.getElementById("projetos").offsetTop+innerHeight*.08)',
+  );
+  await until('document.documentElement.dataset.chapter==="projetos"', 'scroll enters Projects');
+  await wait(1500);
+  await findRoomTarget('MarQ HR', cartXs, cartYs);
+  fs.writeFileSync(
+    path.join(output, 'projects-scroll-browse.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  for (const chapter of ['sobre', 'experiencia', 'projetos', 'skills', 'hobbies', 'contato']) {
+    await evaluate(`document.querySelector('.site-nav a[href="#${chapter}"]').click()`);
+    await until(
+      `document.documentElement.dataset.chapter==='${chapter}' && document.documentElement.dataset.tvMenu==='visible'`,
+      'TV owns navigation: ' + chapter,
+    );
+    assert.equal(
+      await evaluate('getComputedStyle(document.querySelector(".site-nav")).display'),
+      'none',
+      'No duplicated navigation in ' + chapter,
+    );
+  }
+  await evaluate('document.querySelector("[data-toggle=mode]").click()');
+  await until('document.documentElement.dataset.mode==="2d"', 'desktop 2D mode');
+  for (const section of ['inicio', 'sobre', 'experiencia', 'projetos', 'skills', 'hobbies']) {
+    await evaluate(`document.getElementById('${section}').scrollIntoView()`);
+    await wait(100);
+    assert.equal(
+      await evaluate(
+        'Math.round(document.querySelector(".site-header").getBoundingClientRect().top)',
+      ),
+      0,
+      '2D header stays fixed in ' + section,
+    );
+    assert.notEqual(
+      await evaluate('getComputedStyle(document.querySelector(".site-nav")).display'),
+      'none',
+    );
+    assert.equal(
+      await evaluate('getComputedStyle(document.querySelector(".game-nav")).display'),
+      'none',
+    );
+  }
+  fs.writeFileSync(
+    path.join(output, 'fixed-menu-2d.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await page.send('Emulation.setDeviceMetricsOverride', {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  await evaluate(
+    'if(document.documentElement.dataset.mode==="3d")document.querySelector("[data-toggle=mode]")?.click()',
+  );
+  await wait(250);
+  await evaluate('window.scrollTo(0,0)');
+  fs.writeFileSync(
+    path.join(output, 'mobile.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  assert.equal(
+    await evaluate('document.documentElement.scrollWidth<=innerWidth+1'),
+    true,
+    'Restored portfolio fits mobile width',
+  );
+  await evaluate(
+    'document.querySelector("#sobre").scrollIntoView();document.querySelector(".attribute__trigger").focus();document.querySelector(".attribute__trigger").click()',
+  );
+  await wait(180);
+  assert.equal(
+    await evaluate('getComputedStyle(document.querySelector(".attribute__tooltip")).display'),
+    'block',
+  );
+  fs.writeFileSync(
+    path.join(output, 'cs-tooltip-mobile.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector("#hobbies").scrollIntoView()');
+  await wait(180);
+  fs.writeFileSync(
+    path.join(output, 'cs-hobbies-mobile.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  assert.equal(
+    await evaluate('document.querySelector("#game-over-dialog").open'),
+    false,
+    'Game Over must not open at Hobbies',
+  );
+  await evaluate('document.querySelector("#fim").scrollIntoView()');
+  await until(
+    'document.querySelector("#continue-count").textContent!=="9"',
+    'final Continue begins',
+  );
+  await until('document.querySelector("#game-over-dialog").open', 'Game Over at zero');
+  assert.equal(await evaluate('document.querySelector("#continue-count").textContent'), '0');
+  assert.equal(await evaluate('document.activeElement.id'), 'game-over-title');
+  assert(
+    await evaluate(
+      'document.querySelector("#game-over-dialog [data-whatsapp]").href.includes("?text=")',
+    ),
+  );
+  fs.writeFileSync(
+    path.join(output, 'cs-game-over.png'),
+    Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+  );
+  await evaluate('document.querySelector("[data-game-over-close]").click()');
+  assert.equal(await evaluate('document.querySelector("#game-over-dialog").open'), false);
+  await evaluate('document.querySelector("[data-reload]").click()');
+  await until(
+    'document.querySelector("#continue-count")?.textContent==="9" && scrollY<10',
+    'restart restores the beginning',
+  );
+  await until(
+    'document.documentElement.dataset.mode==="3d" && document.querySelector("[data-loader]").hidden',
+    'reload returns to 3D even after manual 2D and a saved 2D preference',
+  );
+  assert.equal(page.errors.length, 0, JSON.stringify(page.errors));
+  fs.writeFileSync(
+    path.join(output, 'verification.json'),
+    JSON.stringify(
+      {
+        restored: true,
+        checks: [
+          'CS home',
+          'no RPG introduction',
+          '15 skills',
+          'skill dialog open and close',
+          'about and hobbies in 3D',
+          'mobile tooltip',
+          'hobbies do not trigger Game Over',
+          'final countdown reaches zero',
+          'Game Over focus and WhatsApp',
+          'reload restarts at the beginning',
+          'mobile width',
+        ],
+        exceptions: page.errors,
+      },
+      null,
+      2,
+    ),
+  );
+  console.log(
+    'PASS: CS portfolio, SNES navigation, pause/resume, mobile landscape, skill dialogs and zero runtime exceptions.',
+  );
+} finally {
+  page?.close();
+  if (browser) {
+    await browser.send('Browser.close').catch(() => {});
+    browser.close();
+  } else child?.kill();
+}

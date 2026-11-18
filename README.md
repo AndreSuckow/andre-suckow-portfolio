@@ -47,6 +47,8 @@ Remove-Item Env:SITE_BASE_PATH
 
 ## Fontes mantidas
 
+Consulte [ARCHITECTURE.md](ARCHITECTURE.md) para encontrar a fonte de cada funcionalidade, distinguir arquivos manuais e gerados e conhecer os limites da migração incremental. `npm run format` formata somente os scripts já migrados; `npm run format:check` verifica esse mesmo escopo sem editar arquivos. O motor legado e os templates permanecem fora da formatação automática.
+
 O **Novo Quarto 3D** usa um cenário criado em código a partir da referência enviada. A abertura mostra o quarto por cima e o scroll aproxima a câmera da TV. Para trocar somente o ambiente, use `npm run room:previous` (quarto anterior) ou `npm run room:new` (novo quarto). O checkpoint completo antes dessa implementação está em `.checkpoints/antes-novo-quarto-3d.zip`.
 
 - `profile.json`: conteúdo profissional, contatos e hobbies.

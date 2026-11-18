@@ -1,0 +1,7 @@
+# Migrated scripts use LF so formatter checks agree on Windows and CI.
+/build.mjs text eol=lf
+/check.mjs text eol=lf
+/server.mjs text eol=lf
+/range.mjs text eol=lf
+/verify-*.mjs text eol=lf
+/scripts/*.mjs text eol=lf

@@ -1,0 +1,9 @@
+{
+  "singleQuote": true,
+  "quoteProps": "preserve",
+  "embeddedLanguageFormatting": "off",
+  "tabWidth": 2,
+  "printWidth": 100,
+  "trailingComma": "all",
+  "endOfLine": "lf"
+}

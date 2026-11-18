@@ -1,0 +1,14 @@
+# Legacy sources and generated assets: migrate only after reviewing text contracts.
+src/
+public/
+dist/
+node_modules/
+tmp/
+output/
+.checkpoints/
+customize.cjs
+cs-portfolio.cjs
+certification.cjs
+package-lock.json
+profile*.json
+skill-details*.json

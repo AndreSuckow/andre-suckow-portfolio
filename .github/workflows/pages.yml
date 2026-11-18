@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SITE_BASE_PATH: /andre-suckow-portfolio/
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,9 +26,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run format:check
       - run: npm run build
-        env:
-          SITE_BASE_PATH: /andre-suckow-portfolio/
       - run: npm run check
       - run: npm test
       - uses: actions/configure-pages@v5
