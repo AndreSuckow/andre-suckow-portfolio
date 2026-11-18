@@ -351,6 +351,13 @@
         "Lucide"
       ],
       "labelArt": "/img/project-boxlyne.svg",
+      "screenshot": {
+        "src": "/img/boxlyne-capa.png",
+        "alt": "Página inicial da BoxLyne com o título Proteção começa na embalagem e uma caixa da marca em 3D",
+        "width": 1575,
+        "height": 892,
+        "fit": "contain"
+      },
       "labelAlt": "Símbolo da BoxLyne em formato de caixa",
       "labelArtIsLogo": true,
       "shellColor": "#E8783F",

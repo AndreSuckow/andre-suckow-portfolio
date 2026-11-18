@@ -4,6 +4,8 @@ Atualizado em 2026-11-18. Este documento é um resumo para iniciar outro chat no
 
 ## Estado entregue
 
+- Capa da BoxLyne: imagem fornecida pelo usuário em `public/img/boxlyne-capa.png`, 1575×892, aplicada como screenshot em `profile.json` com enquadramento integral (`contain`). Compartilhada pela TV, modo 2D e ficha do projeto; símbolo da marca preservado na fita. Usuário solicitou publicação imediata.
+
 - Usuário aprovou a prévia e autorizou publicar todas as melhorias em 18/11/2026. As referências abaixo a “local/sem publicação” descrevem etapas anteriores; consultar Git e workflow para o estado final. A imagem alternativa do Sinergia segue pendente do arquivo original; a versão aprovada usa a arte B2B para Todos já disponível.
 
 - Ajuste fino da prateleira: espaçamento das fitas na mesa reduzido de .21 para .13, mantendo a primeira posição e liberando a fotografia à direita. Prateleira e fileira superior subiram .035 (rowHeight .335). Build, check, format:check e os 19 testes de conteúdo/projetos passaram; continua local.
