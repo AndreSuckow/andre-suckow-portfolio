@@ -21,19 +21,14 @@
   "missionShort": "Construir interfaces acessíveis, responsivas e eficientes, com foco no usuário.",
   "stats": [
     {
-      "label": "React e TypeScript",
-      "value": 5,
-      "description": "Mais de 50 aplicações em React e TypeScript e participação na migração do time para componentes reutilizáveis."
-    },
-    {
       "label": "Interfaces web",
       "value": 5,
-      "description": "Frontend de mais de 120 aplicações educacionais interativas, com responsividade e implementação a partir do Figma."
+      "description": "Frontend de mais de 120 aplicações educacionais interativas, sendo mais de 50 em React e TypeScript, com componentes reutilizáveis, responsividade e implementação a partir do Figma."
     },
     {
       "label": "APIs e SCORM",
       "value": 4,
-      "description": "Integrações com APIs REST e plataformas LMS via SCORM para progresso, conclusão e interações."
+      "description": "Comunicação via APIs REST e padrão SCORM para registrar progresso, interações e conclusão em plataformas LMS."
     },
     {
       "label": "Performance e WCAG",
@@ -270,12 +265,6 @@
       "text": "Análise e Desenvolvimento de Sistemas · Estácio de Sá · 2019–2021"
     },
     {
-      "id": "sebrae",
-      "icon": "scroll",
-      "title": "Curso · Sebrae",
-      "text": "SEBRAE — Customer Success: Como conquistar e manter clientes"
-    },
-    {
       "id": "english",
       "icon": "book",
       "title": "Inglês · B1",
@@ -284,57 +273,158 @@
   ],
   "projects": [
     {
-      "slug": "frontend",
-      "cartTitle": "FRONTEND",
-      "title": "Aplicações educacionais interativas",
-      "subtitle": "GP Strategies Brasil · 2021–2025",
-      "status": "done",
-      "statusLabel": "Frontend · React e TypeScript",
-      "summary": "Frontend de 120+ aplicações educacionais interativas, incluindo e-learning, games, revistas digitais, quizzes e infográficos. Mais de 50 entregas em React e TypeScript para projetos corporativos, incluindo clientes como Vivo e Coca-Cola.",
+      "slug": "tabuleiro-de-cursos",
+      "cartTitle": "Tabuleiro VIVO",
+      "title": "Tabuleiro VIVO",
+      "subtitle": "Trilha interativa de aprendizagem",
+      "status": "live",
+      "statusLabel": "Online",
+      "summary": "Trilha visual com 18 conteúdos de aprendizagem. Cada casa abre uma janela com a descrição do curso e seu link de acesso, quando disponível.",
+      "stack": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "SCORM"
+      ],
+      "labelArt": "/img/project-tabuleiro-de-cursos.webp",
+      "labelAlt": "Arte do Tabuleiro VIVO, com uma trilha numerada de 1 a 18",
+      "labelArtIsLogo": false,
+      "shellColor": "#A54AE0",
+      "labelColor": "#380054",
+      "screenColor": 4,
+      "screenshot": {
+        "src": "/img/project-tabuleiro-de-cursos.webp",
+        "width": 1600,
+        "height": 900,
+        "alt": "Arte original do Tabuleiro VIVO com 18 casas de aprendizagem"
+      },
+      "demoUrl": "https://andresuckow.github.io/tabuleiro-de-cursos/",
+      "repoUrl": "https://github.com/AndreSuckow/tabuleiro-de-cursos",
+      "caseHeading": "Como funciona",
+      "caseStory": "O tabuleiro organiza 18 conteúdos em uma trilha visual. Ao selecionar uma casa, a interface apresenta o título, a descrição e o acesso ao curso, quando disponível. A implementação utiliza HTML, CSS e JavaScript, com áreas interativas sobre a arte do tabuleiro e janelas de detalhes. O projeto inclui configuração SCORM para comunicação com plataformas LMS; no GitHub Pages, a navegação funciona sem conexão a um LMS."
+    },
+    {
+      "slug": "nike-air-max-90",
+      "cartTitle": "AIR MAX 90",
+      "title": "Nike Air Max 90",
+      "subtitle": "Do layout no Figma à interface em React",
+      "status": "live",
+      "statusLabel": "Estudo de interface",
+      "summary": "Reprodução de uma página de produto a partir de um layout no Figma, com destaque para o tênis, componentes em React, layout responsivo e animações em CSS.",
       "stack": [
         "React",
         "TypeScript",
-        "JavaScript",
-        "APIs REST",
-        "SCORM / LMS",
-        "WCAG"
+        "CSS",
+        "Vite"
       ],
-      "labelArt": "/img/project-frontend.svg",
-      "labelAlt": "Aplicações frontend · React e TypeScript",
-      "labelArtIsLogo": true,
-      "shellColor": "#E0B447",
-      "labelColor": "#1E2A48",
+      "labelArt": "/img/project-nike-air-max.webp",
+      "labelAlt": "Tênis usado na interface do projeto Nike Air Max 90",
+      "labelArtIsLogo": false,
+      "shellColor": "#B58A57",
+      "labelColor": "#181819",
       "screenColor": 5,
-      "company": "GP Strategies Brasil",
-      "mission": "Interfaces interativas, componentização e integrações",
-      "caseHeading": "Minha contribuição",
-      "caseStory": "Desenvolvi o frontend de mais de 120 aplicações educacionais interativas — e-learning, games, revistas digitais, quizzes e infográficos — sendo mais de 50 em React e TypeScript. Participei da migração do time de HTML/CSS/JavaScript puro para React, criando componentes reutilizáveis que padronizaram a interface e reduziram retrabalho e tempo médio de entrega. Integrei aplicações a plataformas LMS via SCORM e a APIs REST para rastrear progresso, conclusão e interações dos usuários. Construí interfaces responsivas e acessíveis seguindo WCAG: HTML semântico, navegação por teclado, foco visível e contraste. Trabalhei com designers e backend, da implementação a partir do Figma à validação com usuários após a publicação."
+      "screenshot": {
+        "src": "/img/project-nike-air-max.webp",
+        "width": 840,
+        "height": 741,
+        "alt": "Imagem original do tênis utilizada na página Nike Air Max 90",
+        "fit": "contain"
+      },
+      "demoUrl": "https://andresuckow.github.io/figmaNikeAirmaxReact_vite/",
+      "repoUrl": "https://github.com/AndreSuckow/figmaNikeAirmaxReact_vite",
+      "caseHeading": "Do design ao código",
+      "caseStory": "Estudo de desenvolvimento frontend voltado à reprodução de uma tela de produto a partir de um layout no Figma. A interface organiza a navegação, as informações do produto e a imagem do tênis em componentes React com TypeScript. O CSS define a composição visual, a tipografia, os estados de hover e uma animação de flutuação do produto. O layout se adapta a telas menores e respeita a preferência por movimento reduzido. O Vite é usado no ambiente de desenvolvimento e na geração da versão publicada no GitHub Pages."
     },
     {
-      "slug": "performance",
-      "cartTitle": "WEB QUALITY",
-      "title": "Performance e qualidade de sites",
-      "subtitle": "Match Creative Studio · 2026–Atual",
+      "slug": "boxlyne",
+      "cartTitle": "BOXLYNE",
+      "title": "BoxLyne",
+      "subtitle": "Site institucional de embalagens",
       "status": "live",
-      "statusLabel": "WordPress · Freelance",
-      "summary": "Manutenção e otimização de sites institucionais de clientes da agência, com foco em performance, acessibilidade, responsividade e SEO técnico.",
+      "statusLabel": "Site publicado",
+      "summary": "Site desenvolvido para apresentar as embalagens da BoxLyne, com caixas interativas em 3D, catálogo de medidas e solicitação de orçamento pelo WhatsApp.",
       "stack": [
-        "WordPress",
-        "Lighthouse",
-        "Core Web Vitals",
-        "Acessibilidade",
-        "SEO técnico"
+        "Next.js",
+        "React",
+        "Three.js",
+        "CSS",
+        "Lucide"
       ],
-      "labelArt": "/img/project-performance.svg",
-      "labelAlt": "Performance e qualidade web",
+      "labelArt": "/img/project-boxlyne.svg",
+      "labelAlt": "Símbolo da BoxLyne em formato de caixa",
       "labelArtIsLogo": true,
-      "shellColor": "#C9C6BF",
-      "labelColor": "#1F2550",
+      "shellColor": "#E8783F",
+      "labelColor": "#1E2329",
+      "screenColor": 5,
+      "demoUrl": "https://boxlyne.com.br/",
+      "caseHeading": "A entrega",
+      "caseStory": "Desenvolvimento do site institucional da BoxLyne, unindo apresentação da marca, informações sobre as embalagens e contato comercial. A experiência inclui caixas em 3D que podem ser giradas, explicação visual da estrutura do papelão e catálogo de medidas com solicitação de orçamento pelo WhatsApp. O site utiliza Next.js e React, com Three.js nas cenas interativas, estilos em CSS e ícones Lucide. Os módulos 3D são carregados sob demanda e a interface inclui navegação para dispositivos móveis."
+    },
+    {
+      "slug": "sinergia-movel",
+      "cartTitle": "SINERGIA MÓVEL",
+      "title": "Sinergia Móvel — B2B para Todos",
+      "subtitle": "Experiência interativa de aprendizagem",
+      "status": "live",
+      "statusLabel": "E-learning",
+      "summary": "Página de aprendizagem sobre a jornada B2B móvel, com vídeos, conteúdos interativos e efeitos de rolagem que conduzem a exploração do material.",
+      "stack": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Rellax",
+        "SCORM 1.2"
+      ],
+      "labelArt": "/img/project-sinergia-movel.svg",
+      "labelAlt": "Identidade visual B2B para Todos do projeto Sinergia Móvel",
+      "labelArtIsLogo": true,
+      "shellColor": "#BD66F2",
+      "labelColor": "#380054",
       "screenColor": 4,
-      "company": "Match Creative Studio",
-      "mission": "Performance, acessibilidade e SEO técnico",
-      "caseHeading": "Minha contribuição",
-      "caseStory": "Mantenho e otimizo sites institucionais de clientes da agência, com foco em performance, acessibilidade e SEO técnico. Melhoro indicadores de Lighthouse e Core Web Vitals ajustando carregamento de recursos, renderização e estabilidade visual das páginas. Corrijo lentidão, excesso de recursos carregados e inconsistências de navegação entre dispositivos."
+      "screenshot": {
+        "src": "/img/project-sinergia-movel.svg",
+        "width": 202,
+        "height": 126,
+        "fit": "contain",
+        "alt": "B2B para Todos em destaque"
+      },
+      "demoUrl": "https://andresuckow.github.io/sinergia_onepage_b2b_para_todos_movel_v4.5/",
+      "repoUrl": "https://github.com/AndreSuckow/sinergia_onepage_b2b_para_todos_movel_v4.5",
+      "caseHeading": "Aprendizagem em uma jornada visual",
+      "caseStory": "Desenvolvimento de uma experiência de aprendizagem em página única sobre a jornada do cliente B2B e as soluções móveis. O conteúdo combina vídeos do Vimeo, navegação por seções, janelas de detalhes e elementos interativos. HTML, CSS e JavaScript estruturam a interface, enquanto a biblioteca Rellax cria efeitos de profundidade durante a rolagem. O projeto inclui um pacote SCORM 1.2 e rotinas de comunicação com LMS para status e pontuação. A demonstração no GitHub Pages permite explorar o material fora de uma plataforma de aprendizagem."
+    },
+    {
+      "slug": "google-workspace",
+      "cartTitle": "WORKSPACE",
+      "title": "Google Workspace",
+      "subtitle": "Transformação digital para negócios",
+      "status": "live",
+      "statusLabel": "E-learning",
+      "summary": "Experiência de aprendizagem sobre transformação digital e segurança nos negócios, com carrosséis, abas e painéis interativos para explorar o conteúdo.",
+      "stack": [
+        "React",
+        "JavaScript",
+        "CSS",
+        "Vite",
+        "SCORM 1.2"
+      ],
+      "labelArt": "/img/project-google-workspace.webp",
+      "labelAlt": "Arte de abertura Transformação Digital — Mudar para prosperar",
+      "labelArtIsLogo": true,
+      "shellColor": "#EBE5DA",
+      "labelColor": "#670099",
+      "screenColor": 4,
+      "screenshot": {
+        "src": "/img/project-google-workspace.webp",
+        "width": 466,
+        "height": 477,
+        "fit": "contain",
+        "alt": "Identidade visual original do projeto: Transformação Digital — Mudar para prosperar"
+      },
+      "demoUrl": "https://andresuckow.github.io/GP_onepage_TorreCloud_GoogleWorkspace_1/",
+      "repoUrl": "https://github.com/AndreSuckow/GP_onepage_TorreCloud_GoogleWorkspace_1",
+      "caseHeading": "Conteúdo que convida à exploração",
+      "caseStory": "Desenvolvimento de uma página de aprendizagem para o projeto Torre Cloud Google Workspace, com conteúdo sobre transformação digital, seus desafios e segurança nos negócios. A interface organiza as informações em carrosséis, abas e painéis expansíveis, utilizando componentes React e estilos em CSS. O projeto é escrito em JavaScript e utiliza Vite para desenvolvimento e build. A estrutura SCORM 1.2, com o wrapper Pipwerks, oferece comunicação com plataformas LMS para informações do participante, pontuação e conclusão. A demonstração está disponível no GitHub Pages."
     }
   ],
   "linkedin": "https://www.linkedin.com/in/andresuckow/",
@@ -458,10 +548,19 @@
   "education": {
     "title": "Tecnólogo em Análise e Desenvolvimento de Sistemas",
     "institution": "Estácio de Sá",
-    "period": "2019 – 2021"
+    "period": "2019 – 2021",
+    "document": "/documents/graduacao-estacio.pdf"
   },
   "certification": "SEBRAE — Customer Success: Como conquistar e manter clientes",
   "language": "Inglês intermediário (B1) — leitura de documentação técnica",
   "github": "https://github.com/AndreSuckow",
-  "displayRole": "DESENVOLVEDOR FRONTEND"
+  "displayRole": "DESENVOLVEDOR FRONTEND",
+  "projectInvitation": {
+    "slug": "em-breve",
+    "cartTitle": "VAMOS CRIAR?",
+    "title": "E aí, o que iremos construir juntos?",
+    "summary": "Uma ideia pode virar a próxima fita. Vamos conversar sobre o que você quer criar?",
+    "shellColor": "#8E8B85",
+    "labelColor": "#141833"
+  }
 }

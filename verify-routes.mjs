@@ -191,11 +191,14 @@ try {
       path.join(output, 'routes-' + kind + '-mobile.png'),
       Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
     );
-    for (const detail of ['curriculo/', 'cases/frontend/', 'cases/performance/']) {
+    const projectRoutes = JSON.parse(fs.readFileSync('profile.json', 'utf8')).projects.map(
+      (project) => `cases/${project.slug}/`,
+    );
+    for (const detail of ['curriculo/', ...projectRoutes]) {
       const details = await evaluate(
         '(async()=>{const r=await fetch(' +
           JSON.stringify(new URL(detail, route).href) +
-          ');const d=new DOMParser().parseFromString(await r.text(),"text/html");return {status:r.status,back:d.querySelector(".document-actions a").getAttribute("href")};})()',
+          ');const d=new DOMParser().parseFromString(await r.text(),"text/html");return {status:r.status,back:d.querySelector("[data-document-back]").getAttribute("href")};})()',
       );
       assert.equal(details.status, 200);
       assert.equal(details.back, new URL(route).pathname, 'detail returns to ' + kind);

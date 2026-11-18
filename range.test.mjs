@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseRange} from './range.mjs';
 import {spawn} from 'node:child_process';
-import {stat} from 'node:fs/promises';
+import {stat,readFile} from 'node:fs/promises';
 test('downloads can request an opening chunk, an open end or a suffix',()=>{
  assert.deepEqual(parseRange('bytes=0-1023',74482594),{start:0,end:1023});assert.deepEqual(parseRange('bytes=50-',100),{start:50,end:99});assert.deepEqual(parseRange('bytes=-10',100),{start:90,end:99});assert.deepEqual(parseRange('bytes=90-500',100),{start:90,end:99});assert.equal(parseRange(undefined,100),undefined);
 });
@@ -18,7 +18,9 @@ test('the server exposes only the main route and streams the new PDF',async()=>{
   for(const removed of ['/cs','/cs/','/cs/curriculo/'])assert.equal((await fetch(base+removed)).status,404);
   for(const route of ['/']){
    const printable=await(await fetch(base+route+'curriculo/')).text();assert(printable.includes(`href="${route}"`),'printable CV returns to its own route');
-   const study=await(await fetch(base+route+'cases/frontend/')).text();assert(study.includes(`href="${route}"`),'case study returns to its own route');
+   const projects=JSON.parse(await readFile('profile.json','utf8')).projects;
+   for(const project of projects){const response=await fetch(base+route+'cases/'+project.slug+'/');assert.equal(response.status,200);const study=await response.text();assert(study.includes(`href="${route}"`),'project details return to the portfolio');}
+   for(const old of ['frontend','performance'])if(!projects.some(project=>project.slug===old))assert.equal((await fetch(base+route+'cases/'+old+'/')).status,404);
   }
   const chunk=await fetch(`${base}/curriculo-andre-suckow.pdf`,{headers:{Range:'bytes=0-31'}});assert.equal(chunk.status,206);assert.equal(chunk.headers.get('content-type'),'application/pdf');assert.equal(chunk.headers.get('content-range'),`bytes 0-31/${size}`);assert.equal((await chunk.arrayBuffer()).byteLength,32);
   const head=await fetch(`${base}/curriculo-andre-suckow.pdf`,{method:'HEAD'});assert.equal(head.status,200);assert.equal(Number(head.headers.get('content-length')),size);assert.equal((await head.arrayBuffer()).byteLength,0);

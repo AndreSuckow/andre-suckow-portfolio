@@ -54,15 +54,6 @@ function showSkillDialog(button) {
   skillDialog.querySelector('#skill-dialog-title').focus({preventScroll:true});
 }
 document.querySelectorAll('.skill-item').forEach(button => button.addEventListener('click', () => openSkill(button)));
-document.querySelectorAll('[data-certification-open]').forEach(button => button.addEventListener('click', event => {
-  if(skillDialog.open) return;
-  skillDialog.dataset.reward = 'certification';
-  skillDialog.querySelector('[data-skill-branch]').textContent = 'Conquista desbloqueada · Certificação';
-  skillDialog.querySelector('#skill-dialog-title').textContent = 'Aprender para conquistar e manter clientes';
-  skillDialog.querySelector('#skill-dialog-description').textContent = 'Certificação do Sebrae em Customer Success, conforme meu currículo.';
-  skillDialog.querySelector('[data-certification-reward]').hidden = false;
-  showSkillDialog(event.currentTarget);
-}));
 skillDialog.querySelectorAll('[data-skill-close]').forEach(button => button.addEventListener('click', () => skillDialog.close()));
 skillDialog.addEventListener('click', event => {
   if(event.target !== skillDialog) return;
@@ -79,5 +70,5 @@ dialog?.addEventListener('click', event => { if(event.target === dialog) dialog.
 document.querySelectorAll('[data-action="insert"]').forEach(button => button.addEventListener('click', () => {
   if(document.documentElement.dataset.mode !== '2d') return;
   const study=Array.from(document.querySelectorAll('a[data-tv]')).find(link=>link.dataset.tv===`projetos/case/${button.dataset.cart}`);
-  if(study)window.location.assign(study.href);
+  if(study)window.location.assign(study.href);else document.querySelector('[data-tv="projetos/contact"]')?.click();
 }));

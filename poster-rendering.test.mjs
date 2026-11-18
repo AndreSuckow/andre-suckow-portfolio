@@ -32,5 +32,5 @@ test('poster texture uses available anisotropy with mipmaps and respects hardwar
   const {meshes}=makePoster(available),map=meshes[1].material.map;
   assert.equal(map.anisotropy,expected);assert.equal(map.generateMipmaps,true);assert.equal(map.colorSpace,'srgb');
  }
- assert.match(fs.readFileSync('src/engine.js','utf8'),/createNewRoom\(\{maxAnisotropy:l\.capabilities\.getMaxAnisotropy\(\)/);
+ assert.match(fs.readFileSync('src/engine.js','utf8'),/createNewRoom\(\{[^}]*maxAnisotropy:l\.capabilities\.getMaxAnisotropy\(\)/);
 });

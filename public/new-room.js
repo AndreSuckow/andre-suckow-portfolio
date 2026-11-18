@@ -1,4 +1,5 @@
 import {createGameBoyModel,createBlueCartridge} from './gameboy-model.js?v=cs-mode-3';
+import {projectShelves} from './project-shelf.js?v=cs-mode-3';
 import {createDiscman} from "./discman.js?v=cs-mode-3";
 import {interactionShake,automaticInteractionShake} from './interaction-motion.js?v=cs-mode-3';
 import {createFamilyFrame} from "./family-frame.js?v=cs-mode-3";
@@ -67,6 +68,13 @@ export function createNewRoom(T){
  box('Side skirting',1.585,.055,.37,.035,.1,3.25,endWood);
  // The desk top stays at y=.5, supporting the existing interactive models.
  box('Desk top',.18,.475,-.99,1.85,.05,.55,darkOak);
+ for(const shelf of projectShelves(T.projectCount??6)){
+  box('Project cartridge shelf',shelf.x,shelf.y,shelf.z,shelf.width,shelf.thickness,shelf.depth,darkOak);
+  for(const x of [shelf.x-shelf.width*.35,shelf.x+shelf.width*.35]){
+   box('Project shelf wall bracket',x,shelf.y-.065,-1.247,.025,.13,.025,black);
+   box('Project shelf support',x,shelf.y-.025,-1.145,.025,.025,.23,black);
+  }
+ }
  box('Desk left side',-.72,.245,-1,.05,.46,.51,oak);
  box('Desk right side',1.08,.245,-1,.05,.46,.51,oak);
  box('Drawer pedestal',.73,.24,-1,.5,.44,.49,oak);

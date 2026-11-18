@@ -1,8 +1,9 @@
 // Adapt the supplied assets at runtime while preserving the original downloads.
-export function clearCareerRoute(geometry,{roadX,stations,buildings,floor=.2}={}){
+export function clearCareerRoute(geometry,{roadX,stations,buildings,routeSegments,floor=.2}={}){
  const position=geometry.attributes.position,index=geometry.index;
  const kept=[];
- const clear=(x,z)=>Math.abs(x-roadX)<.2||stations.some(([sx,sz])=>Math.abs(z-sz)<.2&&x>=Math.min(roadX,sx)-.16&&x<=Math.max(roadX,sx)+.16)||buildings.some(([bx,bz])=>Math.abs(x-bx)<.57&&Math.abs(z-bz)<.52);
+ const onTrail=(x,z)=>routeSegments?.some(([a,b])=>{const dx=b[0]-a[0],dz=b[1]-a[1],s=dx*dx+dz*dz,t=s?Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/s)):0;return Math.hypot(x-a[0]-t*dx,z-a[1]-t*dz)<.25;});
+ const clear=(x,z)=>(routeSegments?onTrail(x,z):Math.abs(x-roadX)<.2||stations.some(([sx,sz])=>Math.abs(z-sz)<.2&&x>=Math.min(roadX,sx)-.16&&x<=Math.max(roadX,sx)+.16))||buildings.some(([bx,bz])=>Math.abs(x-bx)<.57&&Math.abs(z-bz)<.52);
  for(let triangle=0;triangle<(index?.count??position.count);triangle+=3){
   const vertices=[0,1,2].map(offset=>index?index.getX(triangle+offset):triangle+offset);
   const vegetation=Math.max(...vertices.map(i=>position.getY(i)))>floor;

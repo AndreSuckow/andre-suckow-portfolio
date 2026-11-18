@@ -5,6 +5,43 @@ import {JSDOM} from 'jsdom';
 import {whatsappMessage} from './public/cs-model.js';
 import {createCareerJourney,drawCareerScreen} from './public/career-map.js';
 const html=fs.readFileSync('public/index.html','utf8');
+test('project storage puts three cartridges per level on matching shelves',async()=>{
+ const {projectCartridgeLayout,projectShelves,PROJECT_SHELF}=await import('./public/project-shelf.js');
+ const count=JSON.parse(fs.readFileSync('profile.json','utf8')).projects.length+1,slots=projectCartridgeLayout(count),shelves=projectShelves(count);
+ assert.equal(slots.length,count);assert.equal(slots.filter(slot=>slot.position[1]===PROJECT_SHELF.baseY).length,3);
+ assert.equal(slots.filter(slot=>slot.position[1]>PROJECT_SHELF.baseY).length,3);assert.equal(shelves.length,1);
+ for(const slot of slots){
+  const [x,y,z]=slot.position;if(y===PROJECT_SHELF.baseY)continue;
+  const shelf=shelves.find(s=>Math.abs(s.y+s.thickness/2+PROJECT_SHELF.restOffset-y)<1e-8);assert(shelf);
+  assert(x-.05>shelf.x-shelf.width/2&&x+.05<shelf.x+shelf.width/2);assert(z-.03>shelf.z-shelf.depth/2&&z+.03<shelf.z+shelf.depth/2);
+ }
+ const expanded=projectCartridgeLayout(10);assert.equal(new Set(expanded.map(s=>s.position.join(','))).size,10);assert.equal(projectShelves(10).length,3);
+ assert.throws(()=>projectCartridgeLayout(0));
+});
+test('project cartridges offer delivery details and only the links supplied for that project',async()=>{
+ const {default:generator}=await import('./cs-portfolio.cjs');
+ const profile=JSON.parse(fs.readFileSync('profile.json','utf8'));
+ const project={slug:'example',cartTitle:'EXAMPLE',title:'Entrega de exemplo',subtitle:'Descrição da entrega',summary:'Interface de demonstração',stack:['JavaScript'],labelArt:'/img/example.png',shellColor:'#ffffff',labelColor:'#000000',statusLabel:'Projeto',screenshot:{src:'/img/example.png',alt:'Tela da entrega',width:800,height:600}};
+ for(const links of [{demoUrl:'https://example.com/demo'},{repoUrl:'https://github.com/example/project'},{demoUrl:'https://example.com/demo',repoUrl:'https://github.com/example/project'}]){
+  const dom=new JSDOM(generator.sections({...profile,projects:[{...project,...links}]}).projects),d=dom.window.document;
+  for(const [field,action]of [['demoUrl','demo'],['repoUrl','code']]){
+   const link=d.querySelector(`[data-tv="projetos/${action}/example"]`);
+   assert.equal(!!link,!!links[field]);if(link){assert.equal(link.href,links[field]);assert.equal(link.target,'_blank');assert(link.rel.includes('noopener'));}
+  }
+  assert.equal(d.querySelector('.project-site-image').alt,'Tela da entrega');
+  assert(d.querySelector('[data-tv="projetos/contact"][data-action="open-contact"]'));
+  assert(d.body.textContent.includes(profile.projectInvitation.title));
+  assert(!d.body.textContent.includes('Visitar empresa'));dom.window.close();
+ }
+});
+
+test('blank cartridge is a collaboration invitation with contact and eject actions',()=>{
+ const source=fs.readFileSync('src/engine.js','utf8'),start=source.indexOf('function $S('),end=source.indexOf('function ',start+10),profile=JSON.parse(fs.readFileSync('profile.json','utf8'));
+ const text=[],actions=[];const draw=new Function('jh','Z','X','Q','wv','RS',source.slice(start,end)+';return $S;')(profile.projectInvitation,1024,{},(_ctx,value)=>text.push(value),(_ctx,value)=>text.push(value),(_ctx,_game,item)=>actions.push(item));
+ draw({}, {}, 0);assert(text.includes(profile.projectInvitation.title));assert(text.includes(profile.projectInvitation.summary));assert(!text.includes('ERRO 404'));
+ assert.deepEqual(actions.map(item=>item.id),['projetos/contact','projetos/eject']);
+});
+
 test('single frontend route shares canonical content with the TV and printable resume',()=>{
  const profile=JSON.parse(fs.readFileSync('profile.json','utf8')),details=JSON.parse(fs.readFileSync('skill-details.json','utf8'));
  const dom=new JSDOM(html),d=dom.window.document,content=JSON.parse(d.querySelector('#portfolio-data').textContent);
@@ -22,8 +59,9 @@ test('single frontend route shares canonical content with the TV and printable r
  }
  for(const project of projects){
   const study=new JSDOM(fs.readFileSync('public/cases/'+project.slug+'/index.html','utf8'));
+  if(project.demoUrl){const first=study.window.document.querySelector('.document-actions a');assert.equal(first.href,project.demoUrl);assert(first.classList.contains('btn--primary'));assert.equal(study.window.document.querySelectorAll('.btn--primary').length,1);}
   assert(study.window.document.body.textContent.includes(project.caseStory));
-  assert.equal(study.window.document.querySelector('.document-actions a').getAttribute('href'),'/');study.window.close();
+  assert.equal(study.window.document.querySelector('[data-document-back]').getAttribute('href'),'/');study.window.close();
  }
  const engine=fs.readFileSync('public/engine.js','utf8');
  for(const [name,next,field] of [['Eh','Dh','person'],['Dh','Oh','experience'],['Oh','kh','skills'],['kh','Ah','achievements'],['Ah','jh','projects']]){
@@ -49,6 +87,28 @@ test('career travel follows the path for two seconds and changes location only o
  assert.equal(journey.update(1),null);const halfway=journey.position;assert.notDeepEqual(halfway,stops[0]);assert.notDeepEqual(halfway,stops[1]);assert.equal(journey.current,0);
  assert.equal(journey.update(1),null);assert.deepEqual(journey.position,halfway,'A frozen game clock freezes the walk');
  journey.update(1.999);assert.equal(journey.current,0);assert.equal(journey.update(2),1);assert.equal(journey.current,1);assert(!journey.moving);assert.deepEqual(journey.position,stops[1]);assert.equal(journey.walkTo(1,3),false);
+});
+
+test('chronological trail visits every employer and routes around buildings in both directions',async()=>{
+ const {careerStops,careerOrder,careerTrail}=await import('./public/career-map.js');
+ const companies=JSON.parse(fs.readFileSync('profile.json','utf8')).experience,order=careerOrder(companies);
+ assert.deepEqual(order.map(i=>companies[i].id),['gvt','marq','gp','pilgrims','match','next']);
+ const slots=careerStops(companies.length),buildings=companies.map((_,i)=>slots[order.indexOf(i)]),stations=buildings.map(([x,z])=>[x,z+.67]);
+ const trail=careerTrail(stations,order),journey=createCareerJourney(stations,{order});
+ assert.equal(journey.current,order[0]);
+ assert(order.every((id,i)=>i===0||trail.distances[id]>trail.distances[order[i-1]]));
+ const onTrail=([x,z])=>trail.points.slice(1).some((b,i)=>{const a=trail.points[i];return x>=Math.min(a[0],b[0])-1e-8&&x<=Math.max(a[0],b[0])+1e-8&&z>=Math.min(a[1],b[1])-1e-8&&z<=Math.max(a[1],b[1])+1e-8;});
+ for(const [target,start]of [[order.at(-1),0],[order[0],3]]){
+  assert(journey.walkTo(target,start));
+  for(let step=0;step<=100;step++){
+   journey.update(start+step/50);const [x,z]=journey.position;
+   assert(onTrail([x,z]),'Avatar stays on the rendered route');
+   assert(!buildings.some(([bx,bz])=>Math.abs(x-bx)<.5&&Math.abs(z-bz)<.43),'Route cannot cut through a house');
+  }
+  assert.equal(journey.current,target);
+ }
+ journey.walkTo(order.at(-1),6);journey.update(6.7);const before=journey.position;
+ journey.walkTo(order[0],6.7);assert.deepEqual(journey.position,before);journey.update(8.7);assert.equal(journey.current,order[0]);
 });
 test('retargeting a walking character starts from its current position without teleporting',()=>{
  const journey=createCareerJourney([[-.4,-1.93],[.25,.67],[-.4,3.27]]);journey.walkTo(2,0);journey.update(.8);const before=journey.position;
@@ -150,10 +210,10 @@ test('frontend content uses verified contacts and treats Sua companhia as an inv
  assert(d.querySelector('#inicio a[href="https://github.com/AndreSuckow"]'));
  assert(d.querySelector('#inicio a[href="https://www.linkedin.com/in/andresuckow/"]'));
  assert.equal(d.querySelectorAll('[data-pad="a"], [data-pad="b"]').length,2);
- assert.equal(d.querySelectorAll('.attribute__trigger').length,5);
+ assert.equal(d.querySelectorAll('.attribute__trigger').length,JSON.parse(fs.readFileSync('profile.json','utf8')).stats.length);
  for(const button of d.querySelectorAll('.attribute__trigger'))assert(d.getElementById(button.getAttribute('aria-describedby')).textContent.length>40);
  assert(d.querySelector('#hobbies a[href="https://www.instagram.com/tf.church/"]'));
- const project=d.querySelector('[data-tv="projetos/case/frontend"]');assert.equal(project.getAttribute('href'),'/cases/frontend/');assert(project.closest('.resume-project').querySelector('.resume-tags'));
+ for(const project of JSON.parse(fs.readFileSync('profile.json','utf8')).projects){const link=d.querySelector(`[data-tv="projetos/case/${project.slug}"]`);assert.equal(link.getAttribute('href'),`/cases/${project.slug}/`);assert(link.closest('.resume-project').querySelector('.resume-tags'));}
  dom.window.close();
 });
 

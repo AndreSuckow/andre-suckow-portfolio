@@ -1,5 +1,13 @@
 # Direção visual do portfólio
 
+As fitas de Projetos ficam em fileiras de três: três sobre a mesa e três na prateleira de madeira acima, à direita da TV. Posições e suportes compartilham `public/project-shelf.js`. O enquadramento de Projetos considera a altura de todas as fileiras, inclusive no celular. Ao inserir/ejetar, a fita passa à frente da prateleira antes de subir ou retornar ao seu lugar.
+
+Nas fichas de projeto, “Ver projeto online” é a primeira ação no topo e o único botão de destaque. Código e retorno ficam ao lado como ações secundárias; contato permanece ao final sem competir visualmente com a demonstração. Ações de impressão e download do currículo pertencem à ficha de currículo.
+
+Cada fita de Projetos representa uma entrega concreta, com nome próprio, imagem opcional, descrição e tecnologias. Demonstração e código são ações distintas, exibidas apenas quando o projeto tem os respectivos links. Empresas e cargos pertencem à aba Experiência. A fita final é um convite para construir em conjunto, com acesso ao contato, sem simular erro ou projeto concluído. `profile.json` mantém `projects` e `projectInvitation` como fontes compartilhadas por 2D/3D.
+
+O mapa de carreira usa uma trilha contínua em serpentina, em ordem cronológica, de GVT até Sua companhia. Casas recebem número e ano; setas no chão indicam o sentido. O personagem percorre a mesma geometria da trilha, inclusive ao voltar ou trocar de destino durante a caminhada. A vista inicial mais elevada separa as fileiras. A instrução de rotação fica no cabeçalho, sem tooltip sobre o terreno. O mapa mantém os modelos, a paleta e os controles de rotação existentes.
+
 ## Mobile 2D
 
 Movimento: `public/mobile-motion.js` oferece fades de entrada/saída nos blocos ao rolar, com duração de 460/220 ms; o fundo do quarto se desloca mais lentamente na abertura. Os efeitos só atuam no 2D mobile, usam transform/opacity e são removidos com movimento reduzido ou troca de modo. Elementos focados ficam imediatamente visíveis. As fitas dos estudos de caso giram por arraste horizontal, botão Girar fita e setas do teclado; o gesto vertical continua rolando a página e arrastar não abre a ficha. Restaurar retorna à frente; rotação manual continua disponível sem transição com movimento reduzido. Nenhum modelo extra é carregado.

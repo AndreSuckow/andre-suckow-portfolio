@@ -29,25 +29,14 @@ function setup(mode='2d'){
   return {dom,window,document:window.document,dialog:window.document.getElementById('skill-dialog')};
 }
 
-test('Sebrae reward shares the skill dialog lifecycle and does not leak into skills',()=>{
- for(const selector of ['[data-tv="sobre/certification"]','[data-tv="skills/certification"]']){
-  for(const mode of ['2d','3d']){
-    const {dom,document,dialog}=setup(mode),button=document.querySelector(selector);
-    let opened=0,closed=0;
-    document.addEventListener('resume:skill-open',()=>opened++);
-    document.addEventListener('resume:skill-close',()=>closed++);
-    document.body.style.overflow='auto';button.focus();button.click();button.click();
-    assert(dialog.open);assert.equal(opened,1);assert.equal(dialog.dataset.reward,'certification');
-    const reward=dialog.querySelector('[data-certification-reward]');
-    assert(!reward.hidden);assert(reward.textContent.includes(profile.certification));assert(reward.textContent.includes(profile.name));
-    assert.equal(document.activeElement.id,'skill-dialog-title');assert.equal(document.body.style.overflow,'hidden');
-    dialog.close();assert.equal(closed,1);assert.equal(document.body.style.overflow,'auto');
-    assert.equal(document.activeElement,mode==='3d'?document.getElementById('stage-canvas'):button);
-    document.querySelector('.skill-item').click();assert(dialog.open);assert.equal(dialog.dataset.reward,undefined);assert(reward.hidden);
-    assert.equal(dialog.querySelector('[data-skill-definition]').textContent,details[document.querySelector('.skill-item').textContent.trim()].definition);
-    dom.window.close();
-  }
+test('education links open the supplied document from both sections',()=>{
+ const {dom,document}=setup();
+ for(const id of ['sobre/certification','skills/certification']){
+  const link=document.querySelector('[data-tv="'+id+'"]');
+  assert.equal(link.tagName,'A');assert.equal(link.getAttribute('href'),profile.education.document);
+  assert.equal(link.target,'_blank');assert(link.rel.includes('noopener'));
  }
+ dom.window.close();
 });
 
 test('all active frontend skills open their own explanation and company experiences',()=>{
@@ -103,10 +92,10 @@ test('3D activation uses the actual engine action to open the same DOM modal',()
   screen.activate({id:first.dataset.tv,kind:'action'});
   assert(dialog.open);assert.equal(dialog.querySelector('h2').textContent,first.textContent.trim());
   dialog.close();assert.equal(document.activeElement.id,'stage-canvas');
+  let documentOpened=0;
+  document.querySelector('[data-tv="skills/certification"]').addEventListener('click',event=>{event.preventDefault();documentOpened++;});
   screen.activate({id:'skills/certification',kind:'action'});
-  assert(dialog.open);assert.equal(dialog.dataset.reward,'certification');
-  assert(!dialog.querySelector('[data-certification-reward]').hidden);
-  dialog.close();assert.equal(document.activeElement.id,'stage-canvas');
+  assert.equal(documentOpened,1);assert(!dialog.open);
   // Navigation/selecting an item remains separate from opening its details.
   screen.onSelect=()=>{};screen.activate({id:first.dataset.tv,kind:'select'});assert(!dialog.open);
   dom.window.close();
@@ -124,10 +113,10 @@ test('mouse hover does not leave an attribute description pinned; navigation sti
  const drawStart=engine.indexOf('function BS('),drawEnd=engine.indexOf('function csHobbies(',drawStart);
  window.eval(`${engine.slice(drawStart,drawEnd)};window.drawAttributes=BS;`);
  const draw=()=>{window.descriptions=[];window.drawAttributes({},screen,0);return window.descriptions;};
- const last=screen.items[4];screen.hover(last);screen.hover(null);
- assert(!draw().includes(profile.stats[4].description),'Leaving the last hovered attribute clears its bottom description');
- screen.select(4);
- assert(draw().includes(profile.stats[4].description),'Keyboard/controller navigation retains its accessible description');
+ const last=screen.items.at(-1);screen.hover(last);screen.hover(null);
+ assert(!draw().includes(profile.stats.at(-1).description),'Leaving the last hovered attribute clears its bottom description');
+ screen.select(profile.stats.length-1);
+ assert(draw().includes(profile.stats.at(-1).description),'Keyboard/controller navigation retains its accessible description');
  screen.hover(screen.items.find(i=>i.id==='sobre/attribute/1'));screen.hover(null);
  assert(!draw().includes(profile.stats[1].description),'Mouse use clears the navigation description again');
  dom.window.close();
