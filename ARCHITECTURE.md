@@ -5,8 +5,7 @@ Leia este mapa antes de abrir arquivos grandes. Procure o símbolo ou a funciona
 ## Fluxo atual
 
 ```text
-profile-curriculo.json + skill-details-curriculo.json ─┐
-profile.json + skill-details.json ────────────────────┤
+profile.json + skill-details.json ────────────────────┐
 src/portfolio.html + src/room-discoveries.html ────────┤
 src/engine.js + src/boot.js ───────────────────────────┤
                                                     ↓
@@ -25,8 +24,7 @@ src/engine.js + src/boot.js ─────────────────�
 
 | Responsabilidade | Fonte canônica |
 | --- | --- |
-| Conteúdo profissional da raiz | `profile-curriculo.json`, `skill-details-curriculo.json` |
-| Conteúdo profissional de `/cs/` | `profile.json`, `skill-details.json` |
+| Conteúdo profissional único | `profile.json`, `skill-details.json`; fonte factual em `documents/Curriculo-Andre-Suckow-Frontend.pdf` |
 | Estrutura compartilhada e markup dos objetos | `src/portfolio.html`, `src/room-discoveries.html` |
 | Motor legado, câmera, TV e inicialização | `src/engine.js`, `src/boot.js` — migração posterior |
 | Geração de páginas, dados e versões de assets | `customize.cjs`, `cs-portfolio.cjs`, `certification.cjs` — preservar contratos textuais |
@@ -44,9 +42,10 @@ src/engine.js + src/boot.js ─────────────────�
 
 ## Fronteira entre fonte e geração
 
-- `public/engine.js`, `public/boot.js`, `public/index.html`, `public/cs/index.html` e as páginas de fichas/currículos são gerados. Corrija a fonte ou o gerador, nunca somente a saída.
+- `public/engine.js`, `public/boot.js`, `public/index.html` e as páginas de fichas/currículo são gerados. Corrija a fonte ou o gerador, nunca somente a saída. `/cs/` foi retirada, assim como os perfis duplicados. Os nomes históricos `cs-portfolio.cjs`, `cs-interactions.js` e `cs-model.js` ainda identificam módulos compartilhados; não representam uma rota ativa.
 - Os demais módulos JS e estilos de `public/` ainda são fontes mantidas manualmente. Não excluir ou mover `public/` como se fosse uma pasta descartável.
 - `dist/` é inteiramente gerado e não deve ser editado ou versionado.
+- `archived-assets/` preserva originais sem uso no site, com suas licenças, fora do pacote publicado. Atualmente contém o antigo modelo 3D de xadrez; o jogo ativo continua em `public/board-games/`.
 - `public/vendor/`, fontes, modelos, imagens, áudio e ROMs são dependências/assets. Evite ler seu conteúdo em tarefas de código; preserve licenças e créditos.
 - `customize.cjs` depende de nomes e delimitadores específicos do motor (`Eh`, `Dh`, `Oh`, `kh`, `Ah`, `jh`). Alguns testes também verificam trechos literais. Formatação global pode quebrar esses contratos.
 
@@ -64,4 +63,4 @@ Para esta etapa, a equivalência exigida é o mesmo conjunto de arquivos e os me
 2. Separar dependências do motor e substituir suas substituições textuais por interfaces explícitas, uma por vez.
 3. Só depois adotar minificação de produção, com fontes legíveis, preservação de licenças, cache correto e validação de módulos, workers e imports dinâmicos.
 
-Cada etapa deve manter os dados independentes das duas rotas e a apresentação compartilhada. Não juntar mudanças visuais, atualização de dependências do motor e extração de módulos no mesmo lote.
+Cada etapa deve manter uma única fonte de conteúdo para os modos 2D e 3D. Não juntar atualização de dependências do motor e extração de módulos no mesmo lote. O mapa de carreira dimensiona terreno, posições e áreas de clique a partir da quantidade de experiências; novas empresas não devem reutilizar rótulos fixos de empresas anteriores.

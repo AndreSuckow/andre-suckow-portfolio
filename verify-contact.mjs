@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 const executable =
   process.env.GAME_TEST_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4180/cs/';
+const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4173/';
 const output = path.resolve('tmp/contact-browser');
 fs.mkdirSync(output, { recursive: true });
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

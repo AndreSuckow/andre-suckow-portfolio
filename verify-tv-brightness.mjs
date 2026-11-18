@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 const executable =
   process.env.GAME_TEST_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4173/cs/';
+const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4173/';
 const output = path.resolve('tmp/portfolio-browser');
 fs.mkdirSync(output, { recursive: true });
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -274,7 +274,7 @@ try {
   compare(reference, await sample('high'));
   // Run the actual insertion, replacement, ejection and power routines. Sample
   // only after their temporary bursts have fully expired.
-  for (const slug of ['onboarding', 'implantacao']) {
+  for (const slug of ['frontend', 'performance']) {
     await menu('projetos');
     await evaluate(`tvBrightness.insert(${JSON.stringify(slug)})`);
     await until(

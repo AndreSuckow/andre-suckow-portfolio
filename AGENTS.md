@@ -2,7 +2,7 @@
 
 Ao concluir melhorias solicitadas neste site, incluir a publicação na versão final em https://andresuckow.github.io/andre-suckow-portfolio/, conforme preferência explícita do usuário.
 
-A raiz apresenta o currículo e `/cs/` a versão de Customer Success. Ambas usam o mesmo visual, template e motor 2D/3D; apenas o conteúdo profissional pode variar. `profile-curriculo.json` e `skill-details-curriculo.json` alimentam a raiz; `profile.json` e `skill-details.json` alimentam `/cs/`. Preservar essa separação de dados e compartilhar alterações visuais entre as duas rotas.
+A raiz apresenta o portfólio de Desenvolvimento Frontend. A rota `/cs/` foi retirada por solicitação do usuário. `profile.json` e `skill-details.json` são as únicas fontes de conteúdo profissional, compartilhadas pelos modos 2D/3D e pelas fichas. A fonte factual é `documents/Curriculo-Andre-Suckow-Frontend.pdf`; preservar o PDF fornecido e não atribuir tecnologias a empresas sem evidência no documento.
 
 - Validar testes, check e build com `SITE_BASE_PATH=/andre-suckow-portfolio/`.
 - Fazer commit das alterações pertinentes e enviar para `main`, que dispara o workflow de GitHub Pages.

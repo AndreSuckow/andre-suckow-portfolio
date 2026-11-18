@@ -73,9 +73,8 @@ for (const file of gltfs) {
       assert.equal(fs.statSync(asset).size, ref.byteLength, `Incomplete glTF buffer: ${asset}`);
   }
 }
-const html = fs.readFileSync(path.join(root, 'cs/index.html'), 'utf8');
 const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-for (const page of [home, html])
+for (const page of [home])
   for (const id of [
     'stage-canvas',
     'inicio',
@@ -92,15 +91,15 @@ for (const page of [home, html])
   ])
     assert(page.includes(`id="${id}"`), `Missing shared portfolio contract: ${id}`);
 assert(
-  home.includes('data-portfolio="curriculo"') && html.includes('data-portfolio="cs"'),
-  'Each route must identify its own content',
+  home.includes('data-portfolio="curriculo"') && !fs.existsSync(path.join(root, 'cs')),
+  'Only the main portfolio route is maintained',
 );
 const engine = fs.readFileSync(path.join(root, 'engine.js'), 'utf8');
 for (const company of JSON.parse(fs.readFileSync('profile.json', 'utf8')).experience.map(
   (x) => x.org,
 ))
   assert(engine.includes(company), `Missing professional experience ${company}`);
-const originalPdf = fs.readFileSync('documents/ANDRE_LUIS_SUCKOW_CV.pdf');
+const originalPdf = fs.readFileSync('documents/Curriculo-Andre-Suckow-Frontend.pdf');
 const profile = JSON.parse(fs.readFileSync('profile.json', 'utf8'));
 assert.equal(profile.cvPdf, '/curriculo-andre-suckow.pdf');
 const pdf = fs.readFileSync(path.join(root, profile.cvPdf));

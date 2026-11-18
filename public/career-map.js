@@ -4,6 +4,12 @@ import {createCareerOrbit} from './career-orbit.js?v=cs-mode-3';
 
 // Split the usable width (excluding the gutter) into 40% text and 60% map.
 export const CAREER_LAYOUT={text:{x:48,y:156,w:365,h:548},map:{x:429,y:184,w:547,h:474}};
+export function careerStops(count){
+ if(!Number.isInteger(count)||count<1)throw Error('Career map requires at least one stop');
+ if(count<=3)return Array.from({length:count},(_,index)=>[index%2?.55:-.05,(index-(count-1)/2)*1.5]);
+ const rows=Math.ceil(count/2);
+ return Array.from({length:count},(_,index)=>[index%2?1.05:-1.15,(Math.floor(index/2)-(rows-1)/2)*1.5]);
+}
 export function isCareerMapPoint(x,y){const r=CAREER_LAYOUT.map;return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<r.y+r.h;}
 
 // Movement uses the game's clock, so pause freezes the two-second journey.
@@ -59,7 +65,7 @@ export function drawCareerScreen(e,t,n,{companies,colors: X,Q,kv,Ev,wv,Tv,Nv}){
  Q(e,'CLIQUE NAS CASAS · ARRASTE PARA GIRAR',CAREER_LAYOUT.map.x+CAREER_LAYOUT.map.w/2,190,{size:12,color:X.muted,align:'center'});
  companies.forEach((company,index)=>{
   const rect=bounds[index];t.addItem({id:'experiencia/'+index,rect,kind:'career',label:company.org,tooltip:t.careerMap.moving||index===selected?null:'Clique para caminhar até '+company.org});
-  const label=company.invitation?'SUA COMPANHIA':index===0?'MARQ HR':'PILGRIM’S';
+  const label=company.invitation?'SUA COMPANHIA':(company.shortOrg||company.org).toUpperCase();
   Q(e,label,rect.x+rect.w/2,rect.y-7,{size:14,bold:true,color:index===selected?X.sel:X.text,align:'center',max:145});
  });
  for(const [index,label,command]of [[0,'GIRAR -','left'],[1,'GIRAR +','right'],[2,'REPOR','reset']]){
@@ -67,7 +73,7 @@ export function drawCareerScreen(e,t,n,{companies,colors: X,Q,kv,Ev,wv,Tv,Nv}){
   Tv(e,rect,X.panel,X.slate,2);Q(e,label,rect.x+rect.w/2,rect.y+6,{size:14,color:X.text,align:'center'});
   t.addItem({id:'career-view/'+command,kind:'career-view',rect,label:command==='reset'?'Restaurar vista do mapa':command==='left'?'Girar mapa para a esquerda':'Girar mapa para a direita'});
  }
- Q(e,'■ ANTERIORES',CAREER_LAYOUT.map.x+12,704,{size:13,color:'#42d68a'});
+ Q(e,'■ EXPERIÊNCIAS',CAREER_LAYOUT.map.x+12,704,{size:13,color:'#42d68a'});
  Q(e,'■ PRÓXIMA COMPANHIA',CAREER_LAYOUT.map.x+260,704,{size:13,color:'#57a8ff'});
 }
 
@@ -76,6 +82,8 @@ export function createCareerMap(T,companies,assets){
  const {Scene,Group,Mesh,BoxGeometry,PlaneGeometry,BufferGeometry,BufferAttribute,BasicMaterial,CanvasTexture,OrthographicCamera,Renderer,Vector3,SRGB}=T;
  const renderer=new Renderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
  renderer.setSize(CAREER_LAYOUT.map.w,CAREER_LAYOUT.map.h);renderer.setPixelRatio(1);renderer.outputColorSpace=SRGB;renderer.setClearColor(0x000000,0);
+ const rows=companies.length>3?Math.ceil(companies.length/2):companies.length;
+ const terrainDepth=Math.max(4.7,(rows-1)*1.5+1.7),terrainWidth=companies.length>3?5.8:3.9,depthScale=terrainDepth/4.7,widthScale=terrainWidth/3.9;
  const halfHeight=2.45,halfWidth=halfHeight*CAREER_LAYOUT.map.w/CAREER_LAYOUT.map.h;
  const scene=new Scene(),camera=new OrthographicCamera(-halfWidth,halfWidth,halfHeight,-halfHeight,.1,40);
  camera.position.set(.4,9.5,10);camera.lookAt(0,.24,0);
@@ -86,7 +94,7 @@ export function createCareerMap(T,companies,assets){
   camera.lookAt(0,.4,0);camera.zoom=1;camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
   let extent=1;
   const include=(x,y,z)=>{const p=new Vector3(x,y,z).project(camera);extent=Math.max(extent,Math.abs(p.x)/.96,Math.abs(p.y)/.96);};
-  for(const x of [-2.2,2.2])for(const y of [-.5,.85])for(const z of [-2.65,2.65])include(x,y,z);
+  for(const x of [-terrainWidth/2-.25,terrainWidth/2+.25])for(const y of [-.5,.85])for(const z of [-terrainDepth/2-.3,terrainDepth/2+.3])include(x,y,z);
   for(const [bx,bz]of points)for(const x of [bx-.6,bx+1.12])for(const z of [bz-.7,bz+.7])include(x,1.6,z);
   camera.zoom=1/extent;camera.updateProjectionMatrix();
  }
@@ -98,9 +106,10 @@ export function createCareerMap(T,companies,assets){
  }
  const fallbackTerrain=new Group();scene.add(fallbackTerrain);
  const earth=['#314a53','#233742','#5f8670','#253d44','#3a5960','#2b414e'];
- box(fallbackTerrain,0,-.23,0,3.9,.44,4.7,earth);
- box(fallbackTerrain,0,.005,0,3.9,.06,4.7,['#4a7165','#355748','#638a70','#355748','#4a7165','#355748']);
- const floorY=.22,points=[[-.05,-1.5],[.55,0],[-.05,1.5]],stations=points.map(([x,z])=>[x-.3,z+.67]),roadX=-1.18,buildings=[],flags=[];
+ box(fallbackTerrain,0,-.23,0,terrainWidth,.44,terrainDepth,earth);
+ box(fallbackTerrain,0,.005,0,terrainWidth,.06,terrainDepth,['#4a7165','#355748','#638a70','#355748','#4a7165','#355748']);
+ const floorY=.22,points=careerStops(companies.length),stations=points.map(([x,z])=>[x-.3,z+.67]),roadX=companies.length>3?-2.5:-1.18,buildings=[],flags=[];
+ document.documentElement.dataset.careerStops=String(points.length);
  applyOrbit();
  const journey=createCareerJourney(stations,{duration:2,roadX});
  function path(a,b){const distance=Math.hypot(b[0]-a[0],b[1]-a[1]);for(let step=0;step<=distance;step+=.15){const f=distance?step/distance:0;box(scene,a[0]+(b[0]-a[0])*f,floorY,a[1]+(b[1]-a[1])*f,.28,.065,.14,'#b88c50');}}
@@ -141,7 +150,7 @@ export function createCareerMap(T,companies,assets){
  function trackImported(root){root.traverse(object=>{if(!object.isMesh)return;resources.push(object.geometry);for(const material of Array.isArray(object.material)?object.material:[object.material])if(material.map)resources.push(material.map);});}
  document.documentElement.dataset.careerModels='loading';
  const ready=()=>{document.documentElement.dataset.careerModels=terrainReady&&characterReady?'ready':'partial';};
- loadCareerTerrain(T,{roadX,stations,buildings:points}).then(root=>{
+ loadCareerTerrain(T,{roadX,stations,buildings:points,depthScale,widthScale}).then(root=>{
   if(disposed){root.traverse(object=>{if(object.isMesh){object.geometry.dispose();object.material.map?.dispose();object.material.dispose();}});return;}
   trackImported(root);scene.add(root);fallbackTerrain.visible=false;terrainReady=true;ready();
  }).catch(error=>{if(!disposed){document.documentElement.dataset.careerModels='fallback';console.warn('Career terrain unavailable',error);}});
@@ -163,7 +172,17 @@ export function createCareerMap(T,companies,assets){
  const nextCanvas=document.createElement('canvas');nextCanvas.width=400;nextCanvas.height=160;const next=nextCanvas.getContext('2d');
  next.fillStyle='#18253d';next.fillRect(0,0,400,160);next.fillStyle='#7abfff';next.font='bold 40px Arial';next.textAlign='center';next.fillText('SUA COMPANHIA',200,94);
  function syncArt(){
-  companies.forEach((company,i)=>picture(company.invitation?nextCanvas:assets.screenshots['company/'+company.id],buildings[i],0,.58,.332,.72,.24,'company/'+company.id));
+  companies.forEach((company,i)=>{
+   const key='company/'+company.id;if(logos.has(key))return;
+   let image=company.invitation?nextCanvas:assets.screenshots[key];
+   if(!image&&!company.logo){
+    image=document.createElement('canvas');image.width=600;image.height=200;
+    const context=image.getContext('2d');context.fillStyle='#18253d';context.fillRect(0,0,600,200);context.fillStyle='#f1f3fa';context.textAlign='center';
+    let size=46;do{context.font='bold '+size+'px Arial';if(context.measureText(company.org).width<560)break;size-=2;}while(size>20);
+    context.fillText(company.org,300,115);
+   }
+   picture(image,buildings[i],0,.58,.332,.72,.24,key);
+  });
   if(!characterReady&&assets.portrait&&!logos.has('portrait')){
    const texture=new CanvasTexture(assets.portrait);texture.colorSpace=SRGB;resources.push(texture);
    const geometry=new PlaneGeometry(.375,.375);resources.push(geometry);const mesh=new Mesh(geometry,new BasicMaterial({map:texture,transparent:true}));mesh.position.set(0,.58,.103);avatar.add(mesh);logos.set('portrait',mesh);
@@ -184,7 +203,7 @@ export function createCareerMap(T,companies,assets){
    focusMarker.visible=focused!==journey.current;focusMarker.position.set(points[focused][0],floorY+.064,points[focused][1]);
    flags.forEach((flag,index)=>{const attr=flag.geometry.attributes.position;for(let row=0;row<2;row++)for(let col=0;col<=12;col++){const f=col/12;attr.setZ(row*13+col,reduced?0:Math.sin(time*5-f*7+index)*.075*f);}attr.needsUpdate=true;});
    renderer.render(scene,camera);ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(renderer.domElement,rect.x,rect.y,rect.w,rect.h);ctx.restore();
-   return points.map(([x,z],index)=>{const p=new Vector3(x,buildings[index].position.y+.38,z).project(camera);return {x:rect.x+(p.x+1)/2*rect.w-48,y:rect.y+(1-p.y)/2*rect.h-52,w:104,h:115};});
+   return points.map(([x,z],index)=>{const p=new Vector3(x,buildings[index].position.y+.38,z).project(camera),w=companies.length>3?60:104,h=companies.length>3?65:115;return {x:rect.x+(p.x+1)/2*rect.w-w/2,y:rect.y+(1-p.y)/2*rect.h-h/2,w,h};});
   },
   dispose(){disposed=true;for(const resource of new Set(resources))resource.dispose();for(const material of materials.values())material.dispose();scene.traverse(object=>{if(object.isMesh)for(const material of Array.isArray(object.material)?object.material:[object.material])material.dispose();});renderer.dispose();}
  };

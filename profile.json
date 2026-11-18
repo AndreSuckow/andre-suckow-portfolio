@@ -1,292 +1,340 @@
 {
   "name": "André Luis Suckow",
   "shortName": "André Suckow",
-  "role": "CS | CX | Onboarding | SaaS",
-  "roleLong": "Customer Success (CS) | Customer Experience (CX) | Onboarding | Implantação SaaS",
+  "role": "Frontend Pleno | React · TypeScript · Next.js",
+  "roleLong": "Desenvolvedor Frontend Pleno | React · TypeScript · Next.js",
   "location": "Curitiba – PR",
   "available": true,
-  "availability": "Disponível para novos projetos e oportunidades",
+  "availability": "Disponível para oportunidades em desenvolvimento frontend",
   "email": "andre.suckow.dev@gmail.com",
   "phone": "+55 (41) 99583-0758",
   "whatsapp": "https://wa.me/5541995830758",
   "cvPdf": "/curriculo-andre-suckow.pdf",
   "photo": "/img/andre-pixel.png",
-  "headline": "Customer Success, Customer Experience, onboarding e implantação SaaS.",
-  "intro": "Profissional com experiência em Customer Success, onboarding, implantação e suporte a plataformas SaaS de controle de ponto e e-commerce.",
+  "headline": "Interfaces interativas, acessíveis e feitas para pessoas.",
+  "intro": "Desenvolvedor Frontend com 4+ anos de experiência em React, TypeScript e JavaScript e mais de 120 aplicações web interativas entregues.",
   "bio": [
-    "Profissional com experiência em Customer Success, onboarding, implantação e suporte a plataformas SaaS de controle de ponto e e-commerce.",
-    "Atuação em parametrização, capacitação de usuários, adoção de produto, retenção de clientes e suporte técnico N2. Realizei mais de 300 treinamentos, incluindo turmas com mais de 30 participantes, e liderei a criação de um onboarding gravado. Experiência na interface entre clientes, suporte e equipes de Produto."
+    "Sou desenvolvedor Frontend com 4+ anos de experiência em React, TypeScript e JavaScript. Na GP Strategies Brasil, desenvolvi o frontend de mais de 120 aplicações educacionais interativas, sendo mais de 50 em React e TypeScript, em projetos para clientes como Vivo e Coca-Cola.",
+    "Trabalho com componentização, interfaces responsivas e acessíveis, integração com APIs REST e plataformas LMS via SCORM. Também atuo com performance, Lighthouse, Core Web Vitals e SEO técnico. A experiência anterior em suporte N2 e implantação de SaaS complementa meu trabalho com visão de produto, investigação de problemas e foco no usuário final."
   ],
-  "mission": "Ouvir para entender. Orientar para gerar valor. Acompanhar para que o cliente escolha ficar.",
-  "missionShort": "Ouvir para entender. Orientar para gerar valor. Acompanhar para que o cliente escolha ficar.",
+  "mission": "Transformar necessidades reais em interfaces claras, acessíveis e eficientes.",
+  "missionShort": "Construir interfaces acessíveis, responsivas e eficientes, com foco no usuário.",
   "stats": [
     {
-      "label": "Customer Success",
+      "label": "React e TypeScript",
       "value": 5,
-      "description": "Acompanhava a adoção da plataforma, identificava gargalos de utilização e orientava clientes para apoiar a retenção."
+      "description": "Mais de 50 aplicações em React e TypeScript e participação na migração do time para componentes reutilizáveis."
     },
     {
-      "label": "Onboarding",
+      "label": "Interfaces web",
       "value": 5,
-      "description": "Conduzia onboarding, implantação e parametrização de uma plataforma SaaS de controle de ponto e apoiava novas empresas em plataforma integrada de e-commerce."
+      "description": "Frontend de mais de 120 aplicações educacionais interativas, com responsividade e implementação a partir do Figma."
     },
     {
-      "label": "Implantação SaaS",
+      "label": "APIs e SCORM",
       "value": 4,
-      "description": "Parametrizava jornadas, escalas, banco de horas, fechamento de ponto e relatórios conforme as regras de cada empresa."
+      "description": "Integrações com APIs REST e plataformas LMS via SCORM para progresso, conclusão e interações."
     },
     {
-      "label": "Retenção / churn",
+      "label": "Performance e WCAG",
       "value": 4,
-      "description": "Na MarQ HR, realizava abordagens proativas voltadas à retenção e prevenção de churn, identificando gargalos de utilização."
+      "description": "Acessibilidade, Lighthouse, Core Web Vitals e SEO técnico na construção e otimização de interfaces."
     },
     {
-      "label": "Treinamentos",
+      "label": "Visão de produto",
       "value": 5,
-      "description": "Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, incluindo turmas com mais de 30 participantes, e liderei a criação e implementação do onboarding gravado."
+      "description": "Colaboração com design e backend, somada à experiência com usuários reais em suporte e implantação."
     }
   ],
   "experience": [
     {
-      "id": "marq",
-      "phase": "Fase 1",
-      "title": "A jornada do cliente",
-      "role": "Suporte",
-      "org": "MarQ HR (antiga MarQPonto)",
-      "period": "Jan 2018 – Jan 2024",
-      "start": 2018,
-      "summary": "Atendimento, onboarding, implantação e adoção de plataforma SaaS de ponto eletrônico.",
+      "id": "match",
+      "org": "Match Creative Studio",
+      "role": "Desenvolvedor WordPress (Freelance)",
+      "period": "Jul 2026 – Atual",
+      "start": 2026,
+      "location": "Remoto",
+      "workMode": "Freelance",
+      "title": "Performance e qualidade web",
+      "summary": "Manutenção e otimização de sites institucionais de clientes da agência.",
       "bullets": [
-        "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail.",
-        "Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios.",
-        "Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, inclusive com mais de 30 participantes; liderei a criação e implementação do onboarding gravado.",
-        "Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn.",
-        "Registrei e acompanhei chamados e solicitações de melhorias em interface com a equipe de Produto, utilizando Trello para controle e identificação de duplicidades.",
-        "Gerenciei a régua de cobrança de clientes e a recuperação consultiva de valores pendentes, com foco em redução da inadimplência."
+        "Mantenho e otimizo sites institucionais de clientes da agência, com foco em performance, acessibilidade e SEO técnico.",
+        "Melhoro indicadores de Lighthouse e Core Web Vitals ajustando carregamento de recursos, renderização e estabilidade visual das páginas.",
+        "Corrijo lentidão, excesso de recursos carregados e inconsistências de navegação entre dispositivos."
       ],
-      "logo": "/img/marqhr-logo.svg",
-      "location": "Curitiba – PR",
-      "workMode": "CLT · presencial, híbrido e remoto",
       "tvBullets": [
-        "Atendimento via WhatsApp, JivoChat, telefone e e-mail.",
-        "Onboarding e parametrização: jornadas, escalas, banco de horas, fechamento e relatórios.",
-        "Mais de 300 treinamentos; turmas com mais de 30 pessoas; criação do onboarding gravado.",
-        "Adoção, identificação de gargalos e prevenção de churn.",
-        "Chamados e melhorias com Produto; controle de duplicidades no Trello.",
-        "Régua de cobrança e recuperação consultiva de valores pendentes."
-      ]
+        "Manutenção de sites institucionais em WordPress.",
+        "Performance, acessibilidade e SEO técnico.",
+        "Lighthouse e Core Web Vitals: carregamento, renderização e estabilidade visual.",
+        "Correção de lentidão e inconsistências de responsividade."
+      ],
+      "phase": "Etapa 1",
+      "shortOrg": "Match Studio"
     },
     {
       "id": "pilgrims",
-      "phase": "Fase 2",
-      "title": "Missão de implantação",
+      "org": "Pilgrim's Consulting",
       "role": "Analista de Suporte a Sistemas Pleno N2",
-      "org": "Pilgrim’s Consultoria de Tecnologia",
       "period": "Dez 2025 – Jul 2026",
       "start": 2025,
-      "summary": "Onboarding e suporte técnico N2 em plataforma integrada de e-commerce.",
-      "bullets": [
-        "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação.",
-        "Analisei demandas técnicas de maior complexidade como suporte N2, incluindo Nota Fiscal Eletrônica (NF-e) e processos operacionais de e-commerce.",
-        "Atuei na interface entre empresas em implantação e Suporte N1 para análise, acompanhamento e resolução de solicitações."
-      ],
+      "location": "Remoto",
+      "workMode": "PJ",
       "logo": "/img/pilgrims-logo.webp",
-      "location": "Curitiba – PR",
-      "workMode": "Remoto · PJ",
+      "title": "Investigação de problemas",
+      "summary": "Suporte técnico N2 e implantação em plataforma integrada de e-commerce.",
+      "bullets": [
+        "Analisei e resolvi demandas técnicas de maior complexidade em plataforma integrada de e-commerce, incluindo emissão de NF-e e processos operacionais.",
+        "Conduzi o onboarding de novas empresas e atuei como ponte entre clientes em implantação e o Suporte N1."
+      ],
       "tvBullets": [
-        "Onboarding de novas empresas em plataforma integrada de e-commerce; orientação por WhatsApp.",
-        "Suporte técnico N2: demandas complexas, Nota Fiscal Eletrônica (NF-e) e rotinas de e-commerce.",
-        "Interface entre empresas em implantação e Suporte N1 para acompanhar e resolver solicitações."
-      ]
+        "Resolução de demandas N2 em e-commerce, emissão de NF-e e processos operacionais.",
+        "Onboarding de empresas e interface entre clientes e Suporte N1."
+      ],
+      "phase": "Etapa 2",
+      "shortOrg": "Pilgrim's"
+    },
+    {
+      "id": "gp",
+      "org": "GP Strategies Brasil",
+      "role": "Frontend Developer Pleno",
+      "period": "Fev 2021 – Mar 2025",
+      "start": 2021,
+      "location": "Remoto",
+      "workMode": "CLT",
+      "title": "Frontend em escala",
+      "summary": "Aplicações educacionais interativas para clientes corporativos como Vivo e Coca-Cola.",
+      "bullets": [
+        "Desenvolvi o frontend de mais de 120 aplicações educacionais interativas — e-learning, games, revistas digitais, quizzes e infográficos — sendo mais de 50 em React e TypeScript.",
+        "Participei da migração do time de HTML/CSS/JavaScript puro para React, criando componentes reutilizáveis que padronizaram a interface e reduziram retrabalho e tempo médio de entrega.",
+        "Integrei aplicações a plataformas LMS via SCORM e a APIs REST para rastrear progresso, conclusão e interações dos usuários.",
+        "Construí interfaces responsivas e acessíveis seguindo WCAG: HTML semântico, navegação por teclado, foco visível e contraste.",
+        "Trabalhei com designers e backend, da implementação a partir do Figma à validação com usuários após a publicação."
+      ],
+      "tvBullets": [
+        "120+ aplicações interativas; 50+ em React e TypeScript.",
+        "Migração para React e criação de componentes reutilizáveis.",
+        "Integrações REST e SCORM/LMS para progresso e conclusão.",
+        "Responsividade, WCAG e colaboração com design e backend."
+      ],
+      "phase": "Etapa 3",
+      "shortOrg": "GP Strategies"
+    },
+    {
+      "id": "marq",
+      "org": "MarQ HR (antiga MarQPonto)",
+      "role": "Suporte ao Cliente",
+      "period": "Jan 2018 – Jan 2021",
+      "start": 2018,
+      "location": "Curitiba – PR",
+      "workMode": "Presencial, híbrido e remoto · CLT",
+      "logo": "/img/marqhr-logo.svg",
+      "title": "Visão de produto e do usuário",
+      "summary": "Implantação de SaaS, treinamento de usuários e interface com Produto.",
+      "bullets": [
+        "Implantei e parametrizei plataforma SaaS de ponto eletrônico conforme as regras de cada cliente e realizei mais de 300 treinamentos de usuários.",
+        "Registrei e priorizei solicitações de melhoria de interface junto à equipe de Produto, desenvolvendo visão de UX a partir do usuário real."
+      ],
+      "tvBullets": [
+        "Implantação e parametrização de SaaS de ponto eletrônico; 300+ treinamentos.",
+        "Melhorias de interface priorizadas com Produto; visão de UX a partir do usuário real."
+      ],
+      "phase": "Etapa 4",
+      "shortOrg": "MarQ HR"
+    },
+    {
+      "id": "gvt",
+      "org": "GVT – Global Village Telecom",
+      "role": "Consultor de Vendas",
+      "period": "Fev 2013 – Set 2017",
+      "start": 2013,
+      "location": "Curitiba – PR",
+      "workMode": "CLT",
+      "title": "Comunicação e atendimento",
+      "summary": "Venda consultiva de serviços de telecomunicações.",
+      "bullets": [
+        "Venda consultiva de TV, internet e telefonia, com foco em metas e qualidade do atendimento."
+      ],
+      "phase": "Etapa 5",
+      "shortOrg": "GVT"
     },
     {
       "id": "next",
-      "phase": "Fase 3",
-      "title": "A próxima missão",
-      "role": "Customer Success na sua companhia",
       "org": "Sua companhia",
+      "role": "Frontend na sua companhia",
       "period": "O próximo capítulo",
       "invitation": true,
-      "summary": "Uma oportunidade para construir novas jornadas de sucesso.",
+      "title": "A próxima interface",
+      "summary": "Uma oportunidade para construir produtos web com foco no usuário.",
       "bullets": [
-        "Quero contribuir com o onboarding, a adoção e a retenção dos seus clientes.",
-        "Vamos conversar sobre os desafios de Customer Success da sua companhia."
-      ]
+        "Quero contribuir com interfaces acessíveis, componentes reutilizáveis e uma experiência consistente entre dispositivos.",
+        "Vamos conversar sobre os desafios de frontend da sua equipe."
+      ],
+      "phase": "Etapa 6",
+      "shortOrg": "Sua companhia"
     }
   ],
   "skills": [
     {
-      "id": "onboarding",
-      "name": "Onboarding e Implantação",
+      "id": "frontend",
+      "name": "Desenvolvimento Frontend",
       "color": 5,
       "skills": [
         {
-          "name": "Implantação SaaS",
-          "note": "Implantação de ponto eletrônico e apoio ao onboarding de e-commerce."
+          "name": "React",
+          "note": "Componentes reutilizáveis e migração de interfaces para React."
         },
         {
-          "name": "Parametrização",
-          "note": "Jornadas, escalas, banco de horas, fechamento de ponto e relatórios."
+          "name": "TypeScript",
+          "note": "Mais de 50 aplicações com React e TypeScript."
         },
         {
-          "name": "Treinamento de usuários",
-          "note": "Mais de 300 treinamentos por Zoom e Google Meet; turmas com mais de 30 participantes."
+          "name": "JavaScript (ES6+)",
+          "note": "Aplicações interativas e evolução de HTML/CSS/JS para React."
         },
         {
-          "name": "Onboarding gravado",
-          "note": "Liderei a criação e implementação do onboarding gravado."
+          "name": "HTML5 e CSS3",
+          "note": "HTML semântico, interfaces responsivas e acessíveis."
+        },
+        {
+          "name": "Next.js",
+          "note": "Tecnologia frontend indicada no currículo."
         }
       ]
     },
     {
-      "id": "cs",
-      "name": "Customer Success e CX",
+      "id": "quality",
+      "name": "Interfaces e Qualidade",
       "color": 9,
       "skills": [
         {
-          "name": "Customer Success (CS)",
-          "note": "Adoção de produto, retenção de clientes e prevenção de churn."
+          "name": "Acessibilidade WCAG",
+          "note": "Teclado, foco visível, contraste e HTML semântico."
         },
         {
-          "name": "Customer Experience (CX)",
-          "note": "Experiência do cliente no atendimento, no onboarding e no uso da plataforma."
+          "name": "Design responsivo",
+          "note": "Experiência consistente entre dispositivos."
         },
         {
-          "name": "Jornada do cliente",
-          "note": "Onboarding, implantação, capacitação e acompanhamento da adoção."
+          "name": "Componentização",
+          "note": "Padronização de interfaces e redução de retrabalho."
         },
         {
-          "name": "Adoção de produto",
-          "note": "Identificação de gargalos e abordagens proativas para apoiar o uso."
+          "name": "Performance web",
+          "note": "Lighthouse, Core Web Vitals e estabilidade visual."
         },
         {
-          "name": "Retenção de clientes",
-          "note": "Abordagens proativas voltadas à retenção e prevenção de churn."
-        },
-        {
-          "name": "Relacionamento com clientes",
-          "note": "Atendimento multicanal e orientação durante a implantação."
+          "name": "SEO técnico",
+          "note": "Otimização de sites institucionais."
         }
       ]
     },
     {
-      "id": "business",
-      "name": "Competências Complementares",
+      "id": "integration",
+      "name": "Integrações e Produto",
       "color": 15,
       "skills": [
         {
-          "name": "Suporte Técnico N2",
-          "note": "Análise de demandas complexas de e-commerce e interface com Suporte N1."
+          "name": "APIs REST",
+          "note": "Integração de aplicações e acompanhamento de interações."
         },
         {
-          "name": "Nota Fiscal Eletrônica (NF-e)",
-          "note": "Análise de demandas técnicas envolvendo NF-e e processos de e-commerce."
+          "name": "SCORM / LMS",
+          "note": "Rastreamento de progresso e conclusão em plataformas de aprendizagem."
         },
         {
-          "name": "Atendimento multicanal",
-          "note": "Atendimento por WhatsApp, JivoChat, telefone e e-mail."
+          "name": "Figma para código",
+          "note": "Colaboração com designers e backend até a validação com usuários."
         },
         {
-          "name": "Colaboração com Produto",
-          "note": "Chamados e melhorias em interface com Produto; controle pelo Trello."
+          "name": "WordPress",
+          "note": "Manutenção e otimização de sites de clientes da agência."
         },
         {
-          "name": "Cobrança consultiva",
-          "note": "Régua de cobrança e recuperação de valores com foco na redução da inadimplência."
+          "name": "Visão de produto",
+          "note": "Investigação de problemas e foco no usuário final."
         }
       ]
     }
   ],
   "achievements": [
     {
+      "id": "apps",
+      "icon": "book",
+      "title": "120+ aplicações",
+      "text": "Frontend de mais de 120 aplicações educacionais interativas na GP Strategies Brasil; mais de 50 em React e TypeScript."
+    },
+    {
       "id": "ads",
       "icon": "scroll",
       "title": "Tecnólogo em ADS",
-      "text": "Tecnólogo em Análise e Desenvolvimento de Sistemas · Estácio de Sá · Jun 2019 – Dez 2021"
-    },
-    {
-      "id": "training",
-      "icon": "book",
-      "title": "300+ treinamentos",
-      "text": "Mais de 300 treinamentos individuais e coletivos, incluindo turmas com mais de 30 participantes; criação e implementação do onboarding gravado."
+      "text": "Análise e Desenvolvimento de Sistemas · Estácio de Sá · 2019–2021"
     },
     {
       "id": "sebrae",
       "icon": "scroll",
-      "title": "CS · Sebrae",
-      "text": "SEBRAE – Customer Success: Como conquistar e manter clientes"
+      "title": "Curso · Sebrae",
+      "text": "SEBRAE — Customer Success: Como conquistar e manter clientes"
     },
     {
       "id": "english",
       "icon": "book",
       "title": "Inglês · B1",
-      "text": "Inglês Intermediário Avançado (B1)"
+      "text": "Inglês intermediário (B1) — leitura de documentação técnica"
     }
   ],
   "projects": [
     {
-      "slug": "onboarding",
-      "cartTitle": "ONBOARDING",
-      "title": "Onboarding de clientes",
-      "subtitle": "MarQ HR (antiga MarQPonto)",
+      "slug": "frontend",
+      "cartTitle": "FRONTEND",
+      "title": "Aplicações educacionais interativas",
+      "subtitle": "GP Strategies Brasil · 2021–2025",
       "status": "done",
-      "statusLabel": "Experiência profissional",
-      "summary": "Onboarding, implantação e parametrização de plataforma SaaS de ponto eletrônico. Mais de 300 treinamentos, criação do onboarding gravado e acompanhamento da adoção para retenção e prevenção de churn.",
+      "statusLabel": "Frontend · React e TypeScript",
+      "summary": "Frontend de 120+ aplicações educacionais interativas, incluindo e-learning, games, revistas digitais, quizzes e infográficos. Mais de 50 entregas em React e TypeScript para projetos corporativos, incluindo clientes como Vivo e Coca-Cola.",
       "stack": [
-        "SaaS",
-        "Onboarding",
-        "Treinamento",
-        "Retenção"
+        "React",
+        "TypeScript",
+        "JavaScript",
+        "APIs REST",
+        "SCORM / LMS",
+        "WCAG"
       ],
-      "labelArt": "/img/marqhr-logo.svg",
-      "shellColor": "#3A3D44",
-      "labelColor": "#C8642A",
-      "screenColor": 10,
-      "demoUrl": "https://marqhr.com/",
-      "screenshot": {
-        "src": "/img/marqhr-site.png",
-        "width": 1426,
-        "height": 900,
-        "alt": "Site da MarQ HR"
-      },
-      "caseStory": "Prestei atendimento aos usuários de plataforma de ponto eletrônico no modelo software como serviço (SaaS), via WhatsApp, JivoChat, telefone e e-mail. Conduzi onboarding, implantação e parametrização da plataforma conforme regras de cada empresa: jornadas, escalas, banco de horas, fechamento de ponto e relatórios. Realizei mais de 300 treinamentos individuais e coletivos por Zoom e Google Meet, inclusive com mais de 30 participantes; liderei a criação e implementação do onboarding gravado. Acompanhei a adoção da plataforma e identifiquei gargalos de utilização, realizando abordagens proativas voltadas à retenção e prevenção de churn. Registrei e acompanhei chamados e solicitações de melhorias em interface com a equipe de Produto, utilizando Trello para controle e identificação de duplicidades. Gerenciei a régua de cobrança de clientes e a recuperação consultiva de valores pendentes, com foco em redução da inadimplência.",
+      "labelArt": "/img/project-frontend.svg",
+      "labelAlt": "Aplicações frontend · React e TypeScript",
       "labelArtIsLogo": true,
-      "labelAlt": "Logo da MarQ HR",
-      "company": "MarQ HR (antiga MarQPonto)",
-      "mission": "Onboarding, treinamento e adoção de produto",
-      "caseHeading": "Minha atuação"
+      "shellColor": "#E0B447",
+      "labelColor": "#1E2A48",
+      "screenColor": 5,
+      "company": "GP Strategies Brasil",
+      "mission": "Interfaces interativas, componentização e integrações",
+      "caseHeading": "Minha contribuição",
+      "caseStory": "Desenvolvi o frontend de mais de 120 aplicações educacionais interativas — e-learning, games, revistas digitais, quizzes e infográficos — sendo mais de 50 em React e TypeScript. Participei da migração do time de HTML/CSS/JavaScript puro para React, criando componentes reutilizáveis que padronizaram a interface e reduziram retrabalho e tempo médio de entrega. Integrei aplicações a plataformas LMS via SCORM e a APIs REST para rastrear progresso, conclusão e interações dos usuários. Construí interfaces responsivas e acessíveis seguindo WCAG: HTML semântico, navegação por teclado, foco visível e contraste. Trabalhei com designers e backend, da implementação a partir do Figma à validação com usuários após a publicação."
     },
     {
-      "slug": "implantacao",
-      "cartTitle": "IMPLANTAÇÃO",
-      "title": "Implantação de software SaaS",
-      "subtitle": "Pilgrim’s Consultoria de Tecnologia · 2025–2026",
-      "status": "done",
-      "statusLabel": "Suporte N2 · e-commerce",
-      "summary": "Onboarding e suporte técnico N2 em plataforma integrada de e-commerce. Orientação por WhatsApp, análise de demandas envolvendo NF-e e interface com Suporte N1 durante a implantação.",
+      "slug": "performance",
+      "cartTitle": "WEB QUALITY",
+      "title": "Performance e qualidade de sites",
+      "subtitle": "Match Creative Studio · 2026–Atual",
+      "status": "live",
+      "statusLabel": "WordPress · Freelance",
+      "summary": "Manutenção e otimização de sites institucionais de clientes da agência, com foco em performance, acessibilidade, responsividade e SEO técnico.",
       "stack": [
-        "E-commerce",
-        "Onboarding",
-        "Suporte N2",
-        "NF-e"
+        "WordPress",
+        "Lighthouse",
+        "Core Web Vitals",
+        "Acessibilidade",
+        "SEO técnico"
       ],
-      "labelArt": "/img/pilgrims-logo.webp",
+      "labelArt": "/img/project-performance.svg",
+      "labelAlt": "Performance e qualidade web",
+      "labelArtIsLogo": true,
       "shellColor": "#C9C6BF",
       "labelColor": "#1F2550",
       "screenColor": 4,
-      "demoUrl": "https://pilgrimsconsulting.com.br/",
-      "screenshot": {
-        "src": "/img/pilgrims-site.png",
-        "width": 1328,
-        "height": 664,
-        "alt": "Site da Pilgrims Consulting"
-      },
-      "company": "Pilgrim’s Consultoria de Tecnologia",
-      "mission": "Onboarding e suporte técnico N2",
-      "labelArtIsLogo": true,
-      "labelAlt": "Logo da Pilgrims Consulting",
-      "caseStory": "Apoiei o onboarding de novas empresas em plataforma integrada de e-commerce, orientando usuários por WhatsApp durante a implantação. Analisei demandas técnicas de maior complexidade como suporte N2, incluindo Nota Fiscal Eletrônica (NF-e) e processos operacionais de e-commerce. Atuei na interface entre empresas em implantação e Suporte N1 para análise, acompanhamento e resolução de solicitações.",
-      "caseHeading": "Minha atuação"
+      "company": "Match Creative Studio",
+      "mission": "Performance, acessibilidade e SEO técnico",
+      "caseHeading": "Minha contribuição",
+      "caseStory": "Mantenho e otimizo sites institucionais de clientes da agência, com foco em performance, acessibilidade e SEO técnico. Melhoro indicadores de Lighthouse e Core Web Vitals ajustando carregamento de recursos, renderização e estabilidade visual das páginas. Corrijo lentidão, excesso de recursos carregados e inconsistências de navegação entre dispositivos."
     }
   ],
   "linkedin": "https://www.linkedin.com/in/andresuckow/",
@@ -330,68 +378,90 @@
   ],
   "roomVersion": "novo-quarto-3d",
   "competencies": [
-    "Customer Success (CS)",
-    "Customer Experience (CX)",
-    "Onboarding de clientes",
-    "Implantação SaaS",
-    "Jornada e adoção do cliente",
-    "Retenção e prevenção de churn",
-    "Treinamento de usuários",
-    "Atendimento multicanal",
-    "Relacionamento com clientes",
-    "Interface com Produto"
+    "React",
+    "TypeScript",
+    "JavaScript",
+    "Next.js",
+    "Componentização",
+    "Interfaces responsivas",
+    "Acessibilidade WCAG",
+    "APIs REST",
+    "SCORM / LMS",
+    "Performance web",
+    "SEO técnico",
+    "Colaboração com design e backend"
   ],
   "tools": [
     {
-      "name": "Atendimento e suporte",
+      "name": "Frontend",
       "items": [
-        "Intercom",
-        "JivoChat",
-        "WhatsApp",
-        "Suporte Técnico N2"
+        "React",
+        "Next.js",
+        "TypeScript",
+        "JavaScript (ES6+)",
+        "HTML5",
+        "CSS3",
+        "Vite"
       ]
     },
     {
-      "name": "Gestão de processos",
+      "name": "UI e estilização",
       "items": [
+        "Tailwind CSS",
+        "Sass",
+        "shadcn/ui",
+        "GSAP",
+        "Design responsivo",
+        "Figma"
+      ]
+    },
+    {
+      "name": "Estado e formulários",
+      "items": [
+        "Zustand",
+        "React Hook Form"
+      ]
+    },
+    {
+      "name": "Integrações",
+      "items": [
+        "APIs REST",
+        "Node.js",
+        "SCORM / LMS"
+      ]
+    },
+    {
+      "name": "Qualidade",
+      "items": [
+        "WCAG",
+        "Navegação por teclado",
+        "Contraste",
+        "Testes unitários",
+        "Lighthouse",
+        "Core Web Vitals",
+        "SEO técnico"
+      ]
+    },
+    {
+      "name": "Ferramentas",
+      "items": [
+        "Git",
+        "GitHub",
+        "WordPress",
+        "ClickUp",
         "Monday.com",
         "Trello",
-        "ClickUp",
         "Notion"
-      ]
-    },
-    {
-      "name": "Produtividade e colaboração",
-      "items": [
-        "Excel",
-        "Google Sheets",
-        "Google Docs",
-        "Microsoft Teams",
-        "Slack",
-        "Discord"
-      ]
-    },
-    {
-      "name": "Treinamento e comunicação",
-      "items": [
-        "Zoom",
-        "Google Meet"
-      ]
-    },
-    {
-      "name": "Conhecimentos técnicos",
-      "items": [
-        "Plataformas SaaS de controle de ponto e e-commerce",
-        "Parametrização de sistemas",
-        "Nota Fiscal Eletrônica (NF-e)"
       ]
     }
   ],
   "education": {
     "title": "Tecnólogo em Análise e Desenvolvimento de Sistemas",
     "institution": "Estácio de Sá",
-    "period": "Jun 2019 – Dez 2021"
+    "period": "2019 – 2021"
   },
-  "certification": "SEBRAE – Customer Success: Como conquistar e manter clientes",
-  "language": "Inglês Intermediário Avançado (B1)"
+  "certification": "SEBRAE — Customer Success: Como conquistar e manter clientes",
+  "language": "Inglês intermediário (B1) — leitura de documentação técnica",
+  "github": "https://github.com/AndreSuckow",
+  "displayRole": "DESENVOLVEDOR FRONTEND"
 }

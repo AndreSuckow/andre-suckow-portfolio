@@ -4,52 +4,45 @@ import fs from 'node:fs';
 import {JSDOM} from 'jsdom';
 import {whatsappMessage} from './public/cs-model.js';
 import {createCareerJourney,drawCareerScreen} from './public/career-map.js';
-const html=fs.readFileSync('public/cs/index.html','utf8');
-test('curriculum and CS share presentation while HTML, TV data and document links use their own profiles',()=>{
- const routes=[{file:'public/index.html',profile:'profile-curriculo.json',skills:'skill-details-curriculo.json',id:'curriculo',base:'/'},{file:'public/cs/index.html',profile:'profile.json',skills:'skill-details.json',id:'cs',base:'/cs/'}];
- const layouts=[],contents=[];
- for(const route of routes){
-  const dom=new JSDOM(fs.readFileSync(route.file,'utf8')),d=dom.window.document,profile=JSON.parse(fs.readFileSync(route.profile,'utf8'));
-  const content=JSON.parse(d.querySelector('#portfolio-data').textContent);
-  contents.push(content);
-  const {experience,skills,achievements,projects,...person}=profile;
-  assert.deepEqual(content,{person,experience,skills,achievements,projects});
-  assert.deepEqual(JSON.parse(d.querySelector('#skill-details').textContent),JSON.parse(fs.readFileSync(route.skills,'utf8')));
-  assert.equal(d.documentElement.dataset.portfolio,route.id);
-  for(const project of profile.projects)assert.equal(d.querySelector(`[data-tv="projetos/case/${project.slug}"]`).getAttribute('href'),`${route.base}cases/${project.slug}/`);
-  layouts.push({styles:[...d.querySelectorAll('link[rel=stylesheet]')].map(e=>e.getAttribute('href')),scripts:[...d.querySelectorAll('script[src]')].map(e=>e.getAttribute('src')),structure:[...d.querySelectorAll('section[data-chapter],#stage-canvas')].map(e=>[e.tagName,e.id,e.getAttribute('class')])});
-  dom.window.close();
- }
- assert.deepEqual(layouts[0],layouts[1],'both routes reuse the same visual tree, styles and runtime');
- const engine=fs.readFileSync('public/engine.js','utf8');
- for(const [name,next,field] of [['Eh','Dh','person'],['Dh','Oh','experience'],['Oh','kh','skills'],['kh','Ah','achievements'],['Ah','jh','projects']]){
-  const start=engine.indexOf(`${name}=`)+name.length+1,end=engine.indexOf(`,${next}=`,start);
-  const select=new Function('portfolioContent','return '+engine.slice(start,end));
-  for(const content of contents)assert.equal(select(content),content[field],'TV selects this route object: '+field);
- }
-});
-test('all resume facts are shared by the website and printable curriculum',()=>{
- const profile=JSON.parse(fs.readFileSync('profile.json','utf8'));
- const dom=new JSDOM(html),d=dom.window.document;
- const cv=new JSDOM(fs.readFileSync('public/cs/curriculo/index.html','utf8'));
+const html=fs.readFileSync('public/index.html','utf8');
+test('single frontend route shares canonical content with the TV and printable resume',()=>{
+ const profile=JSON.parse(fs.readFileSync('profile.json','utf8')),details=JSON.parse(fs.readFileSync('skill-details.json','utf8'));
+ const dom=new JSDOM(html),d=dom.window.document,content=JSON.parse(d.querySelector('#portfolio-data').textContent);
+ const {experience,skills,achievements,projects,...person}=profile;
+ assert.deepEqual(content,{person,experience,skills,achievements,projects});
+ assert.deepEqual(JSON.parse(d.querySelector('#skill-details').textContent),details);
+ assert.equal(d.documentElement.dataset.portfolio,'curriculo');assert(!fs.existsSync('public/cs'));
+ const cv=new JSDOM(fs.readFileSync('public/curriculo/index.html','utf8'));
  for(const document of [d,cv.window.document]){
   const text=document.body.textContent;
-  for(const company of profile.experience.filter(x=>!x.invitation)){
-   for(const fact of [company.role,company.org,company.period,company.workMode,...company.bullets])assert(text.includes(fact),fact);
-  }
+  for(const company of experience.filter(x=>!x.invitation))for(const fact of [company.role,company.org,company.period,...company.bullets])assert(text.includes(fact),fact);
   for(const group of profile.tools)for(const tool of group.items)assert(text.includes(tool),tool);
-  for(const fact of [profile.education.title,profile.education.institution,profile.education.period,profile.certification,profile.language])assert(text.includes(fact),fact);
-  assert(!/Front.?end|GP Strategies|React|TypeScript|300 empresas|2018–2021|gestão logística/i.test(text));
+  assert(text.includes('React')&&text.includes('TypeScript')&&text.includes('GP Strategies Brasil'));
+  assert(!text.includes('Jan 2018 – Jan 2024'));assert(!text.includes('300 empresas'));
  }
- assert.equal(profile.experience[0].period,'Jan 2018 – Jan 2024');
- assert.equal(profile.location,'Curitiba – PR');
- for(const company of profile.experience.filter(x=>!x.invitation)){
-  const caseDom=new JSDOM(fs.readFileSync(`public/cs/cases/${company.id==='marq'?'onboarding':'implantacao'}/index.html`,'utf8'));
-  for(const bullet of company.bullets)assert(caseDom.window.document.body.textContent.includes(bullet));
-  caseDom.window.close();
+ for(const project of projects){
+  const study=new JSDOM(fs.readFileSync('public/cases/'+project.slug+'/index.html','utf8'));
+  assert(study.window.document.body.textContent.includes(project.caseStory));
+  assert.equal(study.window.document.querySelector('.document-actions a').getAttribute('href'),'/');study.window.close();
  }
+ const engine=fs.readFileSync('public/engine.js','utf8');
+ for(const [name,next,field] of [['Eh','Dh','person'],['Dh','Oh','experience'],['Oh','kh','skills'],['kh','Ah','achievements'],['Ah','jh','projects']]){
+  const begin=engine.indexOf(name+'=')+name.length+1,finish=engine.indexOf(','+next+'=',begin);
+  const select=new Function('portfolioContent','return '+engine.slice(begin,finish));assert.equal(select(content),content[field]);
+ }
+ assert.equal(experience.find(x=>x.id==='marq').period,'Jan 2018 – Jan 2021');
+ assert.equal(experience.find(x=>x.id==='gp').period,'Fev 2021 – Mar 2025');
+ assert.equal(experience.find(x=>x.id==='match').period,'Jul 2026 – Atual');
  dom.window.close();cv.window.close();
 });
+
+test('career map creates a selectable stop for every job and the invitation',async()=>{
+ const {careerStops}=await import('./public/career-map.js');const profile=JSON.parse(fs.readFileSync('profile.json','utf8'));
+ const points=careerStops(profile.experience.length);assert.equal(points.length,6);assert.equal(new Set(points.map(p=>p.join(','))).size,6);
+ const journey=createCareerJourney(points);assert(journey.walkTo(5,0));assert.equal(journey.update(2),5);assert.deepEqual(journey.position,points[5]);
+ assert.throws(()=>careerStops(0));
+});
+
 test('career travel follows the path for two seconds and changes location only on arrival',()=>{
  const stops=[[-.4,-1.93],[.25,.67],[-.4,3.27]],journey=createCareerJourney(stops);
  assert(journey.walkTo(1,0));assert.equal(journey.current,0);assert.deepEqual(journey.position,stops[0]);
@@ -145,21 +138,22 @@ test('WhatsApp greeting uses Sao Paulo time at the morning, afternoon and evenin
  }
 });
 
-test('CS content uses verified contacts and treats Sua companhia as an invitation',()=>{
+test('frontend content uses verified contacts and treats Sua companhia as an invitation',()=>{
  const dom=new JSDOM(html),d=dom.window.document;
- assert.equal(d.querySelectorAll('.phase').length,3);assert(d.querySelectorAll('.phase')[2].textContent.includes('Sua companhia'));
- assert(!/Front.end|React|TypeScript|WordPress/.test(d.querySelector('#inicio').textContent));
- assert(!/Front.end|React|TypeScript|GP Strategies/.test(d.body.textContent));
+ assert.equal(d.querySelectorAll('.phase').length,6);assert(d.querySelectorAll('.phase')[5].textContent.includes('Sua companhia'));
+ assert(/Frontend|React|TypeScript/.test(d.querySelector('#inicio').textContent));
+ assert(d.body.textContent.includes('GP Strategies Brasil'));
  assert(d.querySelector('#sobre').textContent.includes('Curitiba – PR'));
  assert(d.querySelector('#sobre a[href="https://www.linkedin.com/in/andresuckow/"]'));
  assert(d.querySelector('#sobre a[href="mailto:andre.suckow.dev@gmail.com"]'));
- assert.equal(d.querySelectorAll('#inicio .hero__actions .btn').length,3);
+ assert.equal(d.querySelectorAll('#inicio .hero__actions .btn').length,4);
+ assert(d.querySelector('#inicio a[href="https://github.com/AndreSuckow"]'));
  assert(d.querySelector('#inicio a[href="https://www.linkedin.com/in/andresuckow/"]'));
  assert.equal(d.querySelectorAll('[data-pad="a"], [data-pad="b"]').length,2);
  assert.equal(d.querySelectorAll('.attribute__trigger').length,5);
  for(const button of d.querySelectorAll('.attribute__trigger'))assert(d.getElementById(button.getAttribute('aria-describedby')).textContent.length>40);
  assert(d.querySelector('#hobbies a[href="https://www.instagram.com/tf.church/"]'));
- const company=d.querySelector('[data-tv="projetos/demo/onboarding"]');assert.equal(company.href,'https://marqhr.com/');assert(company.closest('.resume-project').querySelector('.resume-tags'));
+ const project=d.querySelector('[data-tv="projetos/case/frontend"]');assert.equal(project.getAttribute('href'),'/cases/frontend/');assert(project.closest('.resume-project').querySelector('.resume-tags'));
  dom.window.close();
 });
 

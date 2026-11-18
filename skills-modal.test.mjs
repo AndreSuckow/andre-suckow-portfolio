@@ -3,22 +3,19 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const html=fs.readFileSync('public/cs/index.html','utf8');
+const html=fs.readFileSync('public/index.html','utf8');
 const enhancements=fs.readFileSync('public/enhancements.js','utf8');
 const engine=fs.readFileSync('public/engine.js','utf8');
 const profile=JSON.parse(fs.readFileSync('profile.json','utf8'));
 const activeNames=new Set(profile.skills.flatMap(b=>b.skills.map(s=>s.name)));
 const details=Object.fromEntries(Object.entries(JSON.parse(fs.readFileSync('skill-details.json','utf8'))).filter(([name])=>activeNames.has(name)));
-test('revised skill tree retains 15 skills grounded in the supplied CS resume',()=>{
- assert.deepEqual(profile.skills.map(b=>[b.name,b.skills.length]),[['Onboarding e Implantação',4],['Customer Success e CX',6],['Competências Complementares',5]]);
- assert.equal(activeNames.size,15);
- assert(profile.skills[1].skills.some(s=>s.name==='Adoção de produto'));
- assert(profile.skills[2].skills.some(s=>s.name==='Suporte Técnico N2'));
- assert(profile.skills[2].skills.some(s=>s.name==='Cobrança consultiva'));
- for(const name of ['Implantação SaaS','Suporte Técnico N2','Nota Fiscal Eletrônica (NF-e)'])assert(details[name].experiences.some(e=>e.company===profile.experience[1].org));
- assert(!activeNames.has('Desenvolvimento Front-end'));
- assert(details['Treinamento de usuários'].experiences.every(e=>e.company===profile.experience[0].org));
- assert.deepEqual(profile.stats.map(s=>s.value),[5,5,4,4,5]);
+test('frontend skill tree matches the new resume without inventing project experience',()=>{
+ assert.deepEqual(profile.skills.map(b=>[b.name,b.skills.length]),[['Desenvolvimento Frontend',5],['Interfaces e Qualidade',5],['Integrações e Produto',5]]);
+ assert.equal(activeNames.size,15);for(const name of ['React','TypeScript','Next.js','Acessibilidade WCAG','SCORM / LMS','WordPress'])assert(activeNames.has(name));
+ assert(details['React'].experiences.every(e=>e.company==='GP Strategies Brasil'));
+ assert(details['WordPress'].experiences.every(e=>e.company==='Match Creative Studio'));
+ assert.equal(details['Next.js'].experiences[0].company,'Competência técnica');
+ assert(!activeNames.has('Cobrança consultiva'));
 });
 function setup(mode='2d'){
   const dom=new JSDOM(html,{runScripts:'outside-only',url:'http://localhost:4173/'});
@@ -53,7 +50,7 @@ test('Sebrae reward shares the skill dialog lifecycle and does not leak into ski
  }
 });
 
-test('all active CS skills open their own explanation and company experiences',()=>{
+test('all active frontend skills open their own explanation and company experiences',()=>{
   const {dom,document,dialog}=setup();
   const buttons=[...document.querySelectorAll('.skill-item')];
   assert.equal(buttons.length,activeNames.size);
@@ -139,6 +136,7 @@ test('mouse hover does not leave an attribute description pinned; navigation sti
 test('active skills reference only employers in the supplied resume',()=>{
   const companies=new Set([...profile.experience.filter(item=>!item.invitation),...(profile.complementaryExperience||[])].map(item=>item.org));
   for(const [name,detail] of Object.entries(details))for(const experience of detail.experiences){
-    assert(companies.has(experience.company),name);
+    if(name==='Next.js'){assert.equal(experience.company,'Competência técnica');assert(experience.description.includes('não associa'));}
+    else assert(companies.has(experience.company),name);
   }
 });

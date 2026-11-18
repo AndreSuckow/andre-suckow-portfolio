@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 const executable =
   process.env.GAME_TEST_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4173/cs/';
+const base = process.env.GAME_TEST_URL || 'http://127.0.0.1:4173/';
 const output = path.resolve('tmp/portfolio-browser');
 fs.mkdirSync(output, { recursive: true });
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -669,8 +669,8 @@ try {
   await key('ArrowDown');
   await key('Enter');
   await until(
-    'document.querySelector("#announcer").textContent.includes("Chegou a Sua companhia")',
-    'keyboard activation walks to the next company',
+    'document.querySelector("#announcer").textContent.includes("Chegou a GP Strategies")',
+    'keyboard activation walks to the next chronological entry',
   );
   await wait(100);
   fs.writeFileSync(
@@ -889,7 +889,7 @@ try {
   );
   const cartXs = Array.from({ length: 16 }, (_, i) => 800 + i * 20),
     cartYs = Array.from({ length: 10 }, (_, i) => 520 + i * 20);
-  const cartridgeHit = await findRoomTarget('MarQ HR', cartXs, cartYs);
+  const cartridgeHit = await findRoomTarget('GP Strategies', cartXs, cartYs);
   await page.send('Input.dispatchMouseEvent', {
     type: 'mousePressed',
     ...cartridgeHit,
@@ -925,7 +925,7 @@ try {
     'document.querySelector("#announcer").textContent.includes("Cartucho ejetado")',
     'eject returns the cartridge',
   );
-  await findRoomTarget('MarQ HR', cartXs, cartYs);
+  await findRoomTarget('GP Strategies', cartXs, cartYs);
   fs.writeFileSync(
     path.join(output, 'project-ejected.png'),
     Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
@@ -942,7 +942,7 @@ try {
   );
   await until('document.documentElement.dataset.chapter==="projetos"', 'scroll enters Projects');
   await wait(1500);
-  await findRoomTarget('MarQ HR', cartXs, cartYs);
+  await findRoomTarget('GP Strategies', cartXs, cartYs);
   fs.writeFileSync(
     path.join(output, 'projects-scroll-browse.png'),
     Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
@@ -1081,7 +1081,7 @@ try {
     ),
   );
   console.log(
-    'PASS: CS portfolio, SNES navigation, pause/resume, mobile landscape, skill dialogs and zero runtime exceptions.',
+    'PASS: frontend portfolio, SNES navigation, pause/resume, mobile landscape, skill dialogs and zero runtime exceptions.',
   );
 } finally {
   page?.close();

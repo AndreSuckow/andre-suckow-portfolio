@@ -21,7 +21,7 @@ export async function loadCareerTerrain(T,layout){
  gltf.scene.traverse(object=>{
   if(!object.isMesh)return;
   const geometry=object.geometry.clone().applyMatrix4(object.matrixWorld);
-  geometry.translate(-center.x,0,-center.z);geometry.scale(scale,scale,scale);
+  geometry.translate(-center.x,0,-center.z);geometry.scale(scale*(layout.widthScale??1),scale,scale*(layout.depthScale??1));
   clearCareerRoute(geometry,layout);
   object.geometry.dispose();object.geometry=geometry;
   const original=object.material;

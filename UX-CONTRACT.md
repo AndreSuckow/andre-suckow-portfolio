@@ -1,8 +1,8 @@
-# Portfólio de CS - contrato de navegação
+# Portfólio Frontend - contrato de navegação
 
-## Portfólio principal de CS
+## Portfólio principal de Desenvolvimento Frontend
 
-Fonte da solicitação: usuário, 14/10/2026. `profile.json` registra os fatos, contatos confirmados e hobbies; `documents/curriculo-original.docx` preserva o documento original. Os tamanhos de equipe no caso da MarQ HR são informação fornecida pelo usuário. Sua companhia é convite, sem vínculo profissional inventado.
+Fonte atual: solicitação do usuário em 18/11/2026 e `documents/Curriculo-Andre-Suckow-Frontend.pdf`. `profile.json` e `skill-details.json` alimentam a única rota principal, seus modos 2D/3D e fichas. `/cs/` foi retirada. As experiências são apresentadas da mais recente para a mais antiga; Sua companhia é um convite sem vínculo profissional inventado. GP Strategies e Match são os destaques de Projetos; suporte aparece como experiência complementar. Tecnologias sem vínculo específico no PDF não são atribuídas a empregadores.
 
 | Capacidade | Responsável | Comportamento e verificação |
 |---|---|---|

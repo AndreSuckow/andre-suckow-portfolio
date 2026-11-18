@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Portfólio de Customer Success de André Suckow em quarto 3D, com alternativa 2D e formulário de contato.",
+  "description": "Portfólio de Desenvolvimento Frontend de André Suckow, com quarto 3D, alternativa 2D e formulário de contato.",
   "scripts": {
     "dev": "node server.mjs",
     "build": "node build.mjs",
@@ -21,13 +21,9 @@
     "@gltf-transform/extensions": "^4.5.1",
     "@gltf-transform/functions": "^4.5.1",
     "@napi-rs/canvas": "^1.0.11",
-    "adm-zip": "^0.6.1",
     "chess.js": "1.4.0",
-    "fast-xml-parser": "^5.11.2",
     "jsdom": "^30.1.2",
     "meshoptimizer": "^1.3.0",
-    "pdfjs-dist": "^6.4.299",
-    "pdfkit": "^0.20.2",
     "prettier": "3.10.1",
     "sharp": "^0.35.5"
   }

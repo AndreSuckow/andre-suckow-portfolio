@@ -112,15 +112,11 @@ try {
     throw Error(`Timed out: ${label}`);
   };
 
-  const cs = new URL('cs/', base);
   const signatures = [];
   await page.send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
   });
-  for (const [route, kind] of [
-    [base, 'curriculo'],
-    [cs.href, 'cs'],
-  ]) {
+  for (const [route, kind] of [[base, 'curriculo']]) {
     await page.send('Emulation.setDeviceMetricsOverride', {
       width: 1440,
       height: 1000,
@@ -148,6 +144,35 @@ try {
       path.join(output, 'routes-' + kind + '-desktop.png'),
       Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
     );
+    const companies = await evaluate(
+      'JSON.parse(document.querySelector("#portfolio-data").textContent).experience.map(x=>x.org)',
+    );
+    assert.equal(
+      await evaluate('Number(document.documentElement.dataset.careerStops)'),
+      companies.length,
+    );
+    await evaluate('document.querySelector("#stage-canvas").focus()');
+    for (let index = 1; index < companies.length; index++) {
+      for (const key of ['ArrowDown', 'Enter']) {
+        await page.send('Input.dispatchKeyEvent', { type: 'keyDown', key });
+        await page.send('Input.dispatchKeyEvent', { type: 'keyUp', key });
+      }
+      await until(
+        'document.querySelector("#announcer").textContent.includes(' +
+          JSON.stringify('Chegou a ' + companies[index]) +
+          ')',
+        'career stop ' + companies[index],
+      );
+    }
+    for (const chapter of ['sobre', 'projetos', 'skills']) {
+      await evaluate('document.querySelector("[data-nav-tab=' + chapter + ']").click()');
+      await until('document.documentElement.dataset.chapter===' + JSON.stringify(chapter), chapter);
+      await wait(800);
+      fs.writeFileSync(
+        path.join(output, 'frontend-' + chapter + '-desktop.png'),
+        Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+      );
+    }
     await evaluate('document.querySelector("[data-toggle=mode]").click()');
     await until('document.documentElement.dataset.mode==="2d"', '2D ' + kind);
     await page.send('Emulation.setDeviceMetricsOverride', {
@@ -166,7 +191,7 @@ try {
       path.join(output, 'routes-' + kind + '-mobile.png'),
       Buffer.from((await page.send('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
     );
-    for (const detail of ['curriculo/', 'cases/onboarding/']) {
+    for (const detail of ['curriculo/', 'cases/frontend/', 'cases/performance/']) {
       const details = await evaluate(
         '(async()=>{const r=await fetch(' +
           JSON.stringify(new URL(detail, route).href) +
@@ -182,28 +207,10 @@ try {
     );
     console.log('PASS:', kind, 'shared 3D/2D layout, mobile, details and direct reload');
   }
-  assert.deepEqual(
-    signatures[0],
-    signatures[1],
-    'root and CS load the same presentation and runtime',
-  );
-  await page.send('Emulation.setDeviceMetricsOverride', {
-    width: 1440,
-    height: 1000,
-    deviceScaleFactor: 1,
-    mobile: false,
-  });
-  await page.send('Page.navigate', { url: new URL('cs', base).href });
-  await until(
-    'location.pathname===' +
-      JSON.stringify(cs.pathname) +
-      ' && document.querySelector("[data-loader]")?.hidden',
-    'CS without trailing slash',
-  );
+  for (const removed of ['cs', 'cs/', 'cs/curriculo/'])
+    assert.equal((await fetch(new URL(removed, base))).status, 404);
   assert.equal(page.errors.length, 0, JSON.stringify(page.errors));
-  console.log(
-    'PASS: identical presentation at root and /cs/, independent route identity, responsive layout and route-specific document return links.',
-  );
+  console.log('PASS: frontend root, 3D/2D, mobile, document links and removed CS route.');
 } finally {
   page?.close();
   if (browser) {

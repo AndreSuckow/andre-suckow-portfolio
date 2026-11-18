@@ -48,7 +48,7 @@ test('the actual bundled core renders an original diagnostic ROM and preserves b
 test('handheld uses the room discovery path, remains separate from TV orientation, and loads the core on demand',()=>{
  const room=fs.readFileSync('public/new-room.js','utf8'),ui=fs.readFileSync('public/room-discoveries.js','utf8'),mobile=fs.readFileSync('public/mobile-reading.js','utf8'),player=fs.readFileSync('public/gameboy.js','utf8');
  assert(room.includes("discovery('gameboy',gameboy.root"));assert(ui.includes("event.detail==='gameboy'"));assert(mobile.includes("getElementById('gameboy-dialog')?.open"));
- assert(!fs.readFileSync('public/cs/index.html','utf8').includes('vendor/gameboy/jsgbc.js'));assert(player.includes('crypto.subtle.digest'));assert(player.includes("document.hidden&&session"));
+ assert(!fs.readFileSync('public/index.html','utf8').includes('vendor/gameboy/jsgbc.js'));assert(player.includes('crypto.subtle.digest'));assert(player.includes("document.hidden&&session"));
 });
 
 test('handheld dialog loads a local cart, keeps it on validation failure, pauses and closes safely',async()=>{
