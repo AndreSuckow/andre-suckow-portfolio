@@ -12,6 +12,8 @@ const port = Number(option('--port', '4173'));
 const host = option('--host', '127.0.0.1');
 const root = path.resolve('public');
 const types = {
+  '.webm': 'video/webm',
+  '.mp4': 'video/mp4',
   '.mp3': 'audio/mpeg',
   '.ogg': 'audio/ogg',
   '.wav': 'audio/wav',

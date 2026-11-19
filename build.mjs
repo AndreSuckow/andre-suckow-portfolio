@@ -1,5 +1,6 @@
 import { cp, mkdir, rm, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import './scripts/prepare-mobile-vendor.mjs';
 import './customize.cjs';
 // Validate the generated directory before replacing it, so removed assets cannot survive a build.
 const output = path.resolve('dist');

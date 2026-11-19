@@ -64,3 +64,7 @@ Para esta etapa, a equivalência exigida é o mesmo conjunto de arquivos e os me
 3. Só depois adotar minificação de produção, com fontes legíveis, preservação de licenças, cache correto e validação de módulos, workers e imports dinâmicos.
 
 Cada etapa deve manter uma única fonte de conteúdo para os modos 2D e 3D. Não juntar atualização de dependências do motor e extração de módulos no mesmo lote. O mapa de carreira dimensiona terreno, posições e áreas de clique a partir da quantidade de experiências; novas empresas não devem reutilizar rótulos fixos de empresas anteriores.
+
+## Demonstrações mobile dos projetos
+
+`profile.json` define `projects[].mobileVideo`. `customize.cjs` gera as ações das fichas; `public/mobile-preview.js` controla a modal e `public/mobile-phone-viewer.js` alinha o vídeo HTML ao modelo original em `public/models/mobile/`. As fichas carregam o Three.js local sob demanda, sem inicializar o quarto. `scripts/prepare-mobile-vendor.mjs` reproduz os módulos de vendor durante o build. `verify-mobile-preview.mjs` verifica a experiência no Chrome.
