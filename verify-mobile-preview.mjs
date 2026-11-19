@@ -120,7 +120,7 @@ try {
 
   await page.send('Emulation.setDeviceMetricsOverride', {width:1440,height:1000,deviceScaleFactor:1,mobile:false});
   await page.send('Page.navigate', {url:new URL('cases/boxlyne/',base).href});
-  await until('document.querySelector("[data-mobile-preview]")','button');
+  await until('document.readyState==="complete" && document.querySelector("[data-mobile-preview]")','button and styles');
   assert.equal(await evaluate('getComputedStyle(document.querySelector("[data-mobile-preview]")).display'),'flex');
   assert.equal(await evaluate('performance.getEntriesByType("resource").some(x=>/scene.gltf|boxlyne.webm|three.module/.test(x.name))'),false);
   await evaluate('document.querySelector("[data-mobile-preview]").click()');
