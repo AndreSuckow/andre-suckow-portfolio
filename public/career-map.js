@@ -1,231 +1,736 @@
-import {interactionShake} from './interaction-motion.js?v=cs-mode-3';
-import {loadCareerTerrain,loadCareerSteve,loadCareerChief,careerAvatarChoice} from './career-models.js?v=cs-mode-3';
-import {createCareerOrbit} from './career-orbit.js?v=cs-mode-3';
+import { interactionShake } from './interaction-motion.js?v=cs-mode-3';
+import {
+  loadCareerTerrain,
+  loadCareerSteve,
+  loadCareerChief,
+  careerAvatarChoice,
+} from './career-models.js?v=cs-mode-3';
+import { createCareerOrbit } from './career-orbit.js?v=cs-mode-3';
 
 // Split the usable width (excluding the gutter) into 40% text and 60% map.
-export const CAREER_LAYOUT={text:{x:48,y:156,w:365,h:548},map:{x:429,y:184,w:547,h:474}};
-export function careerStops(count){
- if(!Number.isInteger(count)||count<1)throw Error('Career map requires at least one stop');
- if(count<=3)return Array.from({length:count},(_,index)=>[index%2?.55:-.05,(index-(count-1)/2)*1.5]);
- const rows=Math.ceil(count/2);
- return Array.from({length:count},(_,index)=>[(Math.floor(index/2)%2?1-index%2:index%2)?1.05:-1.15,(Math.floor(index/2)-(rows-1)/2)*1.8]);
+export const CAREER_LAYOUT = {
+  text: { x: 48, y: 156, w: 365, h: 548 },
+  map: { x: 429, y: 184, w: 547, h: 474 },
+};
+export function careerStops(count) {
+  if (!Number.isInteger(count) || count < 1) throw Error('Career map requires at least one stop');
+  if (count <= 3)
+    return Array.from({ length: count }, (_, index) => [
+      index % 2 ? 0.55 : -0.05,
+      (index - (count - 1) / 2) * 1.5,
+    ]);
+  const rows = Math.ceil(count / 2);
+  return Array.from({ length: count }, (_, index) => [
+    (Math.floor(index / 2) % 2 ? 1 - (index % 2) : index % 2) ? 1.05 : -1.15,
+    (Math.floor(index / 2) - (rows - 1) / 2) * 1.8,
+  ]);
 }
-export function careerOrder(companies){return companies.map((_,i)=>i).sort((a,b)=>(companies[a].invitation?Infinity:companies[a].start)-(companies[b].invitation?Infinity:companies[b].start));}
-export function careerTrail(stations,order=stations.map((_,i)=>i)){
- const points=[[...stations[order[0]]]],distances=Array(stations.length).fill(0);let length=0;
- const add=p=>{length+=Math.hypot(p[0]-points.at(-1)[0],p[1]-points.at(-1)[1]);points.push([...p]);};
- for(let i=1;i<order.length;i++){
-  const a=stations[order[i-1]],b=stations[order[i]];
-  if(a[1]!==b[1]){const outside=Math.max(a[0],b[0])>0?2.3:-2.3;add([outside,a[1]]);add([outside,b[1]]);}
-  add(b);distances[order[i]]=length;
- }
- return {points,distances,length};
+export function careerOrder(companies) {
+  return companies
+    .map((_, i) => i)
+    .sort(
+      (a, b) =>
+        (companies[a].invitation ? Infinity : companies[a].start) -
+        (companies[b].invitation ? Infinity : companies[b].start),
+    );
 }
-export function isCareerMapPoint(x,y){const r=CAREER_LAYOUT.map;return x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<r.y+r.h;}
+export function careerTrail(stations, order = stations.map((_, i) => i)) {
+  const points = [[...stations[order[0]]]],
+    distances = Array(stations.length).fill(0);
+  let length = 0;
+  const add = (p) => {
+    length += Math.hypot(p[0] - points.at(-1)[0], p[1] - points.at(-1)[1]);
+    points.push([...p]);
+  };
+  for (let i = 1; i < order.length; i++) {
+    const a = stations[order[i - 1]],
+      b = stations[order[i]];
+    if (a[1] !== b[1]) {
+      const outside = Math.max(a[0], b[0]) > 0 ? 2.3 : -2.3;
+      add([outside, a[1]]);
+      add([outside, b[1]]);
+    }
+    add(b);
+    distances[order[i]] = length;
+  }
+  return { points, distances, length };
+}
+export function isCareerMapPoint(x, y) {
+  const r = CAREER_LAYOUT.map;
+  return x >= r.x && x <= r.x + r.w && y >= r.y && y < r.y + r.h;
+}
 
 // Movement uses the game's clock, so pause freezes the two-second journey.
-export function createCareerJourney(stations,{duration=2,order=stations.map((_,i)=>i)}={}){
- const trail=careerTrail(stations,order);
- let current=order[0],trip=null,position=[...stations[current]],heading=0,distance=0;
- function update(time){
-  if(!trip)return null;
-  const progress=Math.max(0,Math.min(1,(time-trip.start)/duration));distance=trip.from+(trip.to-trip.from)*progress;
-  let covered=0;
-  for(let i=1;i<trail.points.length;i++){
-   const a=trail.points[i-1],b=trail.points[i],length=Math.hypot(b[0]-a[0],b[1]-a[1]);if(!length)continue;
-   if(distance<=covered+length||i===trail.points.length-1){
-    const fraction=Math.min(1,(distance-covered)/length),direction=trip.to>=trip.from?1:-1;position=[a[0]+(b[0]-a[0])*fraction,a[1]+(b[1]-a[1])*fraction];heading=Math.atan2((b[0]-a[0])*direction,(b[1]-a[1])*direction);break;
-   }covered+=length;
+export function createCareerJourney(
+  stations,
+  { duration = 2, order = stations.map((_, i) => i) } = {},
+) {
+  const trail = careerTrail(stations, order);
+  let current = order[0],
+    trip = null,
+    position = [...stations[current]],
+    heading = 0,
+    distance = 0;
+  function update(time) {
+    if (!trip) return null;
+    const progress = Math.max(0, Math.min(1, (time - trip.start) / duration));
+    distance = trip.from + (trip.to - trip.from) * progress;
+    let covered = 0;
+    for (let i = 1; i < trail.points.length; i++) {
+      const a = trail.points[i - 1],
+        b = trail.points[i],
+        length = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (!length) continue;
+      if (distance <= covered + length || i === trail.points.length - 1) {
+        const fraction = Math.min(1, (distance - covered) / length),
+          direction = trip.to >= trip.from ? 1 : -1;
+        position = [a[0] + (b[0] - a[0]) * fraction, a[1] + (b[1] - a[1]) * fraction];
+        heading = Math.atan2((b[0] - a[0]) * direction, (b[1] - a[1]) * direction);
+        break;
+      }
+      covered += length;
+    }
+    if (progress === 1) {
+      current = trip.target;
+      position = [...stations[current]];
+      trip = null;
+      return current;
+    }
+    return null;
   }
-  if(progress===1){current=trip.target;position=[...stations[current]];trip=null;return current;}
-  return null;
- }
- return {
-  get current(){return current;},get moving(){return !!trip;},get target(){return trip?.target??current;},get position(){return [...position];},get heading(){return heading;},update,
-  walkTo(index,time){
-   if(!Number.isInteger(index)||!stations[index]||trip?.target===index||(!trip&&current===index))return false;
-   update(time);trip={start:time,target:index,from:distance,to:trail.distances[index]};return true;
-  }
- };
+  return {
+    get current() {
+      return current;
+    },
+    get moving() {
+      return !!trip;
+    },
+    get target() {
+      return trip?.target ?? current;
+    },
+    get position() {
+      return [...position];
+    },
+    get heading() {
+      return heading;
+    },
+    update,
+    walkTo(index, time) {
+      if (
+        !Number.isInteger(index) ||
+        !stations[index] ||
+        trip?.target === index ||
+        (!trip && current === index)
+      )
+        return false;
+      update(time);
+      trip = { start: time, target: index, from: distance, to: trail.distances[index] };
+      return true;
+    },
+  };
 }
 
-export function drawCareerScreen(e,t,n,{companies,colors: X,Q,kv,Ev,wv,Tv,Nv}){
- t.dominant=4;
- Q(e,`NÍVEL ${companies.length}`,48,104,{size:24,bold:true,color:X.violet});
- kv(e,{x:188,y:109,w:360,h:16},8.6,10,X.violet,X.deep);
- Q(e,`XP DESDE ${Math.min(...companies.filter(c=>!c.invitation).map(c=>c.start))}`,564,105,{size:20,color:X.muted});
- t.careerMap??=t.createCareerMap();
- const arrived=t.careerMap.update(n);
- if(arrived!==null){const location=companies[arrived];t.onSelect({id:'experiencia/'+arrived,kind:'career-arrival',label:'Chegou a '+location.org+'. '+location.role});}
- const order=careerOrder(companies),selected=t.careerMap.current,company=companies[selected],panel=CAREER_LAYOUT.text,left=panel.x+20,width=panel.w-40;
- Ev(e,panel,X.slate,X.panel);
- Q(e,`ETAPA ${order.indexOf(selected)+1} · ${company.title}`.toUpperCase(),left,178,{size:17,color:X.sel,max:width});
- let y=wv(e,company.role,left,208,width,{size:26,bold:true,maxLines:3,lineH:30});
- y=wv(e,company.org,left,y+8,width,{size:21,color:X.sky,maxLines:2,lineH:25});
- const logo=t.assets.screenshots['company/'+company.id];
- if(logo){const scale=Math.min(80/logo.width,30/logo.height);e.save();e.imageSmoothingEnabled=true;e.drawImage(logo,left,y+8,logo.width*scale,logo.height*scale);e.restore();}
- Q(e,company.period.toUpperCase(),left+(logo?92:0),y+12,{size:15,color:X.muted,max:width-(logo?92:0)});
- y+=44;
- if(company.workMode)y=wv(e,`${company.location} · ${company.workMode}`,left,y,width,{size:15,color:X.muted,maxLines:2,lineH:19})+8;
- Tv(e,{x:left,y,w:width,h:2},X.deep);y+=14;
- for(const text of company.tvBullets||company.bullets){Nv(e,'right',left,y+5,9,X.sel);y=wv(e,text,left+16,y,width-16,{size:17,color:X.text,maxLines:4,lineH:21})+6;}
- Q(e,'MAPA DA JORNADA',CAREER_LAYOUT.map.x+CAREER_LAYOUT.map.w/2,168,{size:20,bold:true,color:X.sel,align:'center'});
- const hover=t.hoverId?.startsWith('experiencia/')?Number(t.hoverId.split('/')[1]):null;
- const focused=hover??(t.selectionSource==='navigation'&&t.selectedItem?.kind==='career'?Number(t.selectedItem.id.split('/')[1]):selected);
- const bounds=t.careerMap.draw(e,CAREER_LAYOUT.map,focused,n,t.reducedMotion);
- Q(e,`SIGA 1 → ${companies.length} · CLIQUE NAS CASAS · ARRASTE PARA GIRAR`,CAREER_LAYOUT.map.x+CAREER_LAYOUT.map.w/2,190,{size:12,color:X.muted,align:'center'});
- order.forEach(index=>{
-  const company=companies[index];
-  const rect=bounds[index];t.addItem({id:'experiencia/'+index,rect,kind:'career',label:company.org,tooltip:t.careerMap.moving||index===selected?null:'Clique para caminhar até '+company.org});
-  const label=company.invitation?'SUA COMPANHIA':(company.shortOrg||company.org).toUpperCase();
-  const cx=rect.x+rect.w/2,number=order.indexOf(index)+1;
-  Tv(e,{x:cx-76,y:rect.y-29,w:152,h:39},X.panel,X.slate,1);
-  Q(e,`${number} · ${label}`,cx,rect.y-26,{size:13,bold:true,color:index===selected?X.sel:X.text,align:'center',max:146});
-  Q(e,company.invitation?'PRÓXIMO CAPÍTULO':String(company.start),cx,rect.y-9,{size:12,color:X.muted,align:'center'});
- });
- for(const [index,label,command]of [[0,'GIRAR -','left'],[1,'GIRAR +','right'],[2,'REPOR','reset']]){
-  const rect={x:CAREER_LAYOUT.map.x+index*184,y:666,w:176,h:30};
-  Tv(e,rect,X.panel,X.slate,2);Q(e,label,rect.x+rect.w/2,rect.y+6,{size:14,color:X.text,align:'center'});
-  t.addItem({id:'career-view/'+command,kind:'career-view',rect,label:command==='reset'?'Restaurar vista do mapa':command==='left'?'Girar mapa para a esquerda':'Girar mapa para a direita'});
- }
- Q(e,'■ EXPERIÊNCIAS',CAREER_LAYOUT.map.x+12,704,{size:13,color:'#42d68a'});
- Q(e,'■ PRÓXIMA COMPANHIA',CAREER_LAYOUT.map.x+260,704,{size:13,color:'#57a8ff'});
+export function drawCareerScreen(e, t, n, { companies, colors: X, Q, kv, Ev, wv, Tv, Nv }) {
+  t.dominant = 4;
+  Q(e, `NÍVEL ${companies.length}`, 48, 104, { size: 24, bold: true, color: X.violet });
+  kv(e, { x: 188, y: 109, w: 360, h: 16 }, 8.6, 10, X.violet, X.deep);
+  Q(
+    e,
+    `XP DESDE ${Math.min(...companies.filter((c) => !c.invitation).map((c) => c.start))}`,
+    564,
+    105,
+    { size: 20, color: X.muted },
+  );
+  t.careerMap ??= t.createCareerMap();
+  const arrived = t.careerMap.update(n);
+  if (arrived !== null) {
+    const location = companies[arrived];
+    t.onSelect({
+      id: 'experiencia/' + arrived,
+      kind: 'career-arrival',
+      label: 'Chegou a ' + location.org + '. ' + location.role,
+    });
+  }
+  const order = careerOrder(companies),
+    selected = t.careerMap.current,
+    company = companies[selected],
+    panel = CAREER_LAYOUT.text,
+    left = panel.x + 20,
+    width = panel.w - 40;
+  Ev(e, panel, X.slate, X.panel);
+  Q(e, `ETAPA ${order.indexOf(selected) + 1} · ${company.title}`.toUpperCase(), left, 178, {
+    size: 17,
+    color: X.sel,
+    max: width,
+  });
+  let y = wv(e, company.role, left, 208, width, { size: 26, bold: true, maxLines: 3, lineH: 30 });
+  y = wv(e, company.org, left, y + 8, width, { size: 21, color: X.sky, maxLines: 2, lineH: 25 });
+  const logo = t.assets.screenshots['company/' + company.id];
+  if (logo) {
+    const scale = Math.min(80 / logo.width, 30 / logo.height);
+    e.save();
+    e.imageSmoothingEnabled = true;
+    e.drawImage(logo, left, y + 8, logo.width * scale, logo.height * scale);
+    e.restore();
+  }
+  Q(e, company.period.toUpperCase(), left + (logo ? 92 : 0), y + 12, {
+    size: 15,
+    color: X.muted,
+    max: width - (logo ? 92 : 0),
+  });
+  y += 44;
+  if (company.workMode)
+    y =
+      wv(e, `${company.location} · ${company.workMode}`, left, y, width, {
+        size: 15,
+        color: X.muted,
+        maxLines: 2,
+        lineH: 19,
+      }) + 8;
+  Tv(e, { x: left, y, w: width, h: 2 }, X.deep);
+  y += 14;
+  for (const text of company.tvBullets || company.bullets) {
+    Nv(e, 'right', left, y + 5, 9, X.sel);
+    y =
+      wv(e, text, left + 16, y, width - 16, { size: 17, color: X.text, maxLines: 4, lineH: 21 }) +
+      6;
+  }
+  Q(e, 'MAPA DA JORNADA', CAREER_LAYOUT.map.x + CAREER_LAYOUT.map.w / 2, 168, {
+    size: 20,
+    bold: true,
+    color: X.sel,
+    align: 'center',
+  });
+  const hover = t.hoverId?.startsWith('experiencia/') ? Number(t.hoverId.split('/')[1]) : null;
+  const focused =
+    hover ??
+    (t.selectionSource === 'navigation' && t.selectedItem?.kind === 'career'
+      ? Number(t.selectedItem.id.split('/')[1])
+      : selected);
+  const bounds = t.careerMap.draw(e, CAREER_LAYOUT.map, focused, n, t.reducedMotion);
+  Q(
+    e,
+    `SIGA 1 → ${companies.length} · CLIQUE NAS CASAS · ARRASTE PARA GIRAR`,
+    CAREER_LAYOUT.map.x + CAREER_LAYOUT.map.w / 2,
+    190,
+    { size: 12, color: X.muted, align: 'center' },
+  );
+  order.forEach((index) => {
+    const company = companies[index];
+    const rect = bounds[index];
+    t.addItem({
+      id: 'experiencia/' + index,
+      rect,
+      kind: 'career',
+      label: company.org,
+      tooltip:
+        t.careerMap.moving || index === selected ? null : 'Clique para caminhar até ' + company.org,
+    });
+    const label = company.invitation
+      ? 'SUA COMPANHIA'
+      : (company.shortOrg || company.org).toUpperCase();
+    const cx = rect.x + rect.w / 2,
+      number = order.indexOf(index) + 1;
+    Tv(e, { x: cx - 76, y: rect.y - 29, w: 152, h: 39 }, X.panel, X.slate, 1);
+    Q(e, `${number} · ${label}`, cx, rect.y - 26, {
+      size: 13,
+      bold: true,
+      color: index === selected ? X.sel : X.text,
+      align: 'center',
+      max: 146,
+    });
+    Q(e, company.invitation ? 'PRÓXIMO CAPÍTULO' : String(company.start), cx, rect.y - 9, {
+      size: 12,
+      color: X.muted,
+      align: 'center',
+    });
+  });
+  for (const [index, label, command] of [
+    [0, 'GIRAR -', 'left'],
+    [1, 'GIRAR +', 'right'],
+    [2, 'REPOR', 'reset'],
+  ]) {
+    const rect = { x: CAREER_LAYOUT.map.x + index * 184, y: 666, w: 176, h: 30 };
+    Tv(e, rect, X.panel, X.slate, 2);
+    Q(e, label, rect.x + rect.w / 2, rect.y + 6, { size: 14, color: X.text, align: 'center' });
+    t.addItem({
+      id: 'career-view/' + command,
+      kind: 'career-view',
+      rect,
+      label:
+        command === 'reset'
+          ? 'Restaurar vista do mapa'
+          : command === 'left'
+            ? 'Girar mapa para a esquerda'
+            : 'Girar mapa para a direita',
+    });
+  }
+  Q(e, '■ EXPERIÊNCIAS', CAREER_LAYOUT.map.x + 12, 704, { size: 13, color: '#42d68a' });
+  Q(e, '■ PRÓXIMA COMPANHIA', CAREER_LAYOUT.map.x + 260, 704, { size: 13, color: '#57a8ff' });
 }
 
 // A real orthographic 3D diorama, composited into the TV's existing canvas.
-export function createCareerMap(T,companies,assets){
- const {Scene,Group,Mesh,BoxGeometry,PlaneGeometry,BufferGeometry,BufferAttribute,BasicMaterial,CanvasTexture,OrthographicCamera,Renderer,Vector3,SRGB}=T;
- const renderer=new Renderer({alpha:true,antialias:true,preserveDrawingBuffer:true});
- renderer.setSize(CAREER_LAYOUT.map.w,CAREER_LAYOUT.map.h);renderer.setPixelRatio(1);renderer.outputColorSpace=SRGB;renderer.setClearColor(0x000000,0);
- const rows=companies.length>3?Math.ceil(companies.length/2):companies.length;
- const terrainDepth=Math.max(4.7,(rows-1)*1.8+2.1),terrainWidth=5.8,depthScale=terrainDepth/4.7,widthScale=terrainWidth/3.9;
- const halfHeight=2.45,halfWidth=halfHeight*CAREER_LAYOUT.map.w/CAREER_LAYOUT.map.h;
- const scene=new Scene(),camera=new OrthographicCamera(-halfWidth,halfWidth,halfHeight,-halfHeight,.1,40);
- camera.position.set(.4,9.5,10);camera.lookAt(0,.24,0);
- const orbit=createCareerOrbit({yaw:0,pitch:Math.PI*.31}),orbitDistance=Math.hypot(.4,9.26,10);
- function applyOrbit(){
-  const {yaw,pitch}=orbit.angles,horizontal=Math.cos(pitch)*orbitDistance;
-  camera.position.set(Math.sin(yaw)*horizontal,.4+Math.sin(pitch)*orbitDistance,Math.cos(yaw)*horizontal);
-  camera.lookAt(0,.4,0);camera.zoom=1;camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
-  let extent=1;
-  const include=(x,y,z)=>{const p=new Vector3(x,y,z).project(camera);extent=Math.max(extent,Math.abs(p.x)/.96,Math.abs(p.y)/.96);};
-  for(const x of [-terrainWidth/2-.25,terrainWidth/2+.25])for(const y of [-.5,.85])for(const z of [-terrainDepth/2-.3,terrainDepth/2+.3])include(x,y,z);
-  for(const [bx,bz]of points)for(const x of [bx-.6,bx+1.12])for(const z of [bz-.7,bz+.7])include(x,1.6,z);
-  camera.zoom=1/extent;camera.updateProjectionMatrix();
- }
- const resources=[],materials=new Map(),logos=new Map();
- function mat(color){if(!materials.has(color))materials.set(color,new BasicMaterial({color}));return materials.get(color);}
- function box(parent,x,y,z,w,h,d,color){
-  const geometry=new BoxGeometry(w,h,d);resources.push(geometry);
-  const faces=Array.isArray(color)?color.map(mat):mat(color),mesh=new Mesh(geometry,faces);mesh.position.set(x,y,z);parent.add(mesh);return mesh;
- }
- const fallbackTerrain=new Group();scene.add(fallbackTerrain);
- const earth=['#314a53','#233742','#5f8670','#253d44','#3a5960','#2b414e'];
- box(fallbackTerrain,0,-.23,0,terrainWidth,.44,terrainDepth,earth);
- box(fallbackTerrain,0,.005,0,terrainWidth,.06,terrainDepth,['#4a7165','#355748','#638a70','#355748','#4a7165','#355748']);
- const floorY=.22,order=careerOrder(companies),slots=careerStops(companies.length),points=companies.map((_,index)=>slots[order.indexOf(index)]),stations=points.map(([x,z])=>[x,z+.67]),buildings=[],flags=[];
- document.documentElement.dataset.careerStops=String(points.length);
- applyOrbit();
- const journey=createCareerJourney(stations,{duration:2,order}),trail=careerTrail(stations,order),routeSegments=trail.points.slice(1).map((p,i)=>[trail.points[i],p]);
- for(const [a,b]of routeSegments){
-  const dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz),angle=Math.atan2(dx,dz);
-  const road=box(scene,(a[0]+b[0])/2,floorY,(a[1]+b[1])/2,.34,.065,length+.14,'#d9b36b');road.rotation.y=angle;
-  // Small center marks give the continuous trail a visible reading direction.
-  if(length>.65){const arrow=new Group();arrow.position.set((a[0]+b[0])/2,floorY+.045,(a[1]+b[1])/2);arrow.rotation.y=angle;scene.add(arrow);
-   box(arrow,-.05,0,0,.035,.015,.15,'#584322').rotation.y=.65;box(arrow,.05,0,0,.035,.015,.15,'#584322').rotation.y=-.65;
+export function createCareerMap(T, companies, assets) {
+  const {
+    Scene,
+    Group,
+    Mesh,
+    BoxGeometry,
+    PlaneGeometry,
+    BufferGeometry,
+    BufferAttribute,
+    BasicMaterial,
+    CanvasTexture,
+    OrthographicCamera,
+    Renderer,
+    Vector3,
+    SRGB,
+  } = T;
+  const renderer = new Renderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
+  renderer.setSize(CAREER_LAYOUT.map.w, CAREER_LAYOUT.map.h);
+  renderer.setPixelRatio(1);
+  renderer.outputColorSpace = SRGB;
+  renderer.setClearColor(0x000000, 0);
+  const rows = companies.length > 3 ? Math.ceil(companies.length / 2) : companies.length;
+  const terrainDepth = Math.max(4.7, (rows - 1) * 1.8 + 2.1),
+    terrainWidth = 5.8,
+    depthScale = terrainDepth / 4.7,
+    widthScale = terrainWidth / 3.9;
+  const halfHeight = 2.45,
+    halfWidth = (halfHeight * CAREER_LAYOUT.map.w) / CAREER_LAYOUT.map.h;
+  const scene = new Scene(),
+    camera = new OrthographicCamera(-halfWidth, halfWidth, halfHeight, -halfHeight, 0.1, 40);
+  camera.position.set(0.4, 9.5, 10);
+  camera.lookAt(0, 0.24, 0);
+  const orbit = createCareerOrbit({ yaw: 0, pitch: Math.PI * 0.31 }),
+    orbitDistance = Math.hypot(0.4, 9.26, 10);
+  function applyOrbit() {
+    const { yaw, pitch } = orbit.angles,
+      horizontal = Math.cos(pitch) * orbitDistance;
+    camera.position.set(
+      Math.sin(yaw) * horizontal,
+      0.4 + Math.sin(pitch) * orbitDistance,
+      Math.cos(yaw) * horizontal,
+    );
+    camera.lookAt(0, 0.4, 0);
+    camera.zoom = 1;
+    camera.updateProjectionMatrix();
+    camera.updateMatrixWorld(true);
+    let extent = 1;
+    const include = (x, y, z) => {
+      const p = new Vector3(x, y, z).project(camera);
+      extent = Math.max(extent, Math.abs(p.x) / 0.96, Math.abs(p.y) / 0.96);
+    };
+    for (const x of [-terrainWidth / 2 - 0.25, terrainWidth / 2 + 0.25])
+      for (const y of [-0.5, 0.85])
+        for (const z of [-terrainDepth / 2 - 0.3, terrainDepth / 2 + 0.3]) include(x, y, z);
+    for (const [bx, bz] of points)
+      for (const x of [bx - 0.6, bx + 1.12])
+        for (const z of [bz - 0.7, bz + 0.7]) include(x, 1.6, z);
+    camera.zoom = 1 / extent;
+    camera.updateProjectionMatrix();
   }
- }
- // Quiet landscaping makes the terrain's depth readable without obscuring stops.
- for(const [x,z] of [[1.55,1.8],[-1.55,-1.9],[1.55,-1.5]]){
-  box(fallbackTerrain,x,.15,z,.045,.3,.045,'#a18e69');box(fallbackTerrain,x,.38,z,.26,.32,.26,['#387563','#275d50','#65a381','#234b43','#46846b','#387563']);
- }
- companies.forEach((company,index)=>{
-  const [x,z]=points[index],building=new Group();building.position.set(x,floorY,z);scene.add(building);
-  box(building,0,.035,0,1,.07,.86,'#a6aa9e');
-  box(building,0,.38,0,.84,.68,.64,['#9cacc0','#74869b','#e0e4e2','#74869b','#cbd4d8','#8595a9']);
-  box(building,0,.77,0,.96,.13,.76,['#3c4b69','#283a55','#657b98','#283a55','#4b6283','#344862']);
-  box(building,.22,.24,.326,.16,.4,.02,'#31435c');
-  box(building,-.22,.25,.333,.22,.18,.018,'#73b4c6');
-  box(building,-.22,.25,.346,.018,.19,.012,'#cbd4d8');
-  box(building,-.22,.25,.346,.23,.014,.012,'#cbd4d8');
-  const poleX=x+.61,poleZ=z-.14;
-  box(scene,poleX,floorY,poleZ,.18,.07,.18,'#c4c5b6');
-  box(scene,poleX,floorY+.66,poleZ,.035,1.28,.035,'#d0d7de');
-  const positions=[],uv=[],indices=[],columns=12;
-  for(let row=0;row<2;row++)for(let col=0;col<=columns;col++){positions.push(col/columns*.46,1.25-row*.25,0);uv.push(col/columns,1-row);}
-  for(let col=0;col<columns;col++){const a=col,b=col+columns+1;indices.push(a,b,a+1,b,b+1,a+1);}
-  const geometry=new BufferGeometry();geometry.setAttribute('position',new BufferAttribute(new Float32Array(positions),3));geometry.setAttribute('uv',new BufferAttribute(new Float32Array(uv),2));geometry.setIndex(indices);geometry.computeVertexNormals();resources.push(geometry);
-  const flag=new Mesh(geometry,new BasicMaterial({color:company.invitation?'#57a8ff':'#42d68a',side:2}));flag.position.set(poleX,floorY,poleZ);scene.add(flag);flags.push(flag);
-  buildings.push(building);
- });
- const avatar=new Group();scene.add(avatar);avatar.rotation.y=Math.atan2(1.4,12);
- let leftLeg=box(avatar,-.075,.09,0,.09,.18,.12,'#283b68'),rightLeg=box(avatar,.075,.09,0,.09,.18,.12,'#283b68');
- box(avatar,0,.29,0,.25,.25,.16,['#a96327','#a96327','#ffc56d','#a96327','#ed9c37','#a96327']);
- let leftArm=box(avatar,-.17,.29,0,.075,.22,.09,'#e5a16b'),rightArm=box(avatar,.17,.29,0,.075,.22,.09,'#e5a16b');
- box(avatar,0,.58,0,.37,.37,.2,'#8c6348');
- const marker=box(scene,0,.075,0,1.08,.025,.94,'#ffb547');
- const focusMarker=box(scene,0,.064,0,1.12,.014,.98,'#7f9cdd');
- let disposed=false,characterReady=false,terrainReady=false;
- const avatarChoice=careerAvatarChoice(location.search);
- document.documentElement.dataset.careerAvatar=avatarChoice;
- function trackImported(root){root.traverse(object=>{if(!object.isMesh)return;resources.push(object.geometry);for(const material of Array.isArray(object.material)?object.material:[object.material])if(material.map)resources.push(material.map);});}
- document.documentElement.dataset.careerModels='loading';
- const ready=()=>{document.documentElement.dataset.careerModels=terrainReady&&characterReady?'ready':'partial';};
- loadCareerTerrain(T,{routeSegments,stations,buildings:points,depthScale,widthScale}).then(root=>{
-  if(disposed){root.traverse(object=>{if(object.isMesh){object.geometry.dispose();object.material.map?.dispose();object.material.dispose();}});return;}
-  trackImported(root);scene.add(root);fallbackTerrain.visible=false;terrainReady=true;ready();
- }).catch(error=>{if(!disposed){document.documentElement.dataset.careerModels='fallback';console.warn('Career terrain unavailable',error);}});
- (avatarChoice==='chief'?loadCareerChief(T):loadCareerSteve(T,{personalized:avatarChoice==='andre'})).then(({root,parts})=>{
-  if(disposed){root.traverse(object=>{if(object.isMesh){object.geometry.dispose();for(const material of Array.isArray(object.material)?object.material:[object.material]){material.map?.dispose();material.dispose();}}});return;}
-  avatar.children.forEach(child=>{child.visible=false;});avatar.add(root);trackImported(root);
-  ({leftLeg,rightLeg,leftArm,rightArm}=parts);characterReady=true;ready();
- }).catch(error=>{if(!disposed){document.documentElement.dataset.careerModels='fallback';console.warn('Career character unavailable',error);}});
- function picture(image,parent,x,y,z,w,h,key){
-  if(!image||logos.has(key))return;
-  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=256;
-  const c=canvas.getContext('2d');c.fillStyle=key==='portrait'?'#151c30':'#18253d';c.fillRect(0,0,512,256);
-  const scale=Math.min(480/image.width,220/image.height);c.imageSmoothingEnabled=key!=='portrait';c.drawImage(image,(512-image.width*scale)/2,(256-image.height*scale)/2,image.width*scale,image.height*scale);
-  const texture=new CanvasTexture(canvas);texture.colorSpace=SRGB;resources.push(texture);
-  const geometry=new PlaneGeometry(w,h);resources.push(geometry);const material=new BasicMaterial({map:texture});
-  const mesh=new Mesh(geometry,material);mesh.position.set(x,y,z);parent.add(mesh);logos.set(key,mesh);
- }
- // The next company is an invitation, so its facade has a labeled placeholder.
- const nextCanvas=document.createElement('canvas');nextCanvas.width=400;nextCanvas.height=160;const next=nextCanvas.getContext('2d');
- next.fillStyle='#18253d';next.fillRect(0,0,400,160);next.fillStyle='#7abfff';next.font='bold 40px Arial';next.textAlign='center';next.fillText('SUA COMPANHIA',200,94);
- function syncArt(){
-  companies.forEach((company,i)=>{
-   const key='company/'+company.id;if(logos.has(key))return;
-   let image=company.invitation?nextCanvas:assets.screenshots[key];
-   if(!image&&!company.logo){
-    image=document.createElement('canvas');image.width=600;image.height=200;
-    const context=image.getContext('2d');context.fillStyle='#18253d';context.fillRect(0,0,600,200);context.fillStyle='#f1f3fa';context.textAlign='center';
-    let size=46;do{context.font='bold '+size+'px Arial';if(context.measureText(company.org).width<560)break;size-=2;}while(size>20);
-    context.fillText(company.org,300,115);
-   }
-   picture(image,buildings[i],0,.58,.332,.72,.24,key);
+  const resources = [],
+    materials = new Map(),
+    logos = new Map();
+  function mat(color) {
+    if (!materials.has(color)) materials.set(color, new BasicMaterial({ color }));
+    return materials.get(color);
+  }
+  function box(parent, x, y, z, w, h, d, color) {
+    const geometry = new BoxGeometry(w, h, d);
+    resources.push(geometry);
+    const faces = Array.isArray(color) ? color.map(mat) : mat(color),
+      mesh = new Mesh(geometry, faces);
+    mesh.position.set(x, y, z);
+    parent.add(mesh);
+    return mesh;
+  }
+  const fallbackTerrain = new Group();
+  scene.add(fallbackTerrain);
+  const earth = ['#314a53', '#233742', '#5f8670', '#253d44', '#3a5960', '#2b414e'];
+  box(fallbackTerrain, 0, -0.23, 0, terrainWidth, 0.44, terrainDepth, earth);
+  box(fallbackTerrain, 0, 0.005, 0, terrainWidth, 0.06, terrainDepth, [
+    '#4a7165',
+    '#355748',
+    '#638a70',
+    '#355748',
+    '#4a7165',
+    '#355748',
+  ]);
+  const floorY = 0.22,
+    order = careerOrder(companies),
+    slots = careerStops(companies.length),
+    points = companies.map((_, index) => slots[order.indexOf(index)]),
+    stations = points.map(([x, z]) => [x, z + 0.67]),
+    buildings = [],
+    flags = [];
+  document.documentElement.dataset.careerStops = String(points.length);
+  applyOrbit();
+  const journey = createCareerJourney(stations, { duration: 2, order }),
+    trail = careerTrail(stations, order),
+    routeSegments = trail.points.slice(1).map((p, i) => [trail.points[i], p]);
+  for (const [a, b] of routeSegments) {
+    const dx = b[0] - a[0],
+      dz = b[1] - a[1],
+      length = Math.hypot(dx, dz),
+      angle = Math.atan2(dx, dz);
+    const road = box(
+      scene,
+      (a[0] + b[0]) / 2,
+      floorY,
+      (a[1] + b[1]) / 2,
+      0.34,
+      0.065,
+      length + 0.14,
+      '#d9b36b',
+    );
+    road.rotation.y = angle;
+    // Small center marks give the continuous trail a visible reading direction.
+    if (length > 0.65) {
+      const arrow = new Group();
+      arrow.position.set((a[0] + b[0]) / 2, floorY + 0.045, (a[1] + b[1]) / 2);
+      arrow.rotation.y = angle;
+      scene.add(arrow);
+      box(arrow, -0.05, 0, 0, 0.035, 0.015, 0.15, '#584322').rotation.y = 0.65;
+      box(arrow, 0.05, 0, 0, 0.035, 0.015, 0.15, '#584322').rotation.y = -0.65;
+    }
+  }
+  // Quiet landscaping makes the terrain's depth readable without obscuring stops.
+  for (const [x, z] of [
+    [1.55, 1.8],
+    [-1.55, -1.9],
+    [1.55, -1.5],
+  ]) {
+    box(fallbackTerrain, x, 0.15, z, 0.045, 0.3, 0.045, '#a18e69');
+    box(fallbackTerrain, x, 0.38, z, 0.26, 0.32, 0.26, [
+      '#387563',
+      '#275d50',
+      '#65a381',
+      '#234b43',
+      '#46846b',
+      '#387563',
+    ]);
+  }
+  companies.forEach((company, index) => {
+    const [x, z] = points[index],
+      building = new Group();
+    building.position.set(x, floorY, z);
+    scene.add(building);
+    box(building, 0, 0.035, 0, 1, 0.07, 0.86, '#a6aa9e');
+    box(building, 0, 0.38, 0, 0.84, 0.68, 0.64, [
+      '#9cacc0',
+      '#74869b',
+      '#e0e4e2',
+      '#74869b',
+      '#cbd4d8',
+      '#8595a9',
+    ]);
+    box(building, 0, 0.77, 0, 0.96, 0.13, 0.76, [
+      '#3c4b69',
+      '#283a55',
+      '#657b98',
+      '#283a55',
+      '#4b6283',
+      '#344862',
+    ]);
+    box(building, 0.22, 0.24, 0.326, 0.16, 0.4, 0.02, '#31435c');
+    box(building, -0.22, 0.25, 0.333, 0.22, 0.18, 0.018, '#73b4c6');
+    box(building, -0.22, 0.25, 0.346, 0.018, 0.19, 0.012, '#cbd4d8');
+    box(building, -0.22, 0.25, 0.346, 0.23, 0.014, 0.012, '#cbd4d8');
+    const poleX = x + 0.61,
+      poleZ = z - 0.14;
+    box(scene, poleX, floorY, poleZ, 0.18, 0.07, 0.18, '#c4c5b6');
+    box(scene, poleX, floorY + 0.66, poleZ, 0.035, 1.28, 0.035, '#d0d7de');
+    const positions = [],
+      uv = [],
+      indices = [],
+      columns = 12;
+    for (let row = 0; row < 2; row++)
+      for (let col = 0; col <= columns; col++) {
+        positions.push((col / columns) * 0.46, 1.25 - row * 0.25, 0);
+        uv.push(col / columns, 1 - row);
+      }
+    for (let col = 0; col < columns; col++) {
+      const a = col,
+        b = col + columns + 1;
+      indices.push(a, b, a + 1, b, b + 1, a + 1);
+    }
+    const geometry = new BufferGeometry();
+    geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+    geometry.setAttribute('uv', new BufferAttribute(new Float32Array(uv), 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    resources.push(geometry);
+    const flag = new Mesh(
+      geometry,
+      new BasicMaterial({ color: company.invitation ? '#57a8ff' : '#42d68a', side: 2 }),
+    );
+    flag.position.set(poleX, floorY, poleZ);
+    scene.add(flag);
+    flags.push(flag);
+    buildings.push(building);
   });
-  if(!characterReady&&assets.portrait&&!logos.has('portrait')){
-   const texture=new CanvasTexture(assets.portrait);texture.colorSpace=SRGB;resources.push(texture);
-   const geometry=new PlaneGeometry(.375,.375);resources.push(geometry);const mesh=new Mesh(geometry,new BasicMaterial({map:texture,transparent:true}));mesh.position.set(0,.58,.103);avatar.add(mesh);logos.set('portrait',mesh);
+  const avatar = new Group();
+  scene.add(avatar);
+  avatar.rotation.y = Math.atan2(1.4, 12);
+  let leftLeg = box(avatar, -0.075, 0.09, 0, 0.09, 0.18, 0.12, '#283b68'),
+    rightLeg = box(avatar, 0.075, 0.09, 0, 0.09, 0.18, 0.12, '#283b68');
+  box(avatar, 0, 0.29, 0, 0.25, 0.25, 0.16, [
+    '#a96327',
+    '#a96327',
+    '#ffc56d',
+    '#a96327',
+    '#ed9c37',
+    '#a96327',
+  ]);
+  let leftArm = box(avatar, -0.17, 0.29, 0, 0.075, 0.22, 0.09, '#e5a16b'),
+    rightArm = box(avatar, 0.17, 0.29, 0, 0.075, 0.22, 0.09, '#e5a16b');
+  box(avatar, 0, 0.58, 0, 0.37, 0.37, 0.2, '#8c6348');
+  const marker = box(scene, 0, 0.075, 0, 1.08, 0.025, 0.94, '#ffb547');
+  const focusMarker = box(scene, 0, 0.064, 0, 1.12, 0.014, 0.98, '#7f9cdd');
+  let disposed = false,
+    characterReady = false,
+    terrainReady = false;
+  const avatarChoice = careerAvatarChoice(location.search);
+  document.documentElement.dataset.careerAvatar = avatarChoice;
+  function trackImported(root) {
+    root.traverse((object) => {
+      if (!object.isMesh) return;
+      resources.push(object.geometry);
+      for (const material of Array.isArray(object.material) ? object.material : [object.material])
+        if (material.map) resources.push(material.map);
+    });
   }
- }
- let previousFocused=-1,focusStarted=0;
- return {
-  rotate(dx,dy){orbit.rotate(dx,dy);applyOrbit();},resetView(){orbit.reset();applyOrbit();},
-  get current(){return journey.current;},get moving(){return journey.moving;},walkTo(index,time){return journey.walkTo(index,time);},update(time){return journey.update(time);},
-  draw(ctx,rect,focused,time,reduced){
-   syncArt();focused=Math.max(0,Math.min(companies.length-1,focused));
-   if(focused!==previousFocused){previousFocused=focused;focusStarted=time;}
-   buildings.forEach((building,index)=>{const active=index===focused,elapsed=time-focusStarted;building.position.y=floorY+(active?.035:0);building.rotation.z=active?interactionShake(elapsed,reduced):0;});
-   const [x,z]=journey.position,walking=journey.moving,step=walking&&!reduced?Math.sin(time*15)*.55:0;
-   avatar.position.set(x,floorY+.035+(walking&&!reduced?Math.abs(Math.sin(time*15))*.018:0),z);avatar.rotation.y=walking?journey.heading:Math.atan2(1.1,10);
-   leftLeg.rotation.x=step;rightLeg.rotation.x=-step;leftArm.rotation.x=-step*.7;rightArm.rotation.x=step*.7;
-   const [selectedX,selectedZ]=points[journey.current];marker.position.set(selectedX,floorY+.075,selectedZ);
-   focusMarker.visible=focused!==journey.current;focusMarker.position.set(points[focused][0],floorY+.064,points[focused][1]);
-   flags.forEach((flag,index)=>{const attr=flag.geometry.attributes.position;for(let row=0;row<2;row++)for(let col=0;col<=12;col++){const f=col/12;attr.setZ(row*13+col,reduced?0:Math.sin(time*5-f*7+index)*.075*f);}attr.needsUpdate=true;});
-   renderer.render(scene,camera);ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(renderer.domElement,rect.x,rect.y,rect.w,rect.h);ctx.restore();
-   return points.map(([x,z],index)=>{const p=new Vector3(x,buildings[index].position.y+.38,z).project(camera),w=companies.length>3?60:104,h=companies.length>3?65:115;return {x:rect.x+(p.x+1)/2*rect.w-w/2,y:rect.y+(1-p.y)/2*rect.h-h/2,w,h};});
-  },
-  dispose(){disposed=true;for(const resource of new Set(resources))resource.dispose();for(const material of materials.values())material.dispose();scene.traverse(object=>{if(object.isMesh)for(const material of Array.isArray(object.material)?object.material:[object.material])material.dispose();});renderer.dispose();}
- };
+  document.documentElement.dataset.careerModels = 'loading';
+  const ready = () => {
+    document.documentElement.dataset.careerModels =
+      terrainReady && characterReady ? 'ready' : 'partial';
+  };
+  loadCareerTerrain(T, { routeSegments, stations, buildings: points, depthScale, widthScale })
+    .then((root) => {
+      if (disposed) {
+        root.traverse((object) => {
+          if (object.isMesh) {
+            object.geometry.dispose();
+            object.material.map?.dispose();
+            object.material.dispose();
+          }
+        });
+        return;
+      }
+      trackImported(root);
+      scene.add(root);
+      fallbackTerrain.visible = false;
+      terrainReady = true;
+      ready();
+    })
+    .catch((error) => {
+      if (!disposed) {
+        document.documentElement.dataset.careerModels = 'fallback';
+        console.warn('Career terrain unavailable', error);
+      }
+    });
+  (avatarChoice === 'chief'
+    ? loadCareerChief(T)
+    : loadCareerSteve(T, { personalized: avatarChoice === 'andre' })
+  )
+    .then(({ root, parts }) => {
+      if (disposed) {
+        root.traverse((object) => {
+          if (object.isMesh) {
+            object.geometry.dispose();
+            for (const material of Array.isArray(object.material)
+              ? object.material
+              : [object.material]) {
+              material.map?.dispose();
+              material.dispose();
+            }
+          }
+        });
+        return;
+      }
+      avatar.children.forEach((child) => {
+        child.visible = false;
+      });
+      avatar.add(root);
+      trackImported(root);
+      ({ leftLeg, rightLeg, leftArm, rightArm } = parts);
+      characterReady = true;
+      ready();
+    })
+    .catch((error) => {
+      if (!disposed) {
+        document.documentElement.dataset.careerModels = 'fallback';
+        console.warn('Career character unavailable', error);
+      }
+    });
+  function picture(image, parent, x, y, z, w, h, key) {
+    if (!image || logos.has(key)) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 256;
+    const c = canvas.getContext('2d');
+    c.fillStyle = key === 'portrait' ? '#151c30' : '#18253d';
+    c.fillRect(0, 0, 512, 256);
+    const scale = Math.min(480 / image.width, 220 / image.height);
+    c.imageSmoothingEnabled = key !== 'portrait';
+    c.drawImage(
+      image,
+      (512 - image.width * scale) / 2,
+      (256 - image.height * scale) / 2,
+      image.width * scale,
+      image.height * scale,
+    );
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGB;
+    resources.push(texture);
+    const geometry = new PlaneGeometry(w, h);
+    resources.push(geometry);
+    const material = new BasicMaterial({ map: texture });
+    const mesh = new Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    parent.add(mesh);
+    logos.set(key, mesh);
+  }
+  // The next company is an invitation, so its facade has a labeled placeholder.
+  const nextCanvas = document.createElement('canvas');
+  nextCanvas.width = 400;
+  nextCanvas.height = 160;
+  const next = nextCanvas.getContext('2d');
+  next.fillStyle = '#18253d';
+  next.fillRect(0, 0, 400, 160);
+  next.fillStyle = '#7abfff';
+  next.font = 'bold 40px Arial';
+  next.textAlign = 'center';
+  next.fillText('SUA COMPANHIA', 200, 94);
+  function syncArt() {
+    companies.forEach((company, i) => {
+      const key = 'company/' + company.id;
+      if (logos.has(key)) return;
+      let image = company.invitation ? nextCanvas : assets.screenshots[key];
+      if (!image && !company.logo) {
+        image = document.createElement('canvas');
+        image.width = 600;
+        image.height = 200;
+        const context = image.getContext('2d');
+        context.fillStyle = '#18253d';
+        context.fillRect(0, 0, 600, 200);
+        context.fillStyle = '#f1f3fa';
+        context.textAlign = 'center';
+        let size = 46;
+        do {
+          context.font = 'bold ' + size + 'px Arial';
+          if (context.measureText(company.org).width < 560) break;
+          size -= 2;
+        } while (size > 20);
+        context.fillText(company.org, 300, 115);
+      }
+      picture(image, buildings[i], 0, 0.58, 0.332, 0.72, 0.24, key);
+    });
+    if (!characterReady && assets.portrait && !logos.has('portrait')) {
+      const texture = new CanvasTexture(assets.portrait);
+      texture.colorSpace = SRGB;
+      resources.push(texture);
+      const geometry = new PlaneGeometry(0.375, 0.375);
+      resources.push(geometry);
+      const mesh = new Mesh(geometry, new BasicMaterial({ map: texture, transparent: true }));
+      mesh.position.set(0, 0.58, 0.103);
+      avatar.add(mesh);
+      logos.set('portrait', mesh);
+    }
+  }
+  let previousFocused = -1,
+    focusStarted = 0;
+  return {
+    rotate(dx, dy) {
+      orbit.rotate(dx, dy);
+      applyOrbit();
+    },
+    resetView() {
+      orbit.reset();
+      applyOrbit();
+    },
+    get current() {
+      return journey.current;
+    },
+    get moving() {
+      return journey.moving;
+    },
+    walkTo(index, time) {
+      return journey.walkTo(index, time);
+    },
+    update(time) {
+      return journey.update(time);
+    },
+    draw(ctx, rect, focused, time, reduced) {
+      syncArt();
+      focused = Math.max(0, Math.min(companies.length - 1, focused));
+      if (focused !== previousFocused) {
+        previousFocused = focused;
+        focusStarted = time;
+      }
+      buildings.forEach((building, index) => {
+        const active = index === focused,
+          elapsed = time - focusStarted;
+        building.position.y = floorY + (active ? 0.035 : 0);
+        building.rotation.z = active ? interactionShake(elapsed, reduced) : 0;
+      });
+      const [x, z] = journey.position,
+        walking = journey.moving,
+        step = walking && !reduced ? Math.sin(time * 15) * 0.55 : 0;
+      avatar.position.set(
+        x,
+        floorY + 0.035 + (walking && !reduced ? Math.abs(Math.sin(time * 15)) * 0.018 : 0),
+        z,
+      );
+      avatar.rotation.y = walking ? journey.heading : Math.atan2(1.1, 10);
+      leftLeg.rotation.x = step;
+      rightLeg.rotation.x = -step;
+      leftArm.rotation.x = -step * 0.7;
+      rightArm.rotation.x = step * 0.7;
+      const [selectedX, selectedZ] = points[journey.current];
+      marker.position.set(selectedX, floorY + 0.075, selectedZ);
+      focusMarker.visible = focused !== journey.current;
+      focusMarker.position.set(points[focused][0], floorY + 0.064, points[focused][1]);
+      flags.forEach((flag, index) => {
+        const attr = flag.geometry.attributes.position;
+        for (let row = 0; row < 2; row++)
+          for (let col = 0; col <= 12; col++) {
+            const f = col / 12;
+            attr.setZ(row * 13 + col, reduced ? 0 : Math.sin(time * 5 - f * 7 + index) * 0.075 * f);
+          }
+        attr.needsUpdate = true;
+      });
+      renderer.render(scene, camera);
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(renderer.domElement, rect.x, rect.y, rect.w, rect.h);
+      ctx.restore();
+      return points.map(([x, z], index) => {
+        const p = new Vector3(x, buildings[index].position.y + 0.38, z).project(camera),
+          w = companies.length > 3 ? 60 : 104,
+          h = companies.length > 3 ? 65 : 115;
+        return {
+          x: rect.x + ((p.x + 1) / 2) * rect.w - w / 2,
+          y: rect.y + ((1 - p.y) / 2) * rect.h - h / 2,
+          w,
+          h,
+        };
+      });
+    },
+    dispose() {
+      disposed = true;
+      for (const resource of new Set(resources)) resource.dispose();
+      for (const material of materials.values()) material.dispose();
+      scene.traverse((object) => {
+        if (object.isMesh)
+          for (const material of Array.isArray(object.material)
+            ? object.material
+            : [object.material])
+            material.dispose();
+      });
+      renderer.dispose();
+    },
+  };
 }

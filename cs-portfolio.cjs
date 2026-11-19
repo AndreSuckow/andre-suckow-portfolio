@@ -1,37 +1,157 @@
 // Maintained changes to the preserved portfolio, shared by its HTML and TV views.
-const esc=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
-const certification=require('./certification.cjs');
-const posterGames=require('./poster-games.json');
-exports.sections=p=>{
- const nav=[['sobre','Sobre'],['experiencia','Experiência'],['projetos','Projetos'],['skills','Skills'],['hobbies','Tempo livre'],['contato','Contato']];
- const section=(id,subtitle,body)=>`<section id="${id}" class="chapter tab" data-chapter="${id}" data-tab="${id}" aria-labelledby="${id}-title"><div class="tab__inner container"><header class="tab__head"><p class="eyebrow">${subtitle}</p><h2 id="${id}-title">${nav.find(n=>n[0]===id)[1]}</h2></header>${body}</div></section>`;
- const whatsapp=(label,id)=>`<a class="btn" href="${p.whatsapp}" data-whatsapp ${id?`data-tv="${id}"`:''} target="_blank" rel="noopener">${label}</a>`;
- const download=`<a class="btn btn--primary" href="${p.cvPdf}" download data-tv="sobre/cv">↓ Baixar currículo</a>`;
- const linkedin=`<a class="btn" href="${p.linkedin}" target="_blank" rel="noopener" data-tv="sobre/ficha">Contrate-me · LinkedIn ↗</a>`;
- const stats=p.stats.map((a,i)=>`<li class="attribute"><button type="button" class="attribute__trigger" data-tv="sobre/attribute/${i}" aria-describedby="attribute-${i}"><span class="stats__label">${esc(a.label)}</span><span class="stats__bar" role="img" aria-label="${a.value} de 5, autoavaliação ilustrativa">${Array.from({length:5},(_,n)=>`<span class="stats__pip ${n<a.value?'is-on':''}"></span>`).join('')}</span></button><span class="attribute__tooltip" id="attribute-${i}" role="tooltip">${esc(a.description)} Autoavaliação ilustrativa; não representa certificação de proficiência.</span></li>`).join('');
- const about=section('sobre','01 · Selecione seu personagem',`<div class="about"><figure class="about__portrait"><img src="${p.photo}" alt="Retrato de André Luis Suckow em pixel art" width="512" height="512"><figcaption class="pixel">P1 · ANDRÉ LUIS SUCKOW</figcaption>${certification.portrait(p)}</figure><div class="about__sheet"><dl class="sheet">${[['Nome',p.name],['Classe',p.roleLong],['Contato',p.email],['Cidade',p.location],['Status',p.availability]].map(([k,v])=>`<div><dt>${k}</dt><dd>${k==='Contato'?`<a href="mailto:${p.email}" data-tv="sobre/email">${p.email}</a>`:esc(v)}</dd></div>`).join('')}</dl>${p.bio.map(x=>`<p class="about__bio">${esc(x)}</p>`).join('')}<h3 class="about__h3">Missão atual</h3><p class="about__mission">${esc(p.mission)}</p><h3 class="about__h3">Atributos</h3><ul class="stats" role="list">${stats}</ul><p class="attribute-note">Autoavaliações ilustrativas, sem certificação de proficiência. Passe o mouse, toque ou use Tab para conhecer cada um.</p><div class="about__actions">${download}${linkedin}${whatsapp('Conversar pelo WhatsApp','sobre/whatsapp')}</div></div></div>`);
- const experience=section('experiencia','02 · Trajetória profissional',`<div class="xp"><p class="xp__label pixel">Frontend e produto · Jornada desde 2013</p><div class="xp__bar"><span class="xp__fill"></span></div></div><ol class="map" role="list">${p.experience.map((x,i)=>`<li class="phase" data-tv-select="experiencia/${i}"><span class="phase__node" aria-hidden="true">${i+1}</span><article class="phase__card"><p class="phase__meta pixel">${x.phase} · ${x.title}</p><h3>${esc(x.role)}</h3><div class="phase__company"><p class="phase__org">${esc(x.org)}</p>${x.logo?`<img class="company-logo" src="${x.logo}" alt="Logo de ${esc(x.org)}" width="110" height="52">`:``}</div><p class="phase__period">${esc(x.period)}</p>${x.workMode?`<p class="muted">${esc(x.location)} · ${esc(x.workMode)}</p>`:``}<ul>${x.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>${x.invitation?whatsapp('Vamos conversar'):''}</article></li>`).join('')}</ol>`);
- const projects=section('projetos','03 · Frontend na prática',`<p class="muted">Cada fita é um projeto. Selecione para ver a entrega, explorar as imagens e acessar a demonstração ou o código.</p><div class="resume-projects">${p.projects.map(x=>`<article class="resume-project"><button type="button" data-action="insert" data-cart="${x.slug}" data-tv="projetos/insert/${x.slug}" class="resume-cart" style="--shell:${x.shellColor};--band:${x.labelColor}" aria-label="Inserir cartucho ${x.cartTitle}"><span class="cart"><span class="cart__label"><img src="${x.labelArt}" alt="${x.labelAlt||x.screenshot?.alt||x.cartTitle}"><span class="cart__title">${x.cartTitle}</span><span class="cart__badge">AS-16</span></span><span class="cart__grip cart__grip--l"></span><span class="cart__grip cart__grip--r"></span></span></button><div><p class="eyebrow">${x.statusLabel}</p><h3>${x.title}</h3><p class="muted">${x.subtitle}</p>${x.screenshot?`<img class="project-site-image" src="${x.screenshot.src}" alt="${x.screenshot.alt}" width="${x.screenshot.width}" height="${x.screenshot.height}">`:''}<p>${x.summary}</p><div class="resume-tags">${x.stack.map(s=>`<span>${s}</span>`).join('')}</div><div class="project-actions">${x.demoUrl?`<a class="btn" href="${x.demoUrl}" target="_blank" rel="noopener" data-tv="projetos/demo/${x.slug}">Ver projeto online ↗</a>`:''}${x.repoUrl?`<a class="btn" href="${x.repoUrl}" target="_blank" rel="noopener" data-tv="projetos/code/${x.slug}">Ver código no GitHub ↗</a>`:''}<a class="btn" href="/cases/${x.slug}/" data-tv="projetos/case/${x.slug}">Conhecer projeto</a></div></div></article>`).join('')}<article class="resume-project"><button type="button" data-action="insert" data-cart="${p.projectInvitation.slug}" data-tv="projetos/insert/${p.projectInvitation.slug}" class="resume-cart" style="--shell:${p.projectInvitation.shellColor};--band:${p.projectInvitation.labelColor}" aria-label="${esc(p.projectInvitation.title)}"><span class="cart"><span class="cart__label"><span class="cart__title">${esc(p.projectInvitation.cartTitle)}</span><span class="cart__badge">AS-16</span></span><span class="cart__grip cart__grip--l"></span><span class="cart__grip cart__grip--r"></span></span></button><div><p class="eyebrow">Nosso próximo projeto</p><h3>${esc(p.projectInvitation.title)}</h3><p>${esc(p.projectInvitation.summary)}</p><button type="button" class="btn btn--primary" data-action="open-contact" data-tv="projetos/contact">Vamos conversar</button></div></article></div><button class="btn only-3d" type="button" data-action="eject" data-tv="projetos/eject">Ejetar cartucho</button>`);
- const skills=section('skills','04 · Desenvolvimento, qualidade e integrações',`<div class="resume-skills">${p.skills.map((b,i)=>`<article><h3>${b.name}</h3><ul role="list">${b.skills.map((s,j)=>`<li><button type="button" class="skill-item" data-tv="skills/${i}/${j}" data-tv-select="skills/${i}/${j}" data-note="${esc(s.note||`Conheça minha atuação em ${s.name}.`)}" aria-haspopup="dialog" aria-controls="skill-dialog">${s.name}</button></li>`).join('')}</ul></article>`).join('')}</div><p class="skill-description" role="status">Selecione uma habilidade para conhecer minha atuação.</p><h3 class="about__h3">Habilidades técnicas e ferramentas</h3><div class="resume-skills">${p.tools.map(group=>`<article><h4>${esc(group.name)}</h4><p>${group.items.map(esc).join(" · ")}</p></article>`).join("")}</div>${certification.card(p)}<h3 class="about__h3">Conquistas</h3><div class="resume-achievements">${p.achievements.filter(a=>a.id!=='ads').map(a=>`<article><h4>${a.title}</h4><p>${a.text}</p></article>`).join('')}</div>`);
- const hobbies=section('hobbies','05 · Além do trabalho',`<p class="muted">O que faz parte de quem sou, fora da jornada profissional.</p><div class="hobbies-grid">${p.hobbies.map((h,i)=>`<article><canvas class="hobby-pixel-icon" width="72" height="72" data-hobby-icon="${h.icon}" aria-hidden="true"></canvas><h3>${h.title}</h3><p>${h.text}</p>${h.url?`<a class="btn" href="${h.url}" target="_blank" rel="noopener" data-tv="hobbies/church">${h.action} ↗</a>`:''}</article>`).join('')}</div><div class="poster-gallery only-2d" aria-label="Jogos dos p&#244;steres">${posterGames.map(game=>`<button type="button" data-room-inspect="${game.id}" aria-haspopup="dialog" aria-controls="games-notebook"><img src="${game.image}" alt="" loading="lazy"><span>${esc(game.title)}<small>Ver p&#244;ster e jogar</small></span></button>`).join('')}</div>`);
- const contacts=[{id:'email',name:'E-mail',value:p.email,url:`mailto:${p.email}`},{id:'linkedin',name:'Contrate-me · LinkedIn',value:'Conheça meu perfil profissional',url:p.linkedin},{id:'github',name:'WhatsApp',value:p.phone,url:p.whatsapp},{id:'mensagem',name:'Enviar mensagem',value:'Enviar diretamente pelo formulário'},{id:'cv',name:'Currículo',value:'Baixar currículo completo · PDF',url:p.cvPdf}];
- const contact=section('contato','06 · Vamos construir a próxima jornada',`<div class="contact"><div class="contact__intro"><h3>VAMOS CONVERSAR?</h3><p class="muted">Sua companhia pode ser o próximo capítulo. Vamos falar sobre React, interfaces acessíveis e qualidade web?</p></div><ol class="resume-slots" role="list">${contacts.map((c,i)=>`<li>${c.url?`<a href="${c.url}" ${c.id==='cv'?'download':''} ${['linkedin','github'].includes(c.id)?'target="_blank" rel="noopener"':''} ${c.id==='github'?'data-whatsapp':''}`:'<button type="button" data-action="open-contact"'} class="slot" ${c.id==='email'?`data-copy-email="${esc(p.email)}" aria-label="Copiar e-mail ${esc(p.email)}"`:``} data-tv="contato/${c.id}"><span class="slot__n pixel">SLOT ${i+1}</span><span class="slot__text"><strong>${c.name}</strong><span>${esc(c.value)}</span></span>${c.url?'</a>':'</button>'}</li>`).join('')}</ol></div>`);
- return {about,experience,projects,skills,hobbies,contact,download,linkedin,whatsapp};
+const esc = (s) =>
+  String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+const certification = require('./certification.cjs');
+const posterGames = require('./poster-games.json');
+exports.sections = (p) => {
+  const nav = [
+    ['sobre', 'Sobre'],
+    ['experiencia', 'Experiência'],
+    ['projetos', 'Projetos'],
+    ['skills', 'Skills'],
+    ['hobbies', 'Tempo livre'],
+    ['contato', 'Contato'],
+  ];
+  const section = (id, subtitle, body) =>
+    `<section id="${id}" class="chapter tab" data-chapter="${id}" data-tab="${id}" aria-labelledby="${id}-title"><div class="tab__inner container"><header class="tab__head"><p class="eyebrow">${subtitle}</p><h2 id="${id}-title">${nav.find((n) => n[0] === id)[1]}</h2></header>${body}</div></section>`;
+  const whatsapp = (label, id) =>
+    `<a class="btn" href="${p.whatsapp}" data-whatsapp ${id ? `data-tv="${id}"` : ''} target="_blank" rel="noopener">${label}</a>`;
+  const download = `<a class="btn btn--primary" href="${p.cvPdf}" download data-tv="sobre/cv">↓ Baixar currículo</a>`;
+  const linkedin = `<a class="btn" href="${p.linkedin}" target="_blank" rel="noopener" data-tv="sobre/ficha">Contrate-me · LinkedIn ↗</a>`;
+  const stats = p.stats
+    .map(
+      (a, i) =>
+        `<li class="attribute"><button type="button" class="attribute__trigger" data-tv="sobre/attribute/${i}" aria-describedby="attribute-${i}"><span class="stats__label">${esc(a.label)}</span><span class="stats__bar" role="img" aria-label="${a.value} de 5, autoavaliação ilustrativa">${Array.from({ length: 5 }, (_, n) => `<span class="stats__pip ${n < a.value ? 'is-on' : ''}"></span>`).join('')}</span></button><span class="attribute__tooltip" id="attribute-${i}" role="tooltip">${esc(a.description)} Autoavaliação ilustrativa; não representa certificação de proficiência.</span></li>`,
+    )
+    .join('');
+  const about = section(
+    'sobre',
+    '01 · Selecione seu personagem',
+    `<div class="about"><figure class="about__portrait"><img src="${p.photo}" alt="Retrato de André Luis Suckow em pixel art" width="512" height="512"><figcaption class="pixel">P1 · ANDRÉ LUIS SUCKOW</figcaption>${certification.portrait(p)}</figure><div class="about__sheet"><dl class="sheet">${[
+      ['Nome', p.name],
+      ['Classe', p.roleLong],
+      ['Contato', p.email],
+      ['Cidade', p.location],
+      ['Status', p.availability],
+    ]
+      .map(
+        ([k, v]) =>
+          `<div><dt>${k}</dt><dd>${k === 'Contato' ? `<a href="mailto:${p.email}" data-tv="sobre/email">${p.email}</a>` : esc(v)}</dd></div>`,
+      )
+      .join(
+        '',
+      )}</dl>${p.bio.map((x) => `<p class="about__bio">${esc(x)}</p>`).join('')}<h3 class="about__h3">Missão atual</h3><p class="about__mission">${esc(p.mission)}</p><h3 class="about__h3">Atributos</h3><ul class="stats" role="list">${stats}</ul><p class="attribute-note">Autoavaliações ilustrativas, sem certificação de proficiência. Passe o mouse, toque ou use Tab para conhecer cada um.</p><div class="about__actions">${download}${linkedin}${whatsapp('Conversar pelo WhatsApp', 'sobre/whatsapp')}</div></div></div>`,
+  );
+  const experience = section(
+    'experiencia',
+    '02 · Trajetória profissional',
+    `<div class="xp"><p class="xp__label pixel">Frontend e produto · Jornada desde 2013</p><div class="xp__bar"><span class="xp__fill"></span></div></div><ol class="map" role="list">${p.experience.map((x, i) => `<li class="phase" data-tv-select="experiencia/${i}"><span class="phase__node" aria-hidden="true">${i + 1}</span><article class="phase__card"><p class="phase__meta pixel">${x.phase} · ${x.title}</p><h3>${esc(x.role)}</h3><div class="phase__company"><p class="phase__org">${esc(x.org)}</p>${x.logo ? `<img class="company-logo" src="${x.logo}" alt="Logo de ${esc(x.org)}" width="110" height="52">` : ``}</div><p class="phase__period">${esc(x.period)}</p>${x.workMode ? `<p class="muted">${esc(x.location)} · ${esc(x.workMode)}</p>` : ``}<ul>${x.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>${x.invitation ? whatsapp('Vamos conversar') : ''}</article></li>`).join('')}</ol>`,
+  );
+  const projects = section(
+    'projetos',
+    '03 · Frontend na prática',
+    `<p class="muted">Cada fita é um projeto. Selecione para ver a entrega, explorar as imagens e acessar a demonstração ou o código.</p><div class="resume-projects">${p.projects.map((x) => `<article class="resume-project"><button type="button" data-action="insert" data-cart="${x.slug}" data-tv="projetos/insert/${x.slug}" class="resume-cart" style="--shell:${x.shellColor};--band:${x.labelColor}" aria-label="Inserir cartucho ${x.cartTitle}"><span class="cart"><span class="cart__label"><img src="${x.labelArt}" alt="${x.labelAlt || x.screenshot?.alt || x.cartTitle}"><span class="cart__title">${x.cartTitle}</span><span class="cart__badge">AS-16</span></span><span class="cart__grip cart__grip--l"></span><span class="cart__grip cart__grip--r"></span></span></button><div><p class="eyebrow">${x.statusLabel}</p><h3>${x.title}</h3><p class="muted">${x.subtitle}</p>${x.screenshot ? `<img class="project-site-image" src="${x.screenshot.src}" alt="${x.screenshot.alt}" width="${x.screenshot.width}" height="${x.screenshot.height}">` : ''}<p>${x.summary}</p><div class="resume-tags">${x.stack.map((s) => `<span>${s}</span>`).join('')}</div><div class="project-actions">${x.demoUrl ? `<a class="btn" href="${x.demoUrl}" target="_blank" rel="noopener" data-tv="projetos/demo/${x.slug}">Ver projeto online ↗</a>` : ''}${x.repoUrl ? `<a class="btn" href="${x.repoUrl}" target="_blank" rel="noopener" data-tv="projetos/code/${x.slug}">Ver código no GitHub ↗</a>` : ''}<a class="btn" href="/cases/${x.slug}/" data-tv="projetos/case/${x.slug}">Conhecer projeto</a></div></div></article>`).join('')}<article class="resume-project"><button type="button" data-action="insert" data-cart="${p.projectInvitation.slug}" data-tv="projetos/insert/${p.projectInvitation.slug}" class="resume-cart" style="--shell:${p.projectInvitation.shellColor};--band:${p.projectInvitation.labelColor}" aria-label="${esc(p.projectInvitation.title)}"><span class="cart"><span class="cart__label"><span class="cart__title">${esc(p.projectInvitation.cartTitle)}</span><span class="cart__badge">AS-16</span></span><span class="cart__grip cart__grip--l"></span><span class="cart__grip cart__grip--r"></span></span></button><div><p class="eyebrow">Nosso próximo projeto</p><h3>${esc(p.projectInvitation.title)}</h3><p>${esc(p.projectInvitation.summary)}</p><button type="button" class="btn btn--primary" data-action="open-contact" data-tv="projetos/contact">Vamos conversar</button></div></article></div><button class="btn only-3d" type="button" data-action="eject" data-tv="projetos/eject">Ejetar cartucho</button>`,
+  );
+  const skills = section(
+    'skills',
+    '04 · Desenvolvimento, qualidade e integrações',
+    `<div class="resume-skills">${p.skills.map((b, i) => `<article><h3>${b.name}</h3><ul role="list">${b.skills.map((s, j) => `<li><button type="button" class="skill-item" data-tv="skills/${i}/${j}" data-tv-select="skills/${i}/${j}" data-note="${esc(s.note || `Conheça minha atuação em ${s.name}.`)}" aria-haspopup="dialog" aria-controls="skill-dialog">${s.name}</button></li>`).join('')}</ul></article>`).join('')}</div><p class="skill-description" role="status">Selecione uma habilidade para conhecer minha atuação.</p><h3 class="about__h3">Habilidades técnicas e ferramentas</h3><div class="resume-skills">${p.tools.map((group) => `<article><h4>${esc(group.name)}</h4><p>${group.items.map(esc).join(' · ')}</p></article>`).join('')}</div>${certification.card(p)}<h3 class="about__h3">Conquistas</h3><div class="resume-achievements">${p.achievements
+      .filter((a) => a.id !== 'ads')
+      .map((a) => `<article><h4>${a.title}</h4><p>${a.text}</p></article>`)
+      .join('')}</div>`,
+  );
+  const hobbies = section(
+    'hobbies',
+    '05 · Além do trabalho',
+    `<p class="muted">O que faz parte de quem sou, fora da jornada profissional.</p><div class="hobbies-grid">${p.hobbies.map((h, i) => `<article><canvas class="hobby-pixel-icon" width="72" height="72" data-hobby-icon="${h.icon}" aria-hidden="true"></canvas><h3>${h.title}</h3><p>${h.text}</p>${h.url ? `<a class="btn" href="${h.url}" target="_blank" rel="noopener" data-tv="hobbies/church">${h.action} ↗</a>` : ''}</article>`).join('')}</div><div class="poster-gallery only-2d" aria-label="Jogos dos p&#244;steres">${posterGames.map((game) => `<button type="button" data-room-inspect="${game.id}" aria-haspopup="dialog" aria-controls="games-notebook"><img src="${game.image}" alt="" loading="lazy"><span>${esc(game.title)}<small>Ver p&#244;ster e jogar</small></span></button>`).join('')}</div>`,
+  );
+  const contacts = [
+    { id: 'email', name: 'E-mail', value: p.email, url: `mailto:${p.email}` },
+    {
+      id: 'linkedin',
+      name: 'Contrate-me · LinkedIn',
+      value: 'Conheça meu perfil profissional',
+      url: p.linkedin,
+    },
+    { id: 'github', name: 'WhatsApp', value: p.phone, url: p.whatsapp },
+    { id: 'mensagem', name: 'Enviar mensagem', value: 'Enviar diretamente pelo formulário' },
+    { id: 'cv', name: 'Currículo', value: 'Baixar currículo completo · PDF', url: p.cvPdf },
+  ];
+  const contact = section(
+    'contato',
+    '06 · Vamos construir a próxima jornada',
+    `<div class="contact"><div class="contact__intro"><h3>VAMOS CONVERSAR?</h3><p class="muted">Sua companhia pode ser o próximo capítulo. Vamos falar sobre React, interfaces acessíveis e qualidade web?</p></div><ol class="resume-slots" role="list">${contacts.map((c, i) => `<li>${c.url ? `<a href="${c.url}" ${c.id === 'cv' ? 'download' : ''} ${['linkedin', 'github'].includes(c.id) ? 'target="_blank" rel="noopener"' : ''} ${c.id === 'github' ? 'data-whatsapp' : ''}` : '<button type="button" data-action="open-contact"'} class="slot" ${c.id === 'email' ? `data-copy-email="${esc(p.email)}" aria-label="Copiar e-mail ${esc(p.email)}"` : ``} data-tv="contato/${c.id}"><span class="slot__n pixel">SLOT ${i + 1}</span><span class="slot__text"><strong>${c.name}</strong><span>${esc(c.value)}</span></span>${c.url ? '</a>' : '</button>'}</li>`).join('')}</ol></div>`,
+  );
+  return { about, experience, projects, skills, hobbies, contact, download, linkedin, whatsapp };
 };
 
-exports.decorate=(html,p)=>{
- html=html.replace('<footer class="skill-modal__footer">',certification.reward(p)+'<footer class="skill-modal__footer">');
- html=html.replace(/<dialog id="contact-dialog"[\s\S]*?<\/dialog>/,`<dialog id="contact-dialog" class="dialog contact-modal" aria-labelledby="contact-dialog-title" aria-describedby="contact-note" data-lenis-prevent><form method="post" action="https://formsubmit.co/andre.suckow.dev@gmail.com" class="dialog__form" novalidate><header class="dialog__head"><p class="eyebrow">Save game · slot 4</p><h2 id="contact-dialog-title">Deixe sua mensagem</h2><button class="dialog__close" type="button" data-close aria-label="Fechar"><span aria-hidden="true">×</span></button></header><label class="field" for="contact-name"><span>Seu nome</span><input id="contact-name" name="name" autocomplete="name" required maxlength="80" aria-describedby="contact-name-error"><span class="field__error" id="contact-name-error"></span></label><label class="field" for="contact-email"><span>Seu e-mail</span><input id="contact-email" name="email" type="email" autocomplete="email" required maxlength="120" aria-describedby="contact-email-error"><span class="field__error" id="contact-email-error"></span></label><label class="field" for="contact-message"><span>Mensagem</span><textarea id="contact-message" name="message" rows="5" required maxlength="2000" aria-describedby="contact-message-error"></textarea><span class="field__error" id="contact-message-error"></span></label><label class="contact-honeypot" aria-hidden="true">Website<input name="website" autocomplete="off" tabindex="-1"></label><p class="dialog__status" role="status" aria-live="polite"></p><div class="dialog__actions"><button class="btn btn--primary" type="submit">Enviar mensagem</button><button class="btn btn--ghost" type="button" data-close>Cancelar</button></div><p id="contact-note" class="dialog__note muted">Sua mensagem será enviada diretamente para André.</p><p class="contact-alternatives"><a href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">Falar pelo WhatsApp</a> · <a href="mailto:${p.email}">E-mail de contato</a></p></form></dialog>`);
- html=html.replace(/(<p class="hero__role">)[\s\S]*?(<\/p>)/,`$1${p.role}$2`);
- html=html.replace(/<div class="hero__actions[^\"]*">[\s\S]*?<\/div>/,`<div class="hero__actions interactive"><a class="btn btn--primary" href="${p.cvPdf}" download>↓ Baixar currículo</a><a class="btn" href="${p.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a><a class="btn" href="${p.github}" target="_blank" rel="noopener">GitHub ↗</a><a class="btn" href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">WhatsApp ↗</a></div>`);
- html=html.replace(/<div class="dock__ab">[\s\S]*?<\/div>/,'');
- html=html.replace('data-hud-index>01</span>/05','data-hud-index>01</span>/06');
- html=html.replace(/(<nav class="site-nav"[^>]*>)[\s\S]*?(<\/nav>)/,(_,start,end)=>start+'<ul role="list">'+[['sobre','Sobre'],['experiencia','Experi\u00eancia'],['projetos','Projetos'],['skills','Skills'],['hobbies','Tempo livre'],['contato','Contato']].map(([id,label])=>'<li><a href="#'+id+'" data-nav-tab="'+id+'">'+label+'</a></li>').join('')+'</ul>'+end);
- // The secondary nav is regenerated to keep both mode variants in the same order.
- html=html.replace(/(<nav class="game-nav"[^>]*>)[\s\S]*?(<\/nav>)/,(_,start,end)=>`${start}<ul class="container" role="list">${[['sobre','Sobre'],['experiencia','Experiência'],['projetos','Projetos'],['skills','Skills'],['hobbies','Tempo livre'],['contato','Contato']].map(([id,label],i)=>`<li><a href="#${id}" data-nav-tab="${id}"><span class="game-nav__n">0${i+1}</span>${label}</a></li>`).join('')}</ul>${end}`);
- // One visible Continue counter, owned by the final section in both modes.
- html=html.replace(/<section id="fim"[\s\S]*?<\/section>/,`<section id="fim" class="chapter chapter--outro" data-chapter="outro" aria-labelledby="fim-title"><footer class="outro interactive"><div class="container outro__inner"><p class="eyebrow">O próximo capítulo pode ser na sua companhia</p><h2 id="fim-title" class="outro__title">Continue? <span id="continue-count" aria-live="off">9</span></h2><p class="outro__text muted">Uma nova chance de construir interfaces que fazem diferença para quem usa.</p><div class="outro__links"><a class="btn btn--primary" href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">Contrate agora · WhatsApp</a><button type="button" class="btn" data-reload>Reiniciar</button></div><div class="outro__meta"><p>© 2026 ${p.name} · Desenvolvimento Frontend</p></div></div></footer></section>`);
- const dialog=`<dialog id="game-over-dialog" class="dialog skill-modal" aria-labelledby="game-over-title" aria-describedby="game-over-description" data-lenis-prevent><div class="dialog__form"><header class="dialog__head"><div><p class="eyebrow">Uma nova chance</p><h2 id="game-over-title" tabindex="-1">GAME OVER</h2></div></header><p id="game-over-description">Você acabou de perder o melhor profissional da sua equipe.<br><span>Mas calma, ainda há uma segunda chance logo abaixo.</span></p><div class="game-over-actions"><a class="btn btn--primary" href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">Contrate agora · WhatsApp</a><button type="button" class="btn" data-reload>Reiniciar do início</button></div><button class="btn btn--ghost game-over-close" type="button" data-game-over-close>Fechar</button></div></dialog>`;
- return html.replace('</body>',`${dialog}<script type="module" src="/cs-interactions.js"></script><script type="module" src="/contact-form.js"></script><script type="module" src="/mobile-reading.js"></script><script type="module" src="/hobby-icons.js?v=cs-mode-3"></script><script type="module" src="/audio-controller.js?v=cs-mode-3"></script></body>`);
+exports.decorate = (html, p) => {
+  html = html.replace(
+    '<footer class="skill-modal__footer">',
+    certification.reward(p) + '<footer class="skill-modal__footer">',
+  );
+  html = html.replace(
+    /<dialog id="contact-dialog"[\s\S]*?<\/dialog>/,
+    `<dialog id="contact-dialog" class="dialog contact-modal" aria-labelledby="contact-dialog-title" aria-describedby="contact-note" data-lenis-prevent><form method="post" action="https://formsubmit.co/andre.suckow.dev@gmail.com" class="dialog__form" novalidate><header class="dialog__head"><p class="eyebrow">Save game · slot 4</p><h2 id="contact-dialog-title">Deixe sua mensagem</h2><button class="dialog__close" type="button" data-close aria-label="Fechar"><span aria-hidden="true">×</span></button></header><label class="field" for="contact-name"><span>Seu nome</span><input id="contact-name" name="name" autocomplete="name" required maxlength="80" aria-describedby="contact-name-error"><span class="field__error" id="contact-name-error"></span></label><label class="field" for="contact-email"><span>Seu e-mail</span><input id="contact-email" name="email" type="email" autocomplete="email" required maxlength="120" aria-describedby="contact-email-error"><span class="field__error" id="contact-email-error"></span></label><label class="field" for="contact-message"><span>Mensagem</span><textarea id="contact-message" name="message" rows="5" required maxlength="2000" aria-describedby="contact-message-error"></textarea><span class="field__error" id="contact-message-error"></span></label><label class="contact-honeypot" aria-hidden="true">Website<input name="website" autocomplete="off" tabindex="-1"></label><p class="dialog__status" role="status" aria-live="polite"></p><div class="dialog__actions"><button class="btn btn--primary" type="submit">Enviar mensagem</button><button class="btn btn--ghost" type="button" data-close>Cancelar</button></div><p id="contact-note" class="dialog__note muted">Sua mensagem será enviada diretamente para André.</p><p class="contact-alternatives"><a href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">Falar pelo WhatsApp</a> · <a href="mailto:${p.email}">E-mail de contato</a></p></form></dialog>`,
+  );
+  html = html.replace(/(<p class="hero__role">)[\s\S]*?(<\/p>)/, `$1${p.role}$2`);
+  html = html.replace(
+    /<div class="hero__actions[^\"]*">[\s\S]*?<\/div>/,
+    `<div class="hero__actions interactive"><a class="btn btn--primary" href="${p.cvPdf}" download>↓ Baixar currículo</a><a class="btn" href="${p.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a><a class="btn" href="${p.github}" target="_blank" rel="noopener">GitHub ↗</a><a class="btn" href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">WhatsApp ↗</a></div>`,
+  );
+  html = html.replace(/<div class="dock__ab">[\s\S]*?<\/div>/, '');
+  html = html.replace('data-hud-index>01</span>/05', 'data-hud-index>01</span>/06');
+  html = html.replace(
+    /(<nav class="site-nav"[^>]*>)[\s\S]*?(<\/nav>)/,
+    (_, start, end) =>
+      start +
+      '<ul role="list">' +
+      [
+        ['sobre', 'Sobre'],
+        ['experiencia', 'Experi\u00eancia'],
+        ['projetos', 'Projetos'],
+        ['skills', 'Skills'],
+        ['hobbies', 'Tempo livre'],
+        ['contato', 'Contato'],
+      ]
+        .map(
+          ([id, label]) =>
+            '<li><a href="#' + id + '" data-nav-tab="' + id + '">' + label + '</a></li>',
+        )
+        .join('') +
+      '</ul>' +
+      end,
+  );
+  // The secondary nav is regenerated to keep both mode variants in the same order.
+  html = html.replace(
+    /(<nav class="game-nav"[^>]*>)[\s\S]*?(<\/nav>)/,
+    (_, start, end) =>
+      `${start}<ul class="container" role="list">${[
+        ['sobre', 'Sobre'],
+        ['experiencia', 'Experiência'],
+        ['projetos', 'Projetos'],
+        ['skills', 'Skills'],
+        ['hobbies', 'Tempo livre'],
+        ['contato', 'Contato'],
+      ]
+        .map(
+          ([id, label], i) =>
+            `<li><a href="#${id}" data-nav-tab="${id}"><span class="game-nav__n">0${i + 1}</span>${label}</a></li>`,
+        )
+        .join('')}</ul>${end}`,
+  );
+  // One visible Continue counter, owned by the final section in both modes.
+  html = html.replace(
+    /<section id="fim"[\s\S]*?<\/section>/,
+    `<section id="fim" class="chapter chapter--outro" data-chapter="outro" aria-labelledby="fim-title"><footer class="outro interactive"><div class="container outro__inner"><p class="eyebrow">O próximo capítulo pode ser na sua companhia</p><h2 id="fim-title" class="outro__title">Continue? <span id="continue-count" aria-live="off">9</span></h2><p class="outro__text muted">Uma nova chance de construir interfaces que fazem diferença para quem usa.</p><div class="outro__links"><a class="btn btn--primary" href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">Contrate agora · WhatsApp</a><button type="button" class="btn" data-reload>Reiniciar</button></div><div class="outro__meta"><p>© 2026 ${p.name} · Desenvolvimento Frontend</p></div></div></footer></section>`,
+  );
+  const dialog = `<dialog id="game-over-dialog" class="dialog skill-modal" aria-labelledby="game-over-title" aria-describedby="game-over-description" data-lenis-prevent><div class="dialog__form"><header class="dialog__head"><div><p class="eyebrow">Uma nova chance</p><h2 id="game-over-title" tabindex="-1">GAME OVER</h2></div></header><p id="game-over-description">Você acabou de perder o melhor profissional da sua equipe.<br><span>Mas calma, ainda há uma segunda chance logo abaixo.</span></p><div class="game-over-actions"><a class="btn btn--primary" href="${p.whatsapp}" data-whatsapp target="_blank" rel="noopener">Contrate agora · WhatsApp</a><button type="button" class="btn" data-reload>Reiniciar do início</button></div><button class="btn btn--ghost game-over-close" type="button" data-game-over-close>Fechar</button></div></dialog>`;
+  return html.replace(
+    '</body>',
+    `${dialog}<script type="module" src="/cs-interactions.js"></script><script type="module" src="/contact-form.js"></script><script type="module" src="/mobile-reading.js"></script><script type="module" src="/hobby-icons.js?v=cs-mode-3"></script><script type="module" src="/audio-controller.js?v=cs-mode-3"></script></body>`,
+  );
 };
-

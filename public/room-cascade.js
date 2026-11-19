@@ -3,6 +3,7 @@ import {createInteractionCascade,automaticInteractionShake} from './interaction-
 export function createRoomCascade(T,{doc=document}={}){
  const {room,equipment,carts,camera,canvas,pick,Box3,Vector3,isAvailable}=T;
  const ray=new T.Raycaster(),occluders=[];
+ // Occluders come from the authored room; the cascade skips objects hidden by real geometry.
  T.scene.traverseVisible(object=>{if(object.isMesh&&!object.userData.interactionCue)occluders.push(object);});
  const cartItems=carts.carts.map(cart=>({key:'cart/'+cart.slug,root:cart.root,cart}));
  const items=[...cartItems,...(room?.interactionObjects()||[]),...equipment.objects().filter(item=>item.key!=='tv'&&!item.key.startsWith('cart/'))];
@@ -13,6 +14,7 @@ export function createRoomCascade(T,{doc=document}={}){
  };
  const cascade=createInteractionCascade({items,
   eligible(item){
+   // Preserve the last interaction as the source of truth instead of guessing from the UI.
    if(item.root.userData.drawerOpen)return false;
    if(item.cart&&(carts.busy||item.cart===carts.inserted))return false;
    if(item.key===room?.focused||item.key===equipment.focused)return false;
