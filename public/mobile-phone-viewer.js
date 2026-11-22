@@ -5,7 +5,7 @@ import { CSS3DObject, CSS3DRenderer } from './vendor/three/CSS3DRenderer.js';
 // Keep the supplied model intact; its original face defines the screen placement.
 export async function createPhoneViewer(stage, screenElement, signal) {
   const { scene: model } = await new GLTFLoader().loadAsync(new URL('./models/mobile/scene.gltf', import.meta.url).href);
-  let renderer, observer, css, frame = 0;
+  let renderer, observer, css;
   const screenStyle = screenElement.getAttribute('style');
   const restoreScreen = () => {
     if (screenStyle === null) screenElement.removeAttribute('style');
@@ -67,7 +67,7 @@ export async function createPhoneViewer(stage, screenElement, signal) {
       renderer.render(scene, camera);
       css.render(screenScene, camera);
     };
-    let angle = -10, manual = false, pointer = null, dragged = false;
+    let angle = -10, pointer = null, dragged = false;
     const rotate = degrees => {
       angle = Math.max(-35, Math.min(35, degrees));
       phone.rotation.set(-0.015, angle * Math.PI / 180, 0);
@@ -83,22 +83,9 @@ export async function createPhoneViewer(stage, screenElement, signal) {
       ray.setFromCamera(mouse, camera);
       return ray.intersectObject(phone, true).length > 0;
     };
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const video = screenElement.querySelector('video');
-    const canMove = () => screenElement.dataset.mode === 'video' && !signal.aborted && !document.hidden && video.paused && !manual && !reduced.matches;
-    const animate = time => {
-      frame = 0;
-      if (!canMove()) return;
-      rotate(-10 + Math.sin(time / 1900) * 7);
-      frame = requestAnimationFrame(animate);
-    };
-    const syncMotion = () => {
-      cancelAnimationFrame(frame); frame = 0;
-      if (canMove()) frame = requestAnimationFrame(animate);
-    };
     stage.addEventListener('pointerdown', event => {
       if (event.target !== renderer.domElement || !hitTest(event.clientX, event.clientY)) return;
-      manual = true; syncMotion(); dragged = false;
+      dragged = false;
       pointer = { id: event.pointerId, x: event.clientX, angle };
       renderer.domElement.setPointerCapture(event.pointerId);
     }, { signal });
@@ -113,21 +100,15 @@ export async function createPhoneViewer(stage, screenElement, signal) {
     stage.addEventListener('pointercancel', endDrag, { signal });
     stage.addEventListener('keydown', event => {
       if (event.target !== stage || !['ArrowLeft', 'ArrowRight', 'Home'].includes(event.key)) return;
-      event.preventDefault(); manual = true; syncMotion();
+      event.preventDefault();
       rotate(event.key === 'Home' ? 0 : angle + (event.key === 'ArrowLeft' ? -5 : 5));
     }, { signal });
-    video.addEventListener('play', () => { syncMotion(); rotate(0); }, { signal });
-    video.addEventListener('pause', syncMotion, { signal });
-    document.addEventListener('visibilitychange', syncMotion, { signal });
-    reduced.addEventListener('change', syncMotion, { signal });
-    rotate(-10); syncMotion();
+    rotate(-10);
     return {
       rotate,
       hitTest,
       consumeDrag() { const moved = dragged; dragged = false; return moved; },
-      syncMotion,
       dispose() {
-        cancelAnimationFrame(frame);
         observer.disconnect();
         stage.append(screenElement);
         restoreScreen();
@@ -140,7 +121,6 @@ export async function createPhoneViewer(stage, screenElement, signal) {
       },
     };
   } catch (error) {
-    cancelAnimationFrame(frame);
     observer?.disconnect();
     stage.append(screenElement);
     restoreScreen();

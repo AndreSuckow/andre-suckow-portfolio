@@ -8,9 +8,10 @@ const esc = (s) =>
 const certification = require('./certification.cjs');
 const posterGames = require('./poster-games.json');
 const projectDemoActions = (project) => {
+  if (!project.demoUrl) return '';
   const online = `<a class="btn" href="${esc(project.demoUrl)}" target="_blank" rel="noopener" data-tv="projetos/demo/${project.slug}"><span>Ver projeto<span class="project-demo-break"> online</span></span></a>`;
-  if (!project.mobileVideo) return online;
-  return `<div class="project-demo-actions" role="group" aria-label="Demonstrações do projeto">${online}<button type="button" class="btn" data-mobile-preview="${esc(project.mobileVideo)}" data-mobile-demo="${esc(project.demoUrl)}" data-project-title="${esc(project.cartTitle)}" data-tv="projetos/mobile/${project.slug}" aria-haspopup="dialog"><span>Ver no<span class="project-demo-break"> celular</span></span></button></div>`;
+  if (project.mobilePreview === false) return online;
+  return `<div class="project-demo-actions" role="group" aria-label="Demonstrações do projeto">${online}<button type="button" class="btn" data-mobile-preview data-mobile-demo="${esc(project.demoUrl)}" data-project-title="${esc(project.cartTitle)}" data-tv="projetos/mobile/${project.slug}" aria-haspopup="dialog"><span>Ver no<span class="project-demo-break"> celular</span></span></button></div>`;
 };
 exports.sections = (p) => {
   const nav = [

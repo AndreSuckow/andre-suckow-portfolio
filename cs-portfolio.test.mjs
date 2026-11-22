@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { whatsappMessage } from './public/cs-model.js';
 import { createCareerJourney, drawCareerScreen } from './public/career-map.js';
+import { projectDemoButtons } from './public/project-demo-actions.js';
 const html = fs.readFileSync('public/index.html', 'utf8');
 test('project storage puts three cartridges per level on matching shelves', async () => {
   const { projectCartridgeLayout, projectShelves, PROJECT_SHELF } =
@@ -73,6 +74,67 @@ test('project cartridges offer delivery details and only the links supplied for 
     assert(!d.body.textContent.includes('Visitar empresa'));
     dom.window.close();
   }
+});
+
+test('every project with an online demo gets its own mobile iframe preview by default', async () => {
+  const { default: generator } = await import('./cs-portfolio.cjs');
+  const profile = JSON.parse(fs.readFileSync('profile.json', 'utf8')),
+    markup = generator.sections(profile).projects,
+    dom = new JSDOM(markup),
+    buttons = [...dom.window.document.querySelectorAll('[data-mobile-preview]')];
+  assert.equal(buttons.length, profile.projects.filter((project) => project.demoUrl).length);
+  for (const project of profile.projects.filter((entry) => entry.demoUrl)) {
+    const button = dom.window.document.querySelector(`[data-tv="projetos/mobile/${project.slug}"]`);
+    assert(button);
+    assert.equal(button.dataset.mobileDemo, project.demoUrl);
+    assert.equal(button.dataset.projectTitle, project.cartTitle);
+  }
+  assert(!markup.includes('boxlyne.webm'));
+
+  const future = {
+      ...profile.projects[0],
+      slug: 'future-project',
+      cartTitle: 'FUTURE PROJECT',
+      demoUrl: 'https://future.example/',
+    },
+    futureDom = new JSDOM(generator.sections({ ...profile, projects: [future] }).projects);
+  assert.equal(
+    futureDom.window.document.querySelector('[data-mobile-preview]').dataset.mobileDemo,
+    future.demoUrl,
+  );
+
+  const disabled = { ...future, mobilePreview: false },
+    disabledDom = new JSDOM(generator.sections({ ...profile, projects: [disabled] }).projects);
+  assert.equal(disabledDom.window.document.querySelector('[data-mobile-preview]'), null);
+  assert.equal(
+    disabledDom.window.document.querySelector('[data-tv="projetos/demo/future-project"]').href,
+    future.demoUrl,
+  );
+  dom.window.close();
+  futureDom.window.close();
+  disabledDom.window.close();
+});
+
+test('3D project cards also show the mobile preview for online demos on desktop', () => {
+  const profile = JSON.parse(fs.readFileSync('profile.json', 'utf8'));
+  for (const project of profile.projects.filter((entry) => entry.demoUrl)) {
+    const [online, mobile] = projectDemoButtons(project, 120, true);
+    assert.equal(online.id, `projetos/demo/${project.slug}`);
+    assert.equal(online.rect.w, 192);
+    assert.equal(mobile.id, `projetos/mobile/${project.slug}`);
+    assert.equal(mobile.rect.w, 192);
+    assert.deepEqual(
+      projectDemoButtons(project, 120, false).map((button) => button.id),
+      [`projetos/demo/${project.slug}`],
+    );
+  }
+  assert.deepEqual(projectDemoButtons({ slug: 'no-demo' }, 120, true), []);
+  assert.deepEqual(
+    projectDemoButtons({ ...profile.projects[0], mobilePreview: false }, 120, true).map(
+      (button) => button.id,
+    ),
+    [`projetos/demo/${profile.projects[0].slug}`],
+  );
 });
 
 test('blank cartridge is a collaboration invitation with contact and eject actions', () => {

@@ -1,7 +1,7 @@
 // Shared canvas geometry for the two actions in the project's TV screen.
 export function projectDemoButtons(project, y, desktop) {
   if (!project.demoUrl) return [];
-  const split = Boolean(project.mobileVideo && desktop);
+  const split = Boolean(project.mobilePreview !== false && desktop);
   const online = { id: `projetos/demo/${project.slug}`, label: 'Ver projeto online', lines: split ? ['VER PROJETO', 'ONLINE'] : ['VER PROJETO ONLINE'], rect: { x: 584, y, w: split ? 192 : 392, h: 48 } };
   return split ? [online, { id: `projetos/mobile/${project.slug}`, label: 'Ver no celular', lines: ['VER NO', 'CELULAR'], rect: { x: 784, y, w: 192, h: 48 } }] : [online];
 }

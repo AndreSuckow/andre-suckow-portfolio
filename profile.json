@@ -364,7 +364,6 @@
       "labelColor": "#1E2329",
       "screenColor": 5,
       "demoUrl": "https://boxlyne.com.br/",
-      "mobileVideo": "/mobile-cases/video/boxlyne.webm",
       "caseHeading": "A entrega",
       "caseStory": "Desenvolvimento do site institucional da BoxLyne, unindo apresentação da marca, informações sobre as embalagens e contato comercial. A experiência inclui caixas em 3D que podem ser giradas, explicação visual da estrutura do papelão e catálogo de medidas com solicitação de orçamento pelo WhatsApp. O site utiliza Next.js e React, com Three.js nas cenas interativas, estilos em CSS e ícones Lucide. Os módulos 3D são carregados sob demanda e a interface inclui navegação para dispositivos móveis."
     },
