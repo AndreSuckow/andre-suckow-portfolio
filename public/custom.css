@@ -3169,6 +3169,28 @@ html[data-mode='3d'] .hero[inert] .interactive * {
     sans-serif;
   pointer-events: none;
 }
+.hud__chapter {
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(420px, calc(100vw - 2 * var(--page-margin) - 24px));
+  padding: 8px 12px;
+  border: 1px solid #ffb54760;
+  background: #10172ad9;
+  color: #ffcd7b;
+  font:
+    12px/1.5 Inter,
+    sans-serif;
+  text-shadow: none;
+}
+.hud__chapter p {
+  margin: 0;
+}
+.hud__chapter .hud__keys {
+  color: #f5f1e8;
+  font:
+    12px/1.5 Inter,
+    sans-serif;
+}
 html[data-mode='3d']:not([data-tv-menu='visible']) .room-interaction-hint,
 html[data-mode='3d'][data-chapter='projetos'] .room-interaction-hint {
   display: block;
