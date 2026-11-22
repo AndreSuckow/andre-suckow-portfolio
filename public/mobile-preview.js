@@ -1,82 +1,179 @@
-// Shared by project pages. Assets load only after opening the dialog.
 const desktop = matchMedia('(hover: hover) and (pointer: fine)');
-let dialog, video, origin, overflow, viewer, controller;
-const status = text => { dialog.querySelector('[role="status"]').textContent = text; };
+let dialog, iframe, video, screen, origin, overflow, viewer, controller, iframeTimer;
+let iframeFailed = false;
+
+function status(text, error = false) {
+  dialog.querySelector('[role="status"]').textContent = text;
+  dialog.dataset.error = String(error);
+}
+
+function showVideo() {
+  if (!video.src) {
+    video.src = video.dataset.source;
+    video.preload = 'auto';
+    video.load();
+  }
+  screen.dataset.mode = 'video';
+  iframe.hidden = true;
+  video.hidden = false;
+  dialog.querySelector('[data-show-video]').hidden = !iframeFailed;
+  dialog.querySelector('[data-show-site]').hidden = false;
+  status('Carregando a gravação da versão mobile.');
+  viewer?.syncMotion();
+}
+
+function showSite() {
+  video.pause();
+  screen.dataset.mode = 'site';
+  iframe.hidden = false;
+  video.hidden = true;
+  dialog.querySelector('[data-show-video]').hidden = true;
+  dialog.querySelector('[data-show-site]').hidden = true;
+  status('Site interativo aberto. Role e clique dentro da tela do celular.');
+  viewer?.syncMotion();
+}
+
 function releasePreview() {
   if (!controller || controller.signal.aborted) return;
+  clearTimeout(iframeTimer);
+  iframeTimer = null;
   controller.abort();
-  viewer?.dispose(); viewer = null;
-  video.pause(); video.removeAttribute('src'); video.load();
+  viewer?.dispose();
+  viewer = null;
+  iframe.removeAttribute('src');
+  iframe.dataset.requested = 'false';
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  screen.dataset.mode = 'site';
+  iframe.hidden = false;
+  video.hidden = true;
+  iframeFailed = false;
+  dialog.querySelector('[data-show-video]').hidden = true;
+  dialog.querySelector('[data-show-site]').hidden = true;
   document.documentElement.style.overflow = overflow;
-  origin?.focus();
+  const returnFocus = origin;
+  requestAnimationFrame(() => {
+    if (dialog.open) return;
+    const target =
+      returnFocus?.isConnected && returnFocus.getClientRects().length
+        ? returnFocus
+        : document.getElementById('stage-canvas');
+    target?.focus({ preventScroll: true });
+  });
+  document.dispatchEvent(new CustomEvent('resume:skill-close'));
 }
+
 function createPreview() {
   dialog = document.createElement('dialog');
   dialog.className = 'mobile-preview';
-  dialog.setAttribute('aria-labelledby', 'mobile-preview-title');
-  dialog.setAttribute('aria-describedby', 'mobile-preview-description');
-  dialog.innerHTML = `<header class="mobile-preview__header"><div><p class="eyebrow">Experiência mobile</p><h2 id="mobile-preview-title"></h2></div><button class="btn" type="button" data-close autofocus>Fechar</button></header>
-    <p id="mobile-preview-description">O projeto na palma da mão. Dê play na tela do celular para assistir à gravação.</p>
-    <div class="mobile-preview__stage" aria-busy="true"><video controls playsinline preload="none" aria-label="Demonstração mobile do projeto"></video></div>
-    <div class="mobile-preview__controls"><label for="mobile-preview-angle">Girar celular</label><input id="mobile-preview-angle" type="range" min="-40" max="40" value="-16" disabled><button class="btn" type="button" data-front disabled>Ver de frente</button><button class="btn" type="button" data-retry hidden>Tentar novamente</button></div>
-    <p class="mobile-preview__status" role="status"></p>
-    <p class="mobile-preview__credit">Modelo: <a href="https://sketchfab.com/3d-models/low-poly-mobile-phone-4ff99cf17b164e7b9790638c5d2ef4ce" target="_blank" rel="noopener">Low Poly Mobile Phone</a>, por k. · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></p>`;
+  dialog.setAttribute('aria-label', 'Demonstração interativa do projeto no celular');
+  dialog.innerHTML = `<button class="mobile-preview__close" type="button" data-close aria-label="Fechar demonstração" autofocus>×</button>
+    <div class="mobile-preview__stage" tabindex="0" role="group" aria-label="Celular 3D. Role e clique no site dentro da tela. Arraste a carcaça ou use as setas para girar." aria-busy="true">
+      <div class="mobile-preview__screen" data-preview-screen data-mode="site">
+        <iframe title="Site do projeto no celular" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <video controls playsinline preload="none" aria-label="Gravação da versão mobile do projeto" hidden></video>
+      </div>
+    </div>
+    <div class="mobile-preview__actions" role="group" aria-label="Opções da demonstração">
+      <button class="btn" type="button" data-show-video hidden>Assistir gravação</button>
+      <button class="btn" type="button" data-show-site hidden>Voltar ao site</button>
+    </div>
+    <div class="mobile-preview__feedback"><p role="status" aria-live="polite"></p><button class="btn" type="button" data-retry hidden>Tentar vídeo novamente</button></div>`;
   document.body.append(dialog);
+  iframe = dialog.querySelector('iframe');
   video = dialog.querySelector('video');
-  const angle = dialog.querySelector('input');
-  angle.addEventListener('input', () => viewer?.rotate(Number(angle.value)));
-  dialog.querySelector('[data-front]').addEventListener('click', () => { angle.value = 0; viewer?.rotate(0); });
+  screen = dialog.querySelector('[data-preview-screen]');
+
   dialog.querySelector('[data-close]').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => {
-    if (!dialog.open) releasePreview();
-  });
-  video.addEventListener('loadeddata', () => { if (dialog.open) status('Pronto. Pressione play para assistir.'); });
-  video.addEventListener('playing', () => status('Reproduzindo a demonstração.'));
-  video.addEventListener('waiting', () => status('Carregando vídeo…'));
-  video.addEventListener('error', () => {
-    if (!dialog.open || !video.hasAttribute('src')) return;
-    status('Não foi possível reproduzir o vídeo. Tente novamente ou acesse o projeto online.');
-    dialog.querySelector('[data-retry]').hidden = false;
-  });
+  dialog.querySelector('[data-show-video]').addEventListener('click', showVideo);
+  dialog.querySelector('[data-show-site]').addEventListener('click', showSite);
   dialog.querySelector('[data-retry]').addEventListener('click', () => {
     dialog.querySelector('[data-retry]').hidden = true;
-    status('Carregando vídeo…'); video.load();
+    status('Tentando carregar a gravação.');
+    video.src = video.dataset.source;
+    video.load();
   });
+  iframe.addEventListener('load', () => {
+    if (!dialog.open || iframe.dataset.requested !== 'true') return;
+    clearTimeout(iframeTimer);
+    if (screen.dataset.mode === 'site')
+      status('Site interativo carregado. Use rolagem e clique na tela do celular.');
+  });
+  iframe.addEventListener('error', () => {
+    if (!dialog.open || screen.dataset.mode !== 'site') return;
+    clearTimeout(iframeTimer);
+    iframeFailed = true;
+    dialog.querySelector('[data-show-video]').hidden = false;
+    status('Não foi possível carregar o site interativo. Você pode assistir à gravação mobile.', true);
+  });
+  video.addEventListener('loadeddata', () => {
+    if (dialog.open && screen.dataset.mode === 'video') status('Gravação pronta. Pressione play para assistir.');
+  });
+  video.addEventListener('playing', () => status('Reproduzindo a gravação.'));
+  video.addEventListener('waiting', () => status('Carregando a gravação…'));
+  video.addEventListener('error', () => {
+    if (!dialog.open || !video.hasAttribute('src')) return;
+    status('Não foi possível reproduzir a gravação.', true);
+    dialog.querySelector('[data-retry]').hidden = false;
+  });
+  dialog.addEventListener('click', event => {
+    if (event.target.closest('button, a, video, iframe, [data-preview-screen]')) return;
+    if (viewer?.consumeDrag()) return;
+    if (!viewer?.hitTest(event.clientX, event.clientY)) dialog.close();
+  });
+  dialog.addEventListener('close', () => { if (!dialog.open) releasePreview(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) video.pause(); });
   desktop.addEventListener('change', () => { if (!desktop.matches && dialog.open) dialog.close(); });
 }
+
 document.addEventListener('click', async event => {
   const button = event.target.closest('[data-mobile-preview]');
-  if (!button || !desktop.matches || dialog?.open) return;
+  if (!button || !desktop.matches || document.querySelector('dialog[open]')) return;
   if (!dialog) createPreview();
   releasePreview();
   origin = button;
-  dialog.querySelector('h2').textContent = button.dataset.projectTitle;
-  const angle = dialog.querySelector('input'), front = dialog.querySelector('[data-front]');
-  angle.value = -16; angle.disabled = front.disabled = true;
+  dialog.setAttribute('aria-label', `Demonstração de ${button.dataset.projectTitle} no celular`);
+  iframe.title = `Site ${button.dataset.projectTitle} em uma tela de celular`;
   dialog.querySelector('[data-retry]').hidden = true;
+  dialog.querySelector('[data-show-video]').hidden = true;
+  dialog.querySelector('[data-show-site]').hidden = true;
   const stage = dialog.querySelector('.mobile-preview__stage');
   stage.setAttribute('aria-busy', 'true');
   delete stage.dataset.fallback;
-  status('Carregando celular e vídeo…');
+  status('Carregando o aparelho e o site em visualização mobile.');
   overflow = document.documentElement.style.overflow;
   document.documentElement.style.overflow = 'hidden';
   controller = new AbortController();
   const signal = controller.signal;
+  video.dataset.source = button.dataset.mobilePreview;
+  video.removeAttribute('src');
+  video.hidden = true;
+  screen.dataset.mode = 'site';
+  iframe.hidden = false;
+  iframe.dataset.requested = 'true';
+  iframeFailed = false;
+  dialog.querySelector('[data-show-video]').hidden = true;
   dialog.showModal();
-  video.src = button.dataset.mobilePreview;
-  video.preload = 'auto'; video.load();
+  document.dispatchEvent(new CustomEvent('resume:skill-open'));
+  iframe.src = button.dataset.mobileDemo;
+  iframeTimer = setTimeout(() => {
+    if (dialog.open && screen.dataset.mode === 'site') {
+      iframeFailed = true;
+      dialog.querySelector('[data-show-video]').hidden = false;
+      status('O site ainda não carregou. Você pode assistir à gravação mobile.', true);
+    }
+  }, 8000);
   try {
     const { createPhoneViewer } = await import('./mobile-phone-viewer.js?v=cs-mode-3');
     if (signal.aborted) return;
-    const nextViewer = await createPhoneViewer(stage, video, signal);
+    const nextViewer = await createPhoneViewer(stage, screen, signal);
     if (signal.aborted) { nextViewer?.dispose(); return; }
     viewer = nextViewer;
-    angle.disabled = front.disabled = false;
   } catch {
     if (signal.aborted) return;
     stage.dataset.fallback = 'true';
-    status('O celular 3D não carregou. Você pode assistir ao vídeo aqui.');
+    status('Não foi possível carregar o celular 3D. O site permanece disponível na visualização mobile.', true);
   } finally {
     if (!signal.aborted) stage.setAttribute('aria-busy', 'false');
   }

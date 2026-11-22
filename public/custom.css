@@ -515,6 +515,10 @@ button {
   border: 1px solid var(--ink-600);
   margin: 18px 0;
 }
+.project-site-image[data-fit='cover'],
+.case-site-image[data-fit='cover'] {
+  object-fit: cover;
+}
 .resume-project .cart__label img {
   filter: none;
 }

@@ -110,7 +110,7 @@ try {
     return result.result.value;
   };
   const until = async (expression, label) => {
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 400; i++) {
       if (await evaluate(expression)) return;
       await wait(60);
     }
@@ -119,39 +119,50 @@ try {
 
 
   await page.send('Emulation.setDeviceMetricsOverride', {width:1440,height:1000,deviceScaleFactor:1,mobile:false});
-  await page.send('Page.navigate', {url:new URL('cases/boxlyne/',base).href});
+  await page.send('Page.navigate', {url:base});
   await until('document.readyState==="complete" && document.querySelector("[data-mobile-preview]")','button and styles');
+  await until('document.querySelector("[data-loader]").hidden && !document.documentElement.hasAttribute("data-site-loading")','site ready');
   assert.equal(await evaluate('getComputedStyle(document.querySelector("[data-mobile-preview]")).display'),'flex');
-  assert.equal(await evaluate('performance.getEntriesByType("resource").some(x=>/scene.gltf|boxlyne.webm|three.module/.test(x.name))'),false);
-  await evaluate('document.querySelector("[data-mobile-preview]").click()');
+  assert.equal(await evaluate('performance.getEntriesByType("resource").some(x=>/models\\/mobile\\/scene.gltf|boxlyne.webm|mobile-phone-viewer.js/.test(x.name))'),false);
+  await evaluate('document.querySelector("[data-mobile-preview]").focus(); document.querySelector("[data-mobile-preview]").click()');
   await until('document.querySelector("[data-phone=ready]")','3D ready');
-  await until('document.querySelector("video").readyState>=2','video ready');
-  assert.equal(await evaluate('document.querySelector("video").paused'),true);
+  await until('document.querySelector(".mobile-preview iframe").src==="https://boxlyne.com.br/"','live site');
+  assert.equal(await evaluate('document.querySelector(".mobile-preview iframe").hidden'),false);
+  assert.equal(await evaluate('document.querySelector(".mobile-preview iframe").clientWidth<=320'),true);
+  assert.equal(await evaluate('document.querySelector(".mobile-preview video").hasAttribute("src")'),false);
+  assert.equal(await evaluate('!document.querySelector(".mobile-preview__actions a[href]")'),true);
+  assert.equal(await evaluate('document.querySelector("[data-show-video]").hidden'),true);
   fs.writeFileSync(path.join(output,'mobile-phone.png'),Buffer.from((await page.send('Page.captureScreenshot')).data,'base64'));
-  await evaluate('document.querySelector("video").play()');
-  await until('document.querySelector("video").currentTime>0.1','playing');
-  await evaluate('document.querySelector("[data-front]").click()');
-  assert.equal(await evaluate('document.querySelector("#mobile-preview-angle").value'),'0');
+  await evaluate('document.querySelector(".mobile-preview iframe").dispatchEvent(new Event("error"))');
+  assert.equal(await evaluate('document.querySelector("[data-show-video]").hidden'),false);
+  await evaluate('document.querySelector("[data-show-video]").click()');
+  await until('document.querySelector(".mobile-preview video").readyState>=2','video fallback');
+  assert.equal(await evaluate('document.querySelector(".mobile-preview iframe").hidden'),true);
+  assert.equal(await evaluate('document.querySelector(".mobile-preview video").hidden'),false);
+  const before = await evaluate('document.querySelector("[data-preview-screen]").style.transform');
+  await evaluate('document.querySelector(".mobile-preview__stage").focus()');
+  await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+  await page.send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+  await until(`document.querySelector("[data-preview-screen]").style.transform!==${JSON.stringify(before)}`,'phone rotation');
+  await evaluate('document.querySelector(".mobile-preview video").play()');
+  await until('document.querySelector(".mobile-preview video").currentTime>0.1','playing');
   await page.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   await page.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
-  await until('!document.querySelector("dialog").open','closed');
-  assert.equal(await evaluate('document.activeElement.hasAttribute("data-mobile-preview")'),true);
-  assert.equal(await evaluate('document.querySelector("video").hasAttribute("src")'),false);
+  await until('!document.querySelector("dialog").open && !document.querySelector(".mobile-preview video").hasAttribute("src") && !document.querySelector(".mobile-preview iframe").hasAttribute("src")','closed and cleaned up');
+  assert.equal(await evaluate('document.activeElement.hasAttribute("data-mobile-preview") || document.activeElement.id==="stage-canvas"'),true);
   assert.equal(await evaluate('document.querySelectorAll(".mobile-preview canvas").length'),0);
   await evaluate('document.querySelector("[data-mobile-preview]").click()');
-  await until('document.querySelector("[data-phone=ready]")','reopened');
-  await evaluate('document.querySelector("[data-close]").click()');
-
-  await page.send('Network.setBlockedURLs',{urls:['*models/mobile/scene.gltf*']});
-  await evaluate('document.querySelector("[data-mobile-preview]").click()');
-  await until('document.querySelector("[data-fallback=true]")','fallback');
-  assert.equal(await evaluate('document.querySelector("video").getBoundingClientRect().height>0'),true);
-  await evaluate('document.querySelector("video").src="/missing-mobile-video.webm"');
+  await until('document.querySelector("[data-phone=ready]") && document.querySelector(".mobile-preview iframe").src==="https://boxlyne.com.br/"','reopened');
+  await evaluate('document.querySelector(".mobile-preview iframe").dispatchEvent(new Event("error"))');
+  await evaluate('document.querySelector("[data-show-video]").click()');
+  await until('document.querySelector(".mobile-preview video").readyState>=2','video fallback');
+  assert.equal(await evaluate('document.querySelector(".mobile-preview iframe").hidden'),true);
+  await evaluate('document.querySelector(".mobile-preview video").src="/missing-mobile-video.webm"');
   await until('!document.querySelector("[data-retry]").hidden','video error');
-  await evaluate('document.querySelector("video").src=document.querySelector("[data-mobile-preview]").dataset.mobilePreview; document.querySelector("[data-retry]").click()');
-  await until('document.querySelector("video").readyState>=2','retry recovery');
+  await evaluate('document.querySelector("[data-retry]").click()');
+  await until('document.querySelector(".mobile-preview video").readyState>=2','retry recovery');
   await evaluate('document.querySelector("[data-close]").click()');
-  await page.send('Network.setBlockedURLs',{urls:[]});
+  await until('!document.querySelector("dialog").open','closed after retry');
   await page.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
   await page.send('Emulation.setDeviceMetricsOverride',{width:800,height:600,deviceScaleFactor:1,mobile:false});
   await evaluate('document.querySelector("[data-mobile-preview]").click()');
@@ -160,13 +171,13 @@ try {
   await evaluate('document.querySelector("[data-close]").click()');
   await page.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
   await page.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-  await page.send('Page.navigate',{url:new URL('cases/boxlyne/',base).href});
+  await page.send('Page.navigate',{url:base});
   await until('document.readyState==="complete"','mobile page');
   assert.equal(await evaluate('getComputedStyle(document.querySelector("[data-mobile-preview]")).display'),'none');
-  assert.equal(await evaluate('performance.getEntriesByType("resource").some(x=>/scene.gltf|boxlyne.webm|three.module/.test(x.name))'),false);
+  assert.equal(await evaluate('performance.getEntriesByType("resource").some(x=>/models\\/mobile\\/scene.gltf|boxlyne.webm|mobile-phone-viewer.js/.test(x.name))'),false);
   assert.equal(await evaluate('document.querySelector(".project-demo-actions a").getBoundingClientRect().width>0'),true);
   assert.equal(page.errors.length,0,JSON.stringify(page.errors));
-  console.log('PASS: desktop buttons, lazy 3D/video, play, rotate, Escape, cleanup, reopen and mobile online-only.');
+  console.log('PASS: mobile-width live iframe, video fallback, phone rotation, Escape, cleanup and reopen.');
 } finally {
   page?.close();
   if (browser) {

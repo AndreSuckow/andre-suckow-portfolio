@@ -67,4 +67,4 @@ Cada etapa deve manter uma única fonte de conteúdo para os modos 2D e 3D. Não
 
 ## Demonstrações mobile dos projetos
 
-`profile.json` define `projects[].mobileVideo`. `customize.cjs` gera as ações das fichas; `public/mobile-preview.js` controla a modal e `public/mobile-phone-viewer.js` alinha o vídeo HTML ao modelo original em `public/models/mobile/`. As fichas carregam o Three.js local sob demanda, sem inicializar o quarto. `scripts/prepare-mobile-vendor.mjs` reproduz os módulos de vendor durante o build. `verify-mobile-preview.mjs` verifica a experiência no Chrome.
+`profile.json` define `projects[].demoUrl` e `projects[].mobileVideo`. `customize.cjs` gera as ações das fichas; `public/mobile-preview.js` carrega o site em um iframe interativo com viewport mobile e oferece a gravação apenas se o iframe emitir erro ou não carregar no tempo limite. `public/mobile-phone-viewer.js` alinha o conteúdo ao modelo em `public/models/mobile/`. O Three.js local só é carregado sob demanda, sem inicializar o quarto. `scripts/prepare-mobile-vendor.mjs` reproduz os módulos de vendor durante o build. `verify-mobile-preview.mjs` verifica a experiência no Chrome.
