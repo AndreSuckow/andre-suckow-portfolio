@@ -43,9 +43,9 @@ export async function createPhoneViewer(stage, screenElement, signal) {
     css.domElement.className = 'mobile-preview__screen-layer';
     const screenScene = new T.Scene(), screenGroup = new T.Group();
     const screen = new CSS3DObject(screenElement);
-    const width = size.x * 0.965, height = size.y * 0.94;
+    const width = size.x * 0.965, height = size.y * 0.94, viewportHeight = 300 * height / width;
     screenElement.style.width = '300px';
-    screenElement.style.height = `${300 * height / width}px`;
+    screenElement.style.height = `${viewportHeight}px`;
     screen.scale.setScalar(width / 300);
     screen.position.copy(position);
     screen.position.y -= size.y * 0.018;
@@ -67,12 +67,19 @@ export async function createPhoneViewer(stage, screenElement, signal) {
       renderer.render(scene, camera);
       css.render(screenScene, camera);
     };
-    let angle = -10, pointer = null, dragged = false;
+    let angle = -10, pointer = null, dragged = false, landscape = false;
     const rotate = degrees => {
       angle = Math.max(-35, Math.min(35, degrees));
-      phone.rotation.set(-0.015, angle * Math.PI / 180, 0);
+      phone.rotation.set(-0.015, angle * Math.PI / 180, landscape ? Math.PI / 2 : 0);
       screenGroup.rotation.copy(phone.rotation);
       render();
+    };
+    const setLandscape = value => {
+      landscape = Boolean(value);
+      screenElement.style.width = `${landscape ? viewportHeight : 300}px`;
+      screenElement.style.height = `${landscape ? 300 : viewportHeight}px`;
+      screen.rotation.z = landscape ? -Math.PI / 2 : 0;
+      rotate(angle);
     };
     observer = new ResizeObserver(render);
     observer.observe(stage);
@@ -106,6 +113,7 @@ export async function createPhoneViewer(stage, screenElement, signal) {
     rotate(-10);
     return {
       rotate,
+      setLandscape,
       hitTest,
       consumeDrag() { const moved = dragged; dragged = false; return moved; },
       dispose() {

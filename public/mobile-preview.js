@@ -82,6 +82,8 @@ function releasePreview() {
   dialog.querySelector('[data-project-url]').value = '';
   dialog.querySelector('[data-copy-feedback]').textContent = '';
   stage.removeAttribute('data-fallback');
+  stage.removeAttribute('data-landscape');
+  dialog.querySelector('[data-toggle-orientation]').setAttribute('aria-pressed', 'false');
   stage.setAttribute('aria-busy', 'true');
   dialog.removeAttribute('data-error');
   document.documentElement.style.overflow = overflow;
@@ -107,6 +109,7 @@ function createPreview() {
         <iframe title="Site do projeto no celular" referrerpolicy="strict-origin-when-cross-origin"></iframe>
       </div>
     </div>
+    <button class="mobile-preview__orientation" type="button" data-toggle-orientation aria-pressed="false">Visão horizontal</button>
     <section class="mobile-preview__fallback" data-mobile-fallback hidden role="alert" aria-labelledby="mobile-preview-fallback-title" aria-describedby="mobile-preview-fallback-description" tabindex="-1">
       <p class="eyebrow">Prévia indisponível</p>
       <h2 id="mobile-preview-fallback-title">Veja o projeto no celular</h2>
@@ -130,6 +133,18 @@ function createPreview() {
   screen = dialog.querySelector('[data-preview-screen]');
   stage = dialog.querySelector('.mobile-preview__stage');
   dialog.querySelector('[data-close]').addEventListener('click', () => dialog.close());
+  dialog.querySelector('[data-toggle-orientation]').addEventListener('click', (event) => {
+    const button = event.currentTarget;
+    const landscape = button.getAttribute('aria-pressed') !== 'true';
+    button.setAttribute('aria-pressed', String(landscape));
+    stage.dataset.landscape = String(landscape);
+    viewer?.setLandscape(landscape);
+    status(
+      landscape
+        ? 'Visão horizontal ativada. Clique novamente para voltar à visão vertical.'
+        : 'Visão vertical ativada.',
+    );
+  });
   dialog.querySelector('[data-copy-project]').addEventListener('click', copyProjectUrl);
   dialog.querySelector('[data-retry-site]').addEventListener('click', () =>
     requestSite(iframe.dataset.projectUrl),
@@ -185,6 +200,8 @@ document.addEventListener('click', async event => {
     const nextViewer = await createPhoneViewer(stage, screen, signal);
     if (signal.aborted) { nextViewer?.dispose(); return; }
     viewer = nextViewer;
+    if (dialog.querySelector('[data-toggle-orientation]').getAttribute('aria-pressed') === 'true')
+      viewer?.setLandscape(true);
   } catch {
     if (signal.aborted) return;
     stage.dataset.fallback = 'true';
