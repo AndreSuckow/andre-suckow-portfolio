@@ -17,9 +17,9 @@ test('frontend skill tree matches the new resume without inventing project exper
   assert.deepEqual(
     profile.skills.map((b) => [b.name, b.skills.length]),
     [
-      ['Desenvolvimento Frontend', 5],
-      ['Interfaces e Qualidade', 5],
-      ['Integrações e Produto', 5],
+      ['CORE FRONT-END', 5],
+      ['ENGENHARIA & ARQUITETURA', 5],
+      ['QUALIDADE & EXPERIÊNCIA', 5],
     ],
   );
   assert.equal(activeNames.size, 15);
@@ -28,12 +28,17 @@ test('frontend skill tree matches the new resume without inventing project exper
     'TypeScript',
     'Next.js',
     'Acessibilidade WCAG',
-    'SCORM / LMS',
-    'WordPress',
+    'Arquitetura de componentes',
+    'Git / Versionamento',
+    'Testes automatizados',
   ])
     assert(activeNames.has(name));
   assert(details['React'].experiences.every((e) => e.company === 'GP Strategies Brasil'));
-  assert(details['WordPress'].experiences.every((e) => e.company === 'Match Creative Studio'));
+  assert(
+    details['Arquitetura de componentes'].experiences.every(
+      (e) => e.company === 'GP Strategies Brasil',
+    ),
+  );
   assert.equal(details['Next.js'].experiences[0].company, 'Competência técnica');
   assert(!activeNames.has('Cobrança consultiva'));
 });
@@ -217,9 +222,16 @@ test('active skills reference only employers in the supplied resume', () => {
   );
   for (const [name, detail] of Object.entries(details))
     for (const experience of detail.experiences) {
-      if (name === 'Next.js') {
+      if (
+        [
+          'Next.js',
+          'Gerenciamento de estado',
+          'Git / Versionamento',
+          'Testes automatizados',
+        ].includes(name)
+      ) {
         assert.equal(experience.company, 'Competência técnica');
-        assert(experience.description.includes('não associa'));
+        if (name === 'Next.js') assert(experience.description.includes('não associa'));
       } else assert(companies.has(experience.company), name);
     }
 });

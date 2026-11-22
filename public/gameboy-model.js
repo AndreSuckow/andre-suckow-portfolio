@@ -67,7 +67,7 @@ export function createGameBoyModel(T) {
     box('Speaker slit', 0.026 + i * 0.008, -0.079 + i * 0.002, 0.016, 0.003, 0.026, 0.003, edge);
   box('Red cartridge', 0, 0.109, -0.003, 0.062, 0.034, 0.012, berry);
   box('Cartridge label', 0, 0.11, 0.004, 0.044, 0.018, 0.002, shell);
-  root.scale.setScalar(0.85);
+  root.scale.setScalar(0.72);
   root.rotation.set(-Math.PI / 2, 0, -0.22);
   root.position.set(0.48, 0.523, -0.82);
   return {

@@ -149,5 +149,65 @@
         "logo": "/img/marqhr-logo.svg"
       }
     ]
+  },
+  "Arquitetura de componentes": {
+    "definition": "Criação de componentes reutilizáveis e padronização de interfaces.",
+    "experiences": [
+      {
+        "company": "GP Strategies Brasil",
+        "period": "Fev 2021 – Mar 2025",
+        "description": "Participei da migração do time para React e criei componentes reutilizáveis que padronizaram a interface e reduziram retrabalho."
+      }
+    ]
+  },
+  "Design Systems": {
+    "definition": "Padronização visual e componentes reutilizáveis em aplicações React.",
+    "experiences": [
+      {
+        "company": "GP Strategies Brasil",
+        "period": "Fev 2021 – Mar 2025",
+        "description": "Criei componentes reutilizáveis que padronizaram a interface em aplicações educacionais desenvolvidas em React."
+      }
+    ]
+  },
+  "Gerenciamento de estado": {
+    "definition": "Organização de estado em interfaces React.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Currículo frontend",
+        "description": "Zustand e React Hook Form constam nas ferramentas do currículo como tecnologias de estado e formulários."
+      }
+    ]
+  },
+  "Integração com APIs": {
+    "definition": "Integração de interfaces com APIs REST.",
+    "experiences": [
+      {
+        "company": "GP Strategies Brasil",
+        "period": "Fev 2021 – Mar 2025",
+        "description": "Integrei aplicações a APIs REST para rastrear progresso, conclusão e interações dos usuários."
+      }
+    ]
+  },
+  "Git / Versionamento": {
+    "definition": "Versionamento e colaboração com Git e GitHub.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Currículo frontend",
+        "description": "Git e GitHub constam nas ferramentas técnicas do currículo frontend."
+      }
+    ]
+  },
+  "Testes automatizados": {
+    "definition": "Validação de interfaces e comportamento por testes.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Currículo frontend",
+        "description": "Testes unitários constam nas ferramentas de qualidade do currículo frontend."
+      }
+    ]
   }
 }
