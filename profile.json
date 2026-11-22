@@ -171,7 +171,7 @@
   "skills": [
     {
       "id": "frontend",
-      "name": "CORE FRONT-END",
+      "name": "Desenvolvimento Front-end",
       "color": 5,
       "skills": [
         {
@@ -191,54 +191,54 @@
           "note": "Aplicações interativas e evolução de HTML/CSS/JS para React."
         },
         {
-          "name": "HTML5 e CSS3",
+          "name": "HTML5 & CSS3",
           "note": "HTML semântico, interfaces responsivas e acessíveis."
         }
       ]
     },
     {
-      "id": "quality",
-      "name": "ENGENHARIA & ARQUITETURA",
+      "id": "ui",
+      "name": "UI & Experiências",
       "color": 9,
+      "skills": [
+        {
+          "name": "Tailwind CSS",
+          "note": "Tecnologia de estilização listada nas ferramentas frontend."
+        },
+        {
+          "name": "shadcn/ui",
+          "note": "Biblioteca de componentes listada nas ferramentas frontend."
+        },
+        {
+          "name": "GSAP",
+          "note": "Biblioteca de animação listada nas ferramentas frontend."
+        },
+        {
+          "name": "Three.js",
+          "note": "Utilizado nas caixas interativas em 3D do projeto BoxLyne."
+        },
+        {
+          "name": "Design responsivo",
+          "note": "Experiência consistente entre dispositivos."
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "name": "Engenharia & Qualidade",
+      "color": 15,
       "skills": [
         {
           "name": "Arquitetura de componentes",
           "note": "Criação de componentes reutilizáveis e padronização de interfaces."
         },
         {
-          "name": "Design Systems",
-          "note": "Padronização visual e componentes reutilizáveis em aplicações React."
+          "name": "Integração com APIs REST",
+          "note": "Integração de aplicações e acompanhamento de interações."
         },
         {
-          "name": "Gerenciamento de estado",
-          "note": "Organização de estado em interfaces React."
-        },
-        {
-          "name": "Integração com APIs",
-          "note": "Integração de interfaces com APIs REST."
-        },
-        {
-          "name": "Git / Versionamento",
-          "note": "Versionamento e colaboração com Git e GitHub."
-        }
-      ]
-    },
-    {
-      "id": "integration",
-      "name": "QUALIDADE & EXPERIÊNCIA",
-      "color": 15,
-      "skills": [
-        {
-          "name": "Acessibilidade WCAG",
+          "name": "Acessibilidade (WCAG)",
           "note": "Teclado, foco visível, contraste e HTML semântico."
-        },
-        {
-          "name": "Design responsivo",
-          "note": "Experiência consistente entre dispositivos."
-        },
-        {
-          "name": "Testes automatizados",
-          "note": "Validação de interfaces e comportamento por testes."
         },
         {
           "name": "Performance web",

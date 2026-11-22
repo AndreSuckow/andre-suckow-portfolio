@@ -29,7 +29,7 @@
       }
     ]
   },
-  "HTML5 e CSS3": {
+  "HTML5 & CSS3": {
     "definition": "HTML semântico, interfaces responsivas e acessíveis.",
     "experiences": [
       {
@@ -49,7 +49,7 @@
       }
     ]
   },
-  "Acessibilidade WCAG": {
+  "Acessibilidade (WCAG)": {
     "definition": "Teclado, foco visível, contraste e HTML semântico.",
     "experiences": [
       {
@@ -180,7 +180,7 @@
       }
     ]
   },
-  "Integração com APIs": {
+  "Integração com APIs REST": {
     "definition": "Integração de interfaces com APIs REST.",
     "experiences": [
       {
@@ -207,6 +207,46 @@
         "company": "Competência técnica",
         "period": "Currículo frontend",
         "description": "Testes unitários constam nas ferramentas de qualidade do currículo frontend."
+      }
+    ]
+  },
+  "Tailwind CSS": {
+    "definition": "Tecnologia de estilização listada nas ferramentas frontend.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Currículo frontend",
+        "description": "Tailwind CSS consta nas ferramentas de UI e estilização do currículo."
+      }
+    ]
+  },
+  "shadcn/ui": {
+    "definition": "Biblioteca de componentes listada nas ferramentas frontend.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Currículo frontend",
+        "description": "shadcn/ui consta nas ferramentas de UI e estilização do currículo."
+      }
+    ]
+  },
+  "GSAP": {
+    "definition": "Biblioteca de animação listada nas ferramentas frontend.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Currículo frontend",
+        "description": "GSAP consta nas ferramentas de UI e estilização do currículo."
+      }
+    ]
+  },
+  "Three.js": {
+    "definition": "Biblioteca 3D utilizada nas caixas interativas do projeto BoxLyne.",
+    "experiences": [
+      {
+        "company": "Competência técnica",
+        "period": "Projeto BoxLyne",
+        "description": "Three.js integra o stack do site BoxLyne, que apresenta caixas interativas em 3D."
       }
     ]
   }

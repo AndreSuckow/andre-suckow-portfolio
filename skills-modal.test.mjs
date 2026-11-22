@@ -15,11 +15,23 @@ const details = Object.fromEntries(
 );
 test('frontend skill tree matches the new resume without inventing project experience', () => {
   assert.deepEqual(
-    profile.skills.map((b) => [b.name, b.skills.length]),
+    profile.skills.map((b) => [b.name, b.skills.map((skill) => skill.name)]),
     [
-      ['CORE FRONT-END', 5],
-      ['ENGENHARIA & ARQUITETURA', 5],
-      ['QUALIDADE & EXPERIÊNCIA', 5],
+      [
+        'Desenvolvimento Front-end',
+        ['React', 'Next.js', 'TypeScript', 'JavaScript (ES6+)', 'HTML5 & CSS3'],
+      ],
+      ['UI & Experiências', ['Tailwind CSS', 'shadcn/ui', 'GSAP', 'Three.js', 'Design responsivo']],
+      [
+        'Engenharia & Qualidade',
+        [
+          'Arquitetura de componentes',
+          'Integração com APIs REST',
+          'Acessibilidade (WCAG)',
+          'Performance web',
+          'SEO técnico',
+        ],
+      ],
     ],
   );
   assert.equal(activeNames.size, 15);
@@ -27,10 +39,12 @@ test('frontend skill tree matches the new resume without inventing project exper
     'React',
     'TypeScript',
     'Next.js',
-    'Acessibilidade WCAG',
+    'Acessibilidade (WCAG)',
     'Arquitetura de componentes',
-    'Git / Versionamento',
-    'Testes automatizados',
+    'Tailwind CSS',
+    'shadcn/ui',
+    'GSAP',
+    'Three.js',
   ])
     assert(activeNames.has(name));
   assert(details['React'].experiences.every((e) => e.company === 'GP Strategies Brasil'));
@@ -222,14 +236,7 @@ test('active skills reference only employers in the supplied resume', () => {
   );
   for (const [name, detail] of Object.entries(details))
     for (const experience of detail.experiences) {
-      if (
-        [
-          'Next.js',
-          'Gerenciamento de estado',
-          'Git / Versionamento',
-          'Testes automatizados',
-        ].includes(name)
-      ) {
+      if (['Next.js', 'Tailwind CSS', 'shadcn/ui', 'GSAP', 'Three.js'].includes(name)) {
         assert.equal(experience.company, 'Competência técnica');
         if (name === 'Next.js') assert(experience.description.includes('não associa'));
       } else assert(companies.has(experience.company), name);
