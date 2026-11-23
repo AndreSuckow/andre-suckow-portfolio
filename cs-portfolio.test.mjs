@@ -76,6 +76,14 @@ test('project cartridges offer delivery details and only the links supplied for 
   }
 });
 
+test('Sinergia project points to its 5.0 demo and repository', () => {
+  const profile = JSON.parse(fs.readFileSync('profile.json', 'utf8'));
+  const project = profile.projects.find((entry) => entry.slug === 'sinergia-movel');
+  assert(project);
+  assert.equal(project.demoUrl, 'https://andresuckow.github.io/sinergia-onepage-b2b-5.0/');
+  assert.equal(project.repoUrl, 'https://github.com/AndreSuckow/sinergia-onepage-b2b-5.0');
+});
+
 test('every project with an online demo gets its own mobile iframe preview by default', async () => {
   const { default: generator } = await import('./cs-portfolio.cjs');
   const profile = JSON.parse(fs.readFileSync('profile.json', 'utf8')),

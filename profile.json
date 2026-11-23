@@ -395,8 +395,8 @@
         "fit": "cover",
         "alt": "B2B para Todos em destaque"
       },
-      "demoUrl": "https://andresuckow.github.io/sinergia_onepage_b2b_para_todos_movel_v4.5/",
-      "repoUrl": "https://github.com/AndreSuckow/sinergia_onepage_b2b_para_todos_movel_v4.5",
+      "demoUrl": "https://andresuckow.github.io/sinergia-onepage-b2b-5.0/",
+      "repoUrl": "https://github.com/AndreSuckow/sinergia-onepage-b2b-5.0",
       "caseHeading": "Aprendizagem em uma jornada visual",
       "caseStory": "Desenvolvimento de uma experiência de aprendizagem em página única sobre a jornada do cliente B2B e as soluções móveis. O conteúdo combina vídeos do Vimeo, navegação por seções, janelas de detalhes e elementos interativos. HTML, CSS e JavaScript estruturam a interface, com efeitos de parallax que criam profundidade durante a rolagem. O projeto inclui um pacote SCORM 1.2 e rotinas de comunicação com LMS para status e pontuação. A demonstração no GitHub Pages permite explorar o material fora de uma plataforma de aprendizagem."
     },
